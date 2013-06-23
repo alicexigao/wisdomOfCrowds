@@ -1,8 +1,9 @@
 <template name="chatRoom">
-    <ul>
-    {{#each messages}}
-        <li>{{author}} [{{timestampFormat}}] : {{content}}</li>
-    {{/each}}
+    <h3>Chat Room</h3>
+    <ul class="well" id="messageArea">
+        {{#each messages}}
+            <li>{{author}} [{{timestampFormat}}] : {{content}}</li>
+        {{/each}}
     </ul>
     <form class="form-inline">
         <input type="text" id="msgContent" class="input-xxlarge">

@@ -1,0 +1,6 @@
+ul#messageArea {
+    height: 200px;
+    overflow: auto;
+    list-style: none;
+}
+
