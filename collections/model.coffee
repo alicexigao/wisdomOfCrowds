@@ -1,0 +1,1 @@
+this.ChatMessages = new Meteor.Collection('chatMessages')
