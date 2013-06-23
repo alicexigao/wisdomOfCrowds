@@ -6,10 +6,15 @@ Template.chatRoom.events =
     ev.preventDefault()
 
     msgContent = $("input#msgContent")
+
     if msgContent.val()
       ChatMessages.insert
         author: "Alice Gao"
+        timestamp: (new Date()).toUTCString()
         content: msgContent.val()
 
     msgContent.val ""
     msgContent.focus()
+
+Template.chatRoom.timestampFormat = ->
+  (new Date(this.timestamp)).toLocaleTimeString()

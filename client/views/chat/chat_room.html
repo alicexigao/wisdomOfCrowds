@@ -1,7 +1,7 @@
 <template name="chatRoom">
     <ul>
     {{#each messages}}
-        <li>{{author}} : {{content}}</li>
+        <li>{{author}} [{{timestampFormat}}] : {{content}}</li>
     {{/each}}
     </ul>
     <form class="form-inline">
