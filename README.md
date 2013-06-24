@@ -1,2 +1,2 @@
-wisdomOfCrowds
+Wisdom of Crowds
 ==============
