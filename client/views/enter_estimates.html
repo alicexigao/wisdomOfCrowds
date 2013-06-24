@@ -1,0 +1,26 @@
+<template name="enterEstimates">
+    <h4>Question: What is the population of Massachusetts in 1995?</h4>
+    <form class="form-inline">
+        <label class="control-label" for="inputEstimate">Enter Your Answer:</label>
+        <input type="text" id="inputEstimate" class="input-small" placeholder="" {{isDisabled}}>%
+        <button type="button" id="updateEstimate" class="btn btn-primary {{isDisabled}}" {{isDisabled}}>Update</button>
+        {{#if hasAnswer}}
+            <button type="button" id="finalizeEstimate" class="btn btn-primary {{isDisabled}}" {{isDisabled}}>Finalize</button>
+        {{/if}}
+    </form>
+
+    <div>
+        <span class="lead">Answers:</span>
+        <span class="label label-info lead" id="myEstimate"></span>
+        <ul class="row">
+            <li class="span1"></li>
+            {{#each usernames}}
+                <li class="answer badge badge-warning">
+                <p>{{getAnswer username}}</p>
+                <p>{{username}}</p>
+                </li>
+            {{/each}}
+        </ul>
+
+    </div>
+</template>
