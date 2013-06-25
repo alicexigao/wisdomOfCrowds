@@ -4,7 +4,8 @@
     "basePackages": {
       "router": {},
       "accounts-ui-bootstrap-dropdown": {},
-      "user-status": {}
+      "user-status": {},
+      "bootboxjs": {}
     },
     "packages": {
       "router": {
@@ -21,6 +22,11 @@
         "git": "https://github.com/mizzao/meteor-user-status.git",
         "tag": "v0.1.2",
         "commit": "8ef35ba38a3d301031e39a7ab82a1c1015df8bfc"
+      },
+      "bootboxjs": {
+        "git": "https://github.com/TimHeckel/meteor-bootboxjs.git",
+        "tag": "v0.1.1",
+        "commit": "6c46c71a5632eb49b20cd679a5008b7dc9ac39af"
       },
       "page-js-ie-support": {
         "git": "https://github.com/tmeasday/meteor-page-js-ie-support.git",

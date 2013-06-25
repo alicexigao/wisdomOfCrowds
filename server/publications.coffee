@@ -4,12 +4,13 @@ Meteor.publish "chatMessages", ->
 Meteor.publish "answers", ->
   Answers.find()
 
-Meteor.publish "usernames", ->
-  Meteor.users.find {'profile.online': true},
-    fields:
-      username: 1
+Meteor.publish "rounds", ->
+  Rounds.find()
 
-getOnlineUsers = ->
+Meteor.publish "currentRound", ->
+  CurrentRound.find()
+
+Meteor.publish "usernames", ->
   Meteor.users.find {'profile.online': true},
     fields:
       username: 1

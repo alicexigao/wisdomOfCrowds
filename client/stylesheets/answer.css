@@ -1,4 +1,8 @@
 li.answer {
-    padding: 4px;
-    font-size: 130%;
+    padding: 10px;
+    font-size: 150%;
+}
+
+p {
+    text-align: center;
 }

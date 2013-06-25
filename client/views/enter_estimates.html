@@ -1,26 +1,45 @@
 <template name="enterEstimates">
-    <h4>Question: What is the population of Massachusetts in 1995?</h4>
+    <h3>Question {{getRoundIndex}} of {{numRounds}}: {{getQuestion}}</h3>
     <form class="form-inline">
-        <label class="control-label" for="inputEstimate">Enter Your Answer:</label>
-        <input type="text" id="inputEstimate" class="input-small" placeholder="" {{isDisabled}}>%
-        <button type="button" id="updateEstimate" class="btn btn-primary {{isDisabled}}" {{isDisabled}}>Update</button>
-        {{#if hasAnswer}}
-            <button type="button" id="finalizeEstimate" class="btn btn-primary {{isDisabled}}" {{isDisabled}}>Finalize</button>
+        <span class="lead" for="inputEstimate">Your Answer:</span>
+        <input type="text" id="inputEstimate" class="input-small" placeholder="" {{isDisabled}}><span class="lead">%</span>
+        {{#unless allAnswersFinalized}}
+            <button type="button" id="updateEstimate" class="btn btn-primary {{isDisabled}}" {{isDisabled}}>Update</button>
+            {{#if hasAnswer}}
+                <button type="button" id="finalizeEstimate" class="btn btn-danger {{isDisabled}}" {{isDisabled}}>Finalize</button>
+            {{/if}}
+        {{/unless}}
+
+        {{#if allAnswersFinalized}}
+            <button type="button" id="nextQuestion" class="btn btn-danger">Go To Next Question</button>
         {{/if}}
     </form>
 
     <div>
-        <span class="lead">Answers:</span>
-        <span class="label label-info lead" id="myEstimate"></span>
+        <!--<label class="control-label lead">-->
+            <!--Answers:-->
+        <!--</label>-->
         <ul class="row">
             <li class="span1"></li>
-            {{#each usernames}}
+
+            {{#if allAnswersFinalized}}
+                <li class="answer badge badge-success">
+                    <p>{{correctAnswer}}</p>
+                    <p>answer</p>
+                </li>
+                <li class="answer badge badge-success">
+                    <p>{{getAverage}}</p>
+                    <p>average</p>
+                </li>
+            {{/if}}
+
+            {{#each users}}
                 <li class="answer badge badge-warning">
-                <p>{{getAnswer username}}</p>
-                <p>{{username}}</p>
+                    <p>{{getAnswer _id}}</p>
+                    <p>{{username}}</p>
                 </li>
             {{/each}}
         </ul>
-
     </div>
+
 </template>

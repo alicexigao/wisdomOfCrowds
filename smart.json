@@ -2,6 +2,7 @@
   "packages": {
     "router": {},
     "accounts-ui-bootstrap-dropdown": {},
-    "user-status": {}
+    "user-status": {},
+    "bootboxjs": {}
   }
 }

@@ -2,6 +2,10 @@ this.ChatMessages = new Meteor.Collection('chatMessages')
 
 this.Answers = new Meteor.Collection('answers')
 
+this.Rounds = new Meteor.Collection('rounds')
+
+this.CurrentRound = new Meteor.Collection("currentRound")
+
 Meteor.methods
   sendMsg: (data) ->
     user = Meteor.user()
@@ -19,23 +23,34 @@ Meteor.methods
     if (!user)
       throw new Meteor.Error(401, "You need to login.")
 
-    if Answers.find({username: user.username}).count() > 0
+    cur = Answers.find({userId: user._id})
 
-      ansRecord = Answers.findOne({username: user.username})
-      if ansRecord.finalized is true
+    if cur.count() > 0
+      # already has answer for current user
+
+      if cur.fetch()[0].status is "finalized"
+        # error if answer has been finalized
         throw new Meteor.Error(100, "Answer has been finalized")
 
-      answerDataId = Answers.update {username: user.username},
+      # update current answer
+      answerDataId = Answers.update {userId: user._id},
         $set: {answer: data.answer}
-        $set: {submitted: true}
-      answerDataId = Answers.update {username: user.username},
-        $set: {finalized: data.finalized}
+        $set: {status: data.status}
+
     else
+      # insert new answer
       answerData =
-        answer: data.answer
         userId: user._id
-        username: user.username
-        submitted: true
-        finalized: data.finalized
+        answer: data.answer
+        status: data.status
       answerDataId = Answers.insert answerData
     answerDataId
+
+  saveAnswers: (data) ->
+    roundNum = CurrentRound.findOne().index
+    ansArray = Answers.find().fetch()
+    Rounds.update({index: roundNum}, {$set: {answers: ansArray}})
+    Answers.remove({})
+
+  incrRoundNum: (data) ->
+    CurrentRound.update({}, {$inc: {index: 1}})
