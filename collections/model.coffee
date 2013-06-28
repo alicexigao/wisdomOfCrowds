@@ -6,6 +6,8 @@ this.Rounds = new Meteor.Collection('rounds')
 
 this.CurrentRound = new Meteor.Collection("currentRound")
 
+this.Treatment = new Meteor.Collection('treatment')
+
 Meteor.methods
   sendMsg: (data) ->
     user = Meteor.user()
@@ -38,7 +40,8 @@ Meteor.methods
         $set: {status: data.status}
 
     else
-      # insert new answer
+
+    # insert new answer
       answerData =
         userId: user._id
         answer: data.answer
@@ -46,11 +49,24 @@ Meteor.methods
       answerDataId = Answers.insert answerData
     answerDataId
 
+
+
   saveAnswers: (data) ->
     roundNum = CurrentRound.findOne().index
     ansArray = Answers.find().fetch()
-    Rounds.update({index: roundNum}, {$set: {answers: ansArray}})
-    Answers.remove({})
+    ansObj = {}
+    for ansRecord in ansArray
+      userId = ansRecord.userId
+      ansObj[userId] = {}
+      ansObj[userId].answer = ansRecord.answer
+    Rounds.update {index: roundNum},
+      $set: {answers: ansObj}
 
-  incrRoundNum: (data) ->
+  completeQuestion: (data) ->
+    roundNum = CurrentRound.findOne().index
+    Rounds.update {index: roundNum},
+      $set: {status: "completed"}
+
+  goToNextQuestion: (data) ->
+    Answers.remove({})
     CurrentRound.update({}, {$inc: {index: 1}})

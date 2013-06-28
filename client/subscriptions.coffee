@@ -1,3 +1,5 @@
+Meteor.subscribe "treatment"
+
 Meteor.subscribe "chatMessages"
 
 Meteor.subscribe "answers"

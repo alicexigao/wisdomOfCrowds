@@ -1,5 +1,5 @@
 <template name="enterEstimates">
-    <h3>Question {{getRoundIndex}} of {{numRounds}}: {{getQuestion}}</h3>
+    <h3>Question {{getRoundIndexDisplay}} of {{numRounds}}: {{getQuestion}}</h3>
     <form class="form-inline">
         <span class="lead" for="inputEstimate">Your Answer:</span>
         <input type="text" id="inputEstimate" class="input-small" placeholder="" {{isDisabled}}><span class="lead">%</span>
@@ -25,17 +25,23 @@
             {{#if allAnswersFinalized}}
                 <li class="answer badge badge-success">
                     <p>{{correctAnswer}}</p>
-                    <p>answer</p>
+                    <p>correct answer</p>
                 </li>
-                <li class="answer badge badge-success">
-                    <p>{{getAverage}}</p>
-                    <p>average</p>
-                </li>
+                <!--<li class="answer badge badge-success">-->
+                    <!--<p>{{getAverage}}</p>-->
+                    <!--<p>average</p>-->
+                <!--</li>-->
             {{/if}}
 
             {{#each users}}
                 <li class="answer badge badge-warning">
+                    {{#if allAnswersFinalized}}
+                        {{#if isBestAnswer _id}}
+                            <p>Winner</p>
+                        {{/if}}
+                    {{/if}}
                     <p>{{getAnswer _id}}</p>
+                    <!--<p>{{getStatus _id}}</p>-->
                     <p>{{username}}</p>
                 </li>
             {{/each}}

@@ -1,0 +1,21 @@
+<template name="history">
+
+    <table class="table table-striped">
+        <caption>Results</caption>
+        <tr>
+            <th>Question</th>
+            <th>Your Answer</th>
+            <th>Correct Answer</th>
+            <th>Your Bonus</th>
+        </tr>
+        {{#each rounds}}
+           <tr>
+               <td>{{getIndex}}</td>
+               <td>{{getMyAnswer}}</td>
+               <td>{{getCorrectAnswer}}</td>
+               <td></td>
+           </tr>
+        {{/each}}
+    </table>
+
+</template>

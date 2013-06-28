@@ -1,0 +1,33 @@
+<template name="task">
+
+    <div class="row">
+
+        {{#if isTaskCompleted}}
+            <div class="span8">
+                {{> taskCompleted}}
+            </div>
+        {{else}}
+            <div class="span8">
+                <div>
+                    {{> enterEstimates}}
+                </div>
+                <div>
+                    {{> chatRoom}}
+                </div>
+            </div>
+        {{/if}}
+
+        <div class="span4">
+            <div>
+                {{> history}}
+            </div>
+        </div>
+
+    </div>
+
+</template>
+
+<template name="taskCompleted">
+    <h3>Thank you for playing!</h3>
+    <button type="button" id="goToExitSurvey" class="btn btn-success">Go To Exit Survey</button>
+</template>

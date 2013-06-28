@@ -1,3 +1,6 @@
 Meteor.Router.add({
-    '/': 'homepage'
+    '/'     : 'homepage',
+    '/quiz' : 'quiz',
+    '/task' : 'task',
+    '/exitsurvey' : "exitsurvey"
 })
