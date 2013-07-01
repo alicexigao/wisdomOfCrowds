@@ -8,6 +8,8 @@ this.CurrentRound = new Meteor.Collection("currentRound")
 
 this.Treatment = new Meteor.Collection('treatment')
 
+this.TimeLeft = new Meteor.Collection("timeleft")
+
 Meteor.methods
   sendMsg: (data) ->
     user = Meteor.user()
@@ -49,7 +51,16 @@ Meteor.methods
       answerDataId = Answers.insert answerData
     answerDataId
 
-
+  countdown: (data) ->
+    currTime = new Date()
+    obj = TimeLeft.findOne()
+    if obj
+      endTime = new Date(obj.endTime)
+      if currTime < endTime
+        numSeconds = (endTime.getTime() - currTime.getTime()) / 1000
+        numSeconds = Math.floor(numSeconds)
+        TimeLeft.update {},
+          $set: {secondsLeft: numSeconds}
 
   saveAnswers: (data) ->
     roundNum = CurrentRound.findOne().index
@@ -70,3 +81,11 @@ Meteor.methods
   goToNextQuestion: (data) ->
     Answers.remove({})
     CurrentRound.update({}, {$inc: {index: 1}})
+
+    time = new Date()
+    endTime = time.getTime() + 1000 * 120
+    time.setTime(endTime)
+    TimeLeft.update {},
+      $set: {endTime: time}
+    TimeLeft.update {},
+      $set: {secondsLeft: 120}

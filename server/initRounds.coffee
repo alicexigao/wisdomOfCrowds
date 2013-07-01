@@ -24,9 +24,29 @@ Meteor.startup ->
       answers: {}
       status: "inprogress"
 
+  Answers.remove({})
+
+# Current Round
   CurrentRound.remove({})
   if CurrentRound.find().count() is 0
     CurrentRound.insert index : 0
   else
     CurrentRound.update {},
       $set: {index: 0}
+
+# Time Left
+  TimeLeft.remove({})
+  time = new Date()
+  endTime = time.getTime() + 1000 * 120
+  time.setTime(endTime)
+
+  if TimeLeft.find().count() is 0
+    TimeLeft.insert
+      endTime: time
+      secondsLeft: 120
+  else
+    TimeLeft.update {},
+      $set: {endTime: time}
+    TimeLeft.update {},
+      $set: {secondsLeft: 120}
+

@@ -9,3 +9,5 @@ Meteor.subscribe "rounds"
 Meteor.subscribe "currentRound"
 
 Meteor.subscribe "usernames"
+
+Meteor.subscribe "timeleft"

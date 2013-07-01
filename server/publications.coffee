@@ -18,3 +18,6 @@ Meteor.publish "usernames", ->
   Meteor.users.find {'profile.online': true},
     fields:
       username: 1
+
+Meteor.publish "timeleft", ->
+  TimeLeft.find()

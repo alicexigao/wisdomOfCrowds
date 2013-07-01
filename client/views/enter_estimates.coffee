@@ -30,7 +30,6 @@ Template.enterEstimates.events =
         return bootbox.alert error.reason
 
     if Template.enterEstimates.allAnswersFinalized()
-      console.log "all answers finalized"
       Meteor.call 'completeQuestion', {}, (error, id) ->
         if error
           return bootbox.alert error.reason
@@ -60,6 +59,7 @@ Template.enterEstimates.getAnswer = (uid) ->
     return ans.answer
   else
     return "pending"
+
 
 # Get the status if it's available, otherwise return pending
 Template.enterEstimates.getStatus = (uid) ->
@@ -156,3 +156,4 @@ Template.enterEstimates.userIdForBestAnswer = ->
         bestId = ans.userId
         bestAnswer = ans.answer
     return bestId
+

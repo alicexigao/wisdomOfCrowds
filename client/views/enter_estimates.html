@@ -1,5 +1,6 @@
 <template name="enterEstimates">
     <h3>Question {{getRoundIndexDisplay}} of {{numRounds}}: {{getQuestion}}</h3>
+    {{> timer}}
     <form class="form-inline">
         <span class="lead" for="inputEstimate">Your Answer:</span>
         <input type="text" id="inputEstimate" class="input-small" placeholder="" {{isDisabled}}><span class="lead">%</span>
@@ -11,7 +12,7 @@
         {{/unless}}
 
         {{#if allAnswersFinalized}}
-            <button type="button" id="nextQuestion" class="btn btn-danger">Go To Next Question</button>
+            <button type="button" id="nextQuestion" class="btn btn-danger">Take me to the next question!</button>
         {{/if}}
     </form>
 
@@ -19,7 +20,7 @@
         <!--<label class="control-label lead">-->
             <!--Answers:-->
         <!--</label>-->
-        <ul class="row">
+        <ul class="row" id="answerList">
             <li class="span1"></li>
 
             {{#if allAnswersFinalized}}
@@ -39,9 +40,10 @@
                         {{#if isBestAnswer _id}}
                             <p>Winner</p>
                         {{/if}}
+                        <p>{{getAnswer _id}}</p>
+                    {{else}}
+                        <p>{{getStatus _id}}</p>
                     {{/if}}
-                    <p>{{getAnswer _id}}</p>
-                    <!--<p>{{getStatus _id}}</p>-->
                     <p>{{username}}</p>
                 </li>
             {{/each}}
