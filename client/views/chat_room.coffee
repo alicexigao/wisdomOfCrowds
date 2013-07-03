@@ -29,3 +29,8 @@ Template.chatRoom.timestampFormat = ->
 Template.chatRoom.rendered = ->
   #    scroll to bottom
   $('ul#messageArea').scrollTop($('ul#messageArea').prop("scrollHeight"))
+
+Template.chatRoom.displayChatRoom = ->
+  obj = Treatment.findOne()
+  if obj
+    return obj.displayChatRoom

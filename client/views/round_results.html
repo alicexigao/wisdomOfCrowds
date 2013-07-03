@@ -1,0 +1,57 @@
+<template name="roundResults">
+
+    {{#if allAnswersFinalized}}
+        <li class="answer badge badge-success">
+            <p>{{correctAnswer}}%</p>
+            <p>correct answer</p>
+        </li>
+        {{#if displayAverage}}
+            <li class="answer badge badge-success">
+                <p>{{getAverage}}%</p>
+                <p>average</p>
+            </li>
+        {{/if}}
+    {{/if}}
+
+    {{#each users}}
+
+        {{#if isCurrentUser _id}}
+            {{#if answerFinalized _id}}
+                <li class="answer badge badge-important">
+            {{else}}
+                <li class="answer badge not-finalized-curr">
+            {{/if}}
+        {{else}}
+            {{#if answerFinalized _id}}
+                <li class="answer badge badge-warning">
+            {{else}}
+                <li class="answer badge not-finalized">
+            {{/if}}
+        {{/if}}
+
+            {{#if allAnswersFinalized}}
+
+                {{#if displayWinner}}
+                    {{#if isBestAnswer _id}}
+                        <p>Winner</p>
+                    {{/if}}
+                {{/if}}
+                <p>{{getAnswer _id}}%</p>
+
+            {{else}}
+
+                {{#if displayAnswer _id}}
+                    <p>
+                        {{getAnswer _id}}{{#if hasAnswer _id}}%{{/if}}
+                    </p>
+                {{else}}
+                    <p>{{getStatus _id}}</p>
+                {{/if}}
+
+            {{/if}}
+            <p>{{username}}</p>
+
+        </li>
+
+    {{/each}}
+</template>

@@ -11,8 +11,8 @@
         {{#each rounds}}
            <tr>
                <td>{{getIndex}}</td>
-               <td>{{getMyAnswer}}</td>
-               <td>{{getCorrectAnswer}}</td>
+               <td>{{getMyAnswer}}{{displayPercentageSign this}}</td>
+               <td>{{getCorrectAnswer}}{{displayPercentageSign this}}</td>
                <td></td>
            </tr>
         {{/each}}

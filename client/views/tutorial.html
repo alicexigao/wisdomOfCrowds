@@ -1,24 +1,30 @@
 <template name="tutorial">
-    <h3>Tutorial</h3>
+    <div class="container">
+        <h3>Tutorial</h3>
 
-    <p>
-        In this task, you will be matched with other MTurk workers to play a game, which involves answering a series of factual questions.
+        <p>
+        For this task, you will first be matched with other MTurk workers to play a multi-player real-time game.
+
+        In this game, your group of MTurk workers will answer a series of factual questions.
 
         The game has the following rules:
         <ul>
-            <li>You cannot communicate with the other players in the game.</li>
-            <li>During the game, you can only observe whether the other players have submitted or finalized their answers.</li>
-            <li>You cannot see the other players' answers until the end of the game.</li>
-            <li></li>
-        </ul>
-        <ul>
-            <li>You can communicate with the other players in the game using the chatroom provided.</li>
-            <li>During the game, you can see another player's answer as soon as he/she submits or revises it.</li>
-        </ul>
+            <li>
+                During the game, you cannot communicate with the other players.
+                <!--You can communicate with the other players in the game using the chatroom provided.-->
+            </li>
 
-    </p>
+            <li>During the game, you cannot see other players' answers.  You can only see whether another player's answer is pending, submitted or finalized.</li>
+            <li>There is a time limit for each game.  Once the timer runs out, the system will automatically submit an answer for you if you haven't already done so.</li>
+        </ul>
+        <!--<ul>-->
+            <!--<li>You can communicate with the other players in the game using the chatroom provided.</li>-->
+            <!--<li>During the game, you can see another player's answer as soon as he/she submits or revises it.</li>-->
+        <!--</ul>-->
 
-    <p>
+        </p>
+
+        <p>
         For each question, your reward depends on the average of all the answers, given by the following formula.
 
         Your bonus payment will be your average reward in the multiple rounds of the game.
@@ -27,7 +33,9 @@
 
         For example, for the following scenario, your bonus payment is...
 
-    </p>
+        </p>
 
-    <a class="btn btn-primary" id="goToQuiz">Go to the quiz</a>
+        <a class="btn btn-primary" id="goToQuiz">Go to the quiz</a>
+
+    </div>
 </template>

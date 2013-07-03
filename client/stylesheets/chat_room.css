@@ -1,9 +1,0 @@
-ul#messageArea {
-    height: 150px;
-    overflow: auto;
-    list-style: none;
-}
-
-ul#answerList {
-    list-style: none;
-}

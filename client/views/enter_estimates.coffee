@@ -30,16 +30,14 @@ Template.enterEstimates.events =
         return bootbox.alert error.reason
 
     if Template.enterEstimates.allAnswersFinalized()
-      Meteor.call 'completeQuestion', {}, (error, id) ->
+
+      Meteor.call 'stopTimerMain', {}, (error, id) ->
         if error
           return bootbox.alert error.reason
 
-  "click #nextQuestion": (ev) ->
-    ev.preventDefault()
-
-    Meteor.call 'goToNextQuestion', {}, (error, id) ->
-      if error
-        return bootbox.alert error.reason
+      Meteor.call 'markRoundCompleted', {}, (error, id) ->
+        if error
+          return bootbox.alert error.reason
 
 
 # Get info of all online users, sort by usernames
@@ -60,7 +58,6 @@ Template.enterEstimates.getAnswer = (uid) ->
   else
     return "pending"
 
-
 # Get the status if it's available, otherwise return pending
 Template.enterEstimates.getStatus = (uid) ->
   ans = Answers.findOne({userId: uid})
@@ -71,9 +68,6 @@ Template.enterEstimates.getStatus = (uid) ->
   else
     return "pending"
 
-
-
-
 # Return whether buttons should be disabled
 Template.enterEstimates.isDisabled = ->
   uid = Meteor.user()._id
@@ -82,8 +76,6 @@ Template.enterEstimates.isDisabled = ->
     return "disabled"
   else
     return ""
-
-
 
 # Return total number of rounds
 Template.enterEstimates.numRounds = ->
@@ -126,7 +118,6 @@ Template.enterEstimates.correctAnswer = ->
   if roundObj isnt -1
     return roundObj.correctanswer
   return "Error retrieving correct answer"
-
 
 # Return true if all answers are finalized
 Template.enterEstimates.allAnswersFinalized = ->

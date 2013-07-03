@@ -19,3 +19,8 @@ Template.history.getCorrectAnswer = ->
   if Template.history.isRoundFinished(this)
     return this.correctanswer
   return ""
+
+Template.history.displayPercentageSign = (round) ->
+  if Template.history.isRoundFinished(round)
+    return "%"
+  return ""

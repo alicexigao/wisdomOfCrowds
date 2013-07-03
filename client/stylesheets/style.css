@@ -1,0 +1,22 @@
+ul#messageArea {
+    height: 150px;
+    overflow: auto;
+    list-style: none;
+}
+
+ul#answerList {
+    list-style: none;
+}
+
+li.answer {
+    padding: 10px;
+    font-size: 150%;
+}
+
+.not-finalized {
+    background-color: #FAA938;
+}
+
+.not-finalized-curr {
+    background-color: #C76D6B;
+}

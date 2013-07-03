@@ -9,7 +9,11 @@ Meteor.publish "rounds", ->
     sort: {index: 1}
 
 Meteor.publish "answers", ->
-  Answers.find()
+  Answers.find {},
+    fields:
+      userId: 1
+      answer: 1
+      status: 1
 
 Meteor.publish "chatMessages", ->
   ChatMessages.find()
@@ -20,4 +24,4 @@ Meteor.publish "usernames", ->
       username: 1
 
 Meteor.publish "timeleft", ->
-  TimeLeft.find()
+  Timers.find()

@@ -8,7 +8,7 @@ this.CurrentRound = new Meteor.Collection("currentRound")
 
 this.Treatment = new Meteor.Collection('treatment')
 
-this.TimeLeft = new Meteor.Collection("timeleft")
+this.Timers = new Meteor.Collection("timeleft")
 
 Meteor.methods
   sendMsg: (data) ->
@@ -37,8 +37,11 @@ Meteor.methods
         throw new Meteor.Error(100, "Answer has been finalized")
 
       # update current answer
-      answerDataId = Answers.update {userId: user._id},
-        $set: {answer: data.answer}
+      if data.answer
+        # takes care of case when user clicks on finalize without inputting a value
+        Answers.update {userId: user._id},
+          $set: {answer: data.answer}
+      Answers.update {userId: user._id},
         $set: {status: data.status}
 
     else
@@ -51,16 +54,80 @@ Meteor.methods
       answerDataId = Answers.insert answerData
     answerDataId
 
-  countdown: (data) ->
-    currTime = new Date()
-    obj = TimeLeft.findOne()
-    if obj
-      endTime = new Date(obj.endTime)
+  countdownNext: (data) ->
+    timerObj = Timers.findOne({name: "next"})
+    return unless timerObj.start is true
+
+    if timerObj
+      currTime = new Date()
+      endTime = new Date(timerObj.endTime)
+
       if currTime < endTime
+
+        # Time is not up yet
         numSeconds = (endTime.getTime() - currTime.getTime()) / 1000
         numSeconds = Math.floor(numSeconds)
-        TimeLeft.update {},
+        Timers.update {name: "next"},
           $set: {secondsLeft: numSeconds}
+
+      else
+
+        # Stop timer NEXT
+        Timers.update {name: "next"},
+          $set: {start: false}
+
+        # Go to next round
+        Answers.remove({})
+        CurrentRound.update({}, {$inc: {index: 1}})
+
+        # Reset and start main timer
+        timerMainDur = 60
+        time = new Date()
+        mainEndTime = time.getTime() + 1000 * timerMainDur
+        time.setTime(mainEndTime)
+        Timers.update {name: "main"},
+          $set: {endTime: time}
+        Timers.update {name: "main"},
+          $set: {secondsLeft: timerMainDur}
+        Timers.update {name: "main"},
+          $set: {start: true}
+
+  stopTimerMain: (data) ->
+    Timers.update {name: "main"},
+      $set: {start: false}
+
+  countdown: (data) ->
+    obj = Timers.findOne({name: "main"})
+    return unless obj.start is true
+
+    if obj
+      currTime = new Date()
+      endTime = new Date(obj.endTime)
+      if currTime < endTime
+
+        # Time is not up yet
+        numSeconds = (endTime.getTime() - currTime.getTime()) / 1000
+        numSeconds = Math.floor(numSeconds)
+        Timers.update {name: "main"},
+          $set: {secondsLeft: numSeconds}
+
+      else
+
+        # Time is up, complete this round
+        users = Meteor.users.find().fetch()
+        for user in users
+          ans = Answers.findOne({userId: user._id})
+          if ans
+            Answers.update {userId: user._id},
+              $set: {status: "finalized"}
+          else
+            Answers.insert
+              userId: user._id
+              answer: 50
+              status: "finalized"
+
+        Meteor.call 'saveAnswers'
+        Meteor.call 'markRoundCompleted'
 
   saveAnswers: (data) ->
     roundNum = CurrentRound.findOne().index
@@ -73,19 +140,20 @@ Meteor.methods
     Rounds.update {index: roundNum},
       $set: {answers: ansObj}
 
-  completeQuestion: (data) ->
+  markRoundCompleted: (data) ->
     roundNum = CurrentRound.findOne().index
     Rounds.update {index: roundNum},
       $set: {status: "completed"}
 
-  goToNextQuestion: (data) ->
-    Answers.remove({})
-    CurrentRound.update({}, {$inc: {index: 1}})
-
+    # Start timer NEXT
+    timerNextDur = 10
     time = new Date()
-    endTime = time.getTime() + 1000 * 120
-    time.setTime(endTime)
-    TimeLeft.update {},
+    nextEndTime = time.getTime() + 1000 * timerNextDur
+    time.setTime(nextEndTime)
+    Timers.update {name: "next"},
       $set: {endTime: time}
-    TimeLeft.update {},
-      $set: {secondsLeft: 120}
+    Timers.update {name: "next"},
+      $set: {secondsLeft: timerNextDur}
+    Timers.update {name: "next"},
+      $set: {start: true}
+

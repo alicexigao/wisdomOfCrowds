@@ -1,4 +1,6 @@
 <template name="chatRoom">
+    {{#if displayChatRoom}}
+
     <h4>Chat Room</h4>
 
         <ul class="well" id="messageArea">
@@ -11,4 +13,5 @@
             <button type="submit" id="sendMessage" class="btn btn-primary">Send</button>
         </form>
 
+    {{/if}}
 </template>

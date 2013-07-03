@@ -1,17 +1,16 @@
-#clock = 30
 
-Template.timer.timeLeft = ->
+Template.timerMain.countdown = ->
   Meteor.call 'countdown', null, (error, id) ->
     if error
       return bootbox.alert error.reason
 
-if Meteor.intervalId is undefined
-  Meteor.intervalId = Meteor.setInterval Template.timer.timeLeft, 1000
+if Meteor.intervalIdMain is undefined
+  Meteor.intervalIdMain = Meteor.setInterval Template.timerMain.countdown, 1000
 
-Template.timer.getTimeLeft = ->
-  if TimeLeft.findOne() is undefined
+Template.timerMain.getTimeLeft = ->
+  if Timers.findOne({name: "main"}) is undefined
     return
-  numTotalSeconds = TimeLeft.findOne().secondsLeft
+  numTotalSeconds = Timers.findOne({name: "main"}).secondsLeft
   if numTotalSeconds
     seconds = numTotalSeconds % 60
     minutes = (numTotalSeconds - seconds) / 60
@@ -19,4 +18,4 @@ Template.timer.getTimeLeft = ->
       return minutes + ":0" + seconds
     else
       return minutes + ":" + seconds
-  return
+  return "0:00"

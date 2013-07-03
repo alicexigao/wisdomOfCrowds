@@ -1,7 +1,21 @@
 Meteor.startup ->
-  if Treatment.find().count() is 0
-    Treatment.insert
-      value: "cooperative"
+  Treatment.remove({})
+  Treatment.insert
+    value: "pure-competitive"
+    displayChatRoom:      false
+    displayOtherAnswers:  false
+    displayWinner:        true
+    displayCorrectAnswer: true
+    displayAverage:       false
+
+#  Treatment.insert
+#    value: "cooperative-no-voting"
+#    displayChatRoom:      true
+#    displayOtherAnswers:  true
+#    displayWinner:        false
+#    displayCorrectAnswer: true
+#    displayAverage:       true
+
 
   Rounds.remove({})
   if Rounds.find().count() is 0
@@ -34,19 +48,36 @@ Meteor.startup ->
     CurrentRound.update {},
       $set: {index: 0}
 
-# Time Left
-  TimeLeft.remove({})
+  # Initialize timers
+  Timers.remove({})
+
+  timerMainDur = 60
   time = new Date()
-  endTime = time.getTime() + 1000 * 120
+  endTime = time.getTime() + 1000 * timerMainDur
   time.setTime(endTime)
 
-  if TimeLeft.find().count() is 0
-    TimeLeft.insert
-      endTime: time
-      secondsLeft: 120
-  else
-    TimeLeft.update {},
+  if Timers.findOne({name: "main"})
+    Timers.update {name: "main"},
       $set: {endTime: time}
-    TimeLeft.update {},
-      $set: {secondsLeft: 120}
+    Timers.update {name: "main"},
+      $set: {secondsLeft: timerMainDur}
+    Timers.update {name: "main"},
+      $set: {start: true}
+  else
+    Timers.insert
+      name: "main"
+      endTime: time
+      secondsLeft: timerMainDur
+      start: true
 
+  timerNextDur = 10
+  if Timers.findOne({name: "next"})
+    Timers.update {name: "next"},
+      $set: {secondsLeft: timerNextDur}
+    Timers.update {name: "next"},
+      $set: {start: false}
+  else
+    Timers.insert
+      name: "next"
+      secondsLeft: timerNextDur
+      start: false
