@@ -11,3 +11,5 @@ Meteor.subscribe "currentRound"
 Meteor.subscribe "usernames"
 
 Meteor.subscribe "timeleft"
+
+Meteor.subscribe "votes"

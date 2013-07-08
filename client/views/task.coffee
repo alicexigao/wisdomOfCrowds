@@ -8,5 +8,8 @@ Template.task.isTaskCompleted = ->
 
   round =  Rounds.findOne({index: numQuestions - 1})
   if round
-    return round.status is "completed"
+    if round.status is "completed"
+      Meteor.clearInterval(Template.timerNext.intervalIdNext)
+      Meteor.clearInterval(Template.timerMain.intervalIdMain)
+      return true
   return false

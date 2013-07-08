@@ -1,21 +1,29 @@
 Meteor.startup ->
   Treatment.remove({})
   Treatment.insert
-    value: "pure-competitive"
-    displayChatRoom:      false
-    displayOtherAnswers:  false
-    displayWinner:        true
-    displayCorrectAnswer: true
-    displayAverage:       false
+#    value: "pure-competitive"
+#    displayChatRoom:      false
+#    displayOtherAnswers:  false
+#    displayWinner:        true
+#    displayCorrectAnswer: true
+#    displayAverage:       false
+#    displaySecondStage:       true
 
-#  Treatment.insert
 #    value: "cooperative-no-voting"
 #    displayChatRoom:      true
 #    displayOtherAnswers:  true
 #    displayWinner:        false
 #    displayCorrectAnswer: true
 #    displayAverage:       true
+#    displaySecondStage:       true
 
+    value: "cooperative-voting"
+    displayChatRoom:      true
+    displayOtherAnswers:  true
+    displayWinner:        false
+    displayCorrectAnswer: true
+    displayAverage:       false
+    displaySecondStage:   true
 
   Rounds.remove({})
   if Rounds.find().count() is 0
@@ -81,3 +89,5 @@ Meteor.startup ->
       name: "next"
       secondsLeft: timerNextDur
       start: false
+
+  Votes.remove({})

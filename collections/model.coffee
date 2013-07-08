@@ -10,6 +10,10 @@ this.Treatment = new Meteor.Collection('treatment')
 
 this.Timers = new Meteor.Collection("timeleft")
 
+this.Votes = new Meteor.Collection("votes")
+
+
+
 Meteor.methods
   sendMsg: (data) ->
     user = Meteor.user()
@@ -27,12 +31,11 @@ Meteor.methods
     if (!user)
       throw new Meteor.Error(401, "You need to login.")
 
-    cur = Answers.find({userId: user._id})
-
-    if cur.count() > 0
+    cur = Answers.findOne {userId: user._id}
+    if cur
       # already has answer for current user
 
-      if cur.fetch()[0].status is "finalized"
+      if cur.status is "finalized"
         # error if answer has been finalized
         throw new Meteor.Error(100, "Answer has been finalized")
 
@@ -41,6 +44,7 @@ Meteor.methods
         # takes care of case when user clicks on finalize without inputting a value
         Answers.update {userId: user._id},
           $set: {answer: data.answer}
+
       Answers.update {userId: user._id},
         $set: {status: data.status}
 
@@ -51,8 +55,7 @@ Meteor.methods
         userId: user._id
         answer: data.answer
         status: data.status
-      answerDataId = Answers.insert answerData
-    answerDataId
+      Answers.insert answerData
 
   countdownNext: (data) ->
     timerObj = Timers.findOne({name: "next"})
@@ -78,6 +81,7 @@ Meteor.methods
 
         # Go to next round
         Answers.remove({})
+        Votes.remove({})
         CurrentRound.update({}, {$inc: {index: 1}})
 
         # Reset and start main timer
@@ -92,11 +96,15 @@ Meteor.methods
         Timers.update {name: "main"},
           $set: {start: true}
 
+  startTimerMain: (data) ->
+    Timers.update {name: "main"},
+      $set: {start: true}
+
   stopTimerMain: (data) ->
     Timers.update {name: "main"},
       $set: {start: false}
 
-  countdown: (data) ->
+  countdownMain: (data) ->
     obj = Timers.findOne({name: "main"})
     return unless obj.start is true
 
@@ -114,8 +122,12 @@ Meteor.methods
       else
 
         # Time is up, complete this round
+        Timers.update {name: "main"},
+          $set: {start: false}
+
         users = Meteor.users.find().fetch()
         for user in users
+          # put in fake answer
           ans = Answers.findOne({userId: user._id})
           if ans
             Answers.update {userId: user._id},
@@ -126,17 +138,42 @@ Meteor.methods
               answer: 50
               status: "finalized"
 
-        Meteor.call 'saveAnswers'
+          # put in fake vote
+          vote = Votes.findOne {userId: user._id}
+          if vote
+            Votes.update {userId: user._id},
+              $set: {status: "finalized"}
+          else
+            Votes.insert
+              userId: user._id
+              answerId: user._id
+              status: "finalized"
+
+        Meteor.call 'saveAllAnswers'
         Meteor.call 'markRoundCompleted'
 
+  # save all answers
+  saveAllAnswers: ->
+    ansObj = {}
+    users = Meteor.users.find().fetch()
+    for user in users
+      ansRecord = Answers.findOne {userId: user._id}
+      ansObj[user._id] = {answer: ansRecord.answer}
+
+    roundNum = CurrentRound.findOne().index
+    Rounds.update {index: roundNum},
+      $set: {answers: ansObj}
+
+  # save answers for a particular user
   saveAnswers: (data) ->
     roundNum = CurrentRound.findOne().index
-    ansArray = Answers.find().fetch()
-    ansObj = {}
-    for ansRecord in ansArray
-      userId = ansRecord.userId
-      ansObj[userId] = {}
-      ansObj[userId].answer = ansRecord.answer
+    ansOne = Answers.findOne({userId: data.userId})
+
+    ansObj = Rounds.findOne({index: roundNum}).answers
+    userId = ansOne.userId
+    ansObj[userId] = {}
+    ansObj[userId].answer = ansOne.answer
+
     Rounds.update {index: roundNum},
       $set: {answers: ansObj}
 
@@ -157,3 +194,26 @@ Meteor.methods
     Timers.update {name: "next"},
       $set: {start: true}
 
+  updateVote: (data) ->
+    vote = Votes.findOne {userId: data.userId}
+    if vote
+
+      if vote.status is "finalized"
+        # error if answer has been finalized
+        throw new Meteor.Error(100, "Vote has been finalized")
+
+      Votes.update {userId: data.userId},
+        $set: {answerId: data.answerId}
+      Votes.update {userId: data.userId},
+        $set: {status: "submitted"}
+
+    else
+
+      Votes.insert
+        userId:   data.userId
+        answerId: data.answerId
+        status:   "submitted"
+
+  finalizeVote: (data) ->
+    Votes.update {userId: data.userId},
+      $set: {status: "finalized"}

@@ -25,3 +25,6 @@ Meteor.publish "usernames", ->
 
 Meteor.publish "timeleft", ->
   Timers.find()
+
+Meteor.publish "votes", ->
+  Votes.find()

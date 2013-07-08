@@ -1,6 +1,6 @@
 <template name="roundResults">
 
-    {{#if allAnswersFinalized}}
+    {{#if answersFinalized}}
         <li class="answer badge badge-success">
             <p>{{correctAnswer}}%</p>
             <p>correct answer</p>
@@ -29,23 +29,35 @@
             {{/if}}
         {{/if}}
 
-            {{#if allAnswersFinalized}}
+            {{#if answersFinalized}}
 
                 {{#if displayWinner}}
-                    {{#if isBestAnswer _id}}
+                    {{#if isBestAnswer}}
                         <p>Winner</p>
                     {{/if}}
                 {{/if}}
-                <p>{{getAnswer _id}}%</p>
+
+                {{#if displaySecondStage}}
+                    {{#if hasVote}}
+                        <p><i class="icon-star"></i></p>
+                    {{/if}}
+                    {{#if voteFinalized}}
+                        <p>{{getAnswer}}%</p>
+                    {{else}}
+                        <p><a href="#" class="answerbadges" id="{{_id}}">{{getAnswer}}%</a></p>
+                    {{/if}}
+                {{else}}
+                    <p>{{getAnswer}}%</p>
+                {{/if}}
 
             {{else}}
 
                 {{#if displayAnswer _id}}
                     <p>
-                        {{getAnswer _id}}{{#if hasAnswer _id}}%{{/if}}
+                        {{getAnswer}}{{#if hasAnswer}}%{{/if}}
                     </p>
                 {{else}}
-                    <p>{{getStatus _id}}</p>
+                    <p>{{getStatus}}</p>
                 {{/if}}
 
             {{/if}}

@@ -9,8 +9,8 @@ ul#answerList {
 }
 
 li.answer {
-    padding: 10px;
-    font-size: 150%;
+    padding:    5px;
+    font-size:  120%;
 }
 
 .not-finalized {
@@ -19,4 +19,14 @@ li.answer {
 
 .not-finalized-curr {
     background-color: #C76D6B;
+}
+
+a {
+    color: #FFFFFF;
+    text-decoration: underline;
+}
+a:hover,
+a:focus {
+    font-weight: bold;
+    color: #99FFFF;
 }

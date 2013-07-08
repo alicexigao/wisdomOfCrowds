@@ -1,11 +1,11 @@
 
 Template.timerMain.countdown = ->
-  Meteor.call 'countdown', null, (error, id) ->
+  Meteor.call 'countdownMain', null, (error, id) ->
     if error
       return bootbox.alert error.reason
 
-if Meteor.intervalIdMain is undefined
-  Meteor.intervalIdMain = Meteor.setInterval Template.timerMain.countdown, 1000
+if Template.timerMain.intervalIdMain is undefined
+  Template.timerMain.intervalIdMain = Meteor.setInterval Template.timerMain.countdown, 1000
 
 Template.timerMain.getTimeLeft = ->
   if Timers.findOne({name: "main"}) is undefined

@@ -4,16 +4,36 @@
     <form class="form-inline">
         <span class="lead" for="inputEstimate">Your Answer:</span>
         <input type="text" id="inputEstimate" class="input-small" placeholder="" {{isDisabled}}><span class="lead">%</span>
-        {{#unless allAnswersFinalized}}
+
+        {{#unless answersFinalized}}
+
             <button type="button" id="updateEstimate" class="btn btn-primary {{isDisabled}}" {{isDisabled}}>Update</button>
             {{#if hasAnswer}}
                 <button type="button" id="finalizeEstimate" class="btn btn-danger {{isDisabled}}" {{isDisabled}}>Finalize</button>
             {{/if}}
+
         {{/unless}}
 
-        {{#if allAnswersFinalized}}
-            {{> timerNext}}
+        {{#if hasTwoStages}}
+            {{#if votesFinalized}}
+                {{> timerNext}}
+            {{/if}}
+        {{else}}
+            {{#if answersFinalized}}
+                {{> timerNext}}
+            {{/if}}
         {{/if}}
+
+        {{#if hasTwoStages}}
+            {{#if answersFinalized}}
+            {{#unless votesFinalized}}
+            {{#if hasVote}}
+                <button type="button" id="finalizeVote" class="btn btn-danger {{isDisabledVote}}" {{isDisabledVote}}>Finalize Vote</button>
+            {{/if}}
+            {{/unless}}
+            {{/if}}
+        {{/if}}
+
     </form>
 
     <div>
