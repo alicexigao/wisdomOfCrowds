@@ -8,6 +8,10 @@ ul#answerList {
     list-style: none;
 }
 
+p.badgeRow {
+    text-align: center;
+}
+
 li.answer {
     padding:    5px;
     font-size:  120%;
@@ -21,12 +25,10 @@ li.answer {
     background-color: #C76D6B;
 }
 
-a {
-    color: #FFFFFF;
-    text-decoration: underline;
+.curr {
+    color: #C76D6B;
 }
-a:hover,
-a:focus {
-    font-weight: bold;
-    color: #99FFFF;
+
+td {
+    text-align: center;
 }

@@ -13,3 +13,5 @@ Meteor.subscribe "usernames"
 Meteor.subscribe "timeleft"
 
 Meteor.subscribe "votes"
+
+Meteor.subscribe "bets"

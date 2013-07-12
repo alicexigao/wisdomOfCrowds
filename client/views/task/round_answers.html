@@ -1,67 +1,82 @@
-<template name="roundResults">
+<template name="roundAnswers">
 
-    {{#if answersFinalized}}
+    {{#if displayCorrectAnswer}}
         <li class="answer badge badge-success">
-            <p>{{correctAnswer}}%</p>
-            <p>correct answer</p>
+            <p class="badgeRow">{{correctAnswer}}%</p>
+            <p>correct</p>
         </li>
-        {{#if displayAverage}}
-            <li class="answer badge badge-success">
-                <p>{{getAverage}}%</p>
-                <p>average</p>
-            </li>
-        {{/if}}
+    {{/if}}
+    {{#if displayAverage}}
+        <li class="answer badge badge-success">
+            <p class="badgeRow">{{getAverage}}%</p>
+            <p>average</p>
+        </li>
     {{/if}}
 
     {{#each users}}
 
-        {{#if isCurrentUser _id}}
-            {{#if answerFinalized _id}}
-                <li class="answer badge badge-important">
-            {{else}}
-                <li class="answer badge not-finalized-curr">
-            {{/if}}
+        {{#if isCurrentUser}}
+            <li class="answer badge badge-important">
         {{else}}
-            {{#if answerFinalized _id}}
-                <li class="answer badge badge-warning">
-            {{else}}
-                <li class="answer badge not-finalized">
-            {{/if}}
+            <li class="answer badge badge-warning">
         {{/if}}
 
             {{#if answersFinalized}}
 
                 {{#if displayWinner}}
                     {{#if isBestAnswer}}
-                        <p>Winner</p>
+                        <p class="badgeRow">Winner</p>
                     {{/if}}
                 {{/if}}
 
                 {{#if displaySecondStage}}
-                    {{#if hasVote}}
-                        <p><i class="icon-star"></i></p>
+
+                    {{#if secondStageIsVoting}}
+
+                        {{#if voteFinalized}}
+                            {{#if hasVote _id}}
+                                <p class="badgeRow"><i class="icon-star"></i></p>
+                            {{/if}}
+                        {{else}}
+                            <p class="badgeRow"><label><input type="radio" name="votes" {{isCheckedVote}}> Vote </label></p>
+                        {{/if}}
+
+                        {{#if displayNumVotes}}
+                            <p class="badgeRow">{{getNumVotes}} vote(s)</p>
+                        {{/if}}
+
                     {{/if}}
-                    {{#if voteFinalized}}
-                        <p>{{getAnswer}}%</p>
-                    {{else}}
-                        <p><a href="#" class="answerbadges" id="{{_id}}">{{getAnswer}}%</a></p>
+
+                    {{#if secondStageIsBetting}}
+                        <p class="badgeRow">
+                            {{#unless betsFinalized}}
+                                <input type="checkbox" name="bets" id="{{_id}}" {{isCheckedBet}}>
+                            {{/unless}}
+                            {{#if isCheckedBet}}
+                                <span>{{getBetAmount}}</span>
+                                {{#unless betsFinalized}}
+                                    <input type="button" class="increaseBet" value="&#x25B2;">
+                                    <input type="button" class="decreaseBet" value="&#x25BC;">
+                                {{/unless}}
+                            {{/if}}
+                        </p>
                     {{/if}}
-                {{else}}
-                    <p>{{getAnswer}}%</p>
+
                 {{/if}}
+                <p class="badgeRow">{{getAnswer}}%</p>
 
             {{else}}
 
-                {{#if displayAnswer _id}}
-                    <p>
+                {{#if displayAnswer}}
+                    <p class="badgeRow">
                         {{getAnswer}}{{#if hasAnswer}}%{{/if}}
                     </p>
                 {{else}}
-                    <p>{{getStatus}}</p>
+                    <p class="badgeRow">{{getStatus}}</p>
                 {{/if}}
 
             {{/if}}
-            <p>{{username}}</p>
+            <p class="badgeRow">{{username}}</p>
 
         </li>
 

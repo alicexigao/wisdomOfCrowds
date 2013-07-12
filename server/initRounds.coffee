@@ -1,49 +1,70 @@
 Meteor.startup ->
   Treatment.remove({})
   Treatment.insert
-#    value: "pure-competitive"
-#    displayChatRoom:      false
-#    displayOtherAnswers:  false
-#    displayWinner:        true
-#    displayCorrectAnswer: true
-#    displayAverage:       false
-#    displaySecondStage:       true
+    value: "pure-competitive"
+    displayChatRoom:      false
+    displayOtherAnswers:  false
+    displayAverage:       false
+    displayWinner:        true
+    displayCorrectAnswer: true
+    displaySecondStage:   false
+    pointsRule:           "ownAnswer"
 
 #    value: "cooperative-no-voting"
 #    displayChatRoom:      true
 #    displayOtherAnswers:  true
+#    displayAverage:       true
 #    displayWinner:        false
 #    displayCorrectAnswer: true
-#    displayAverage:       true
-#    displaySecondStage:       true
+#    displaySecondStage:   false
+#    pointsRule:           "average"
 
-    value: "cooperative-voting"
-    displayChatRoom:      true
-    displayOtherAnswers:  true
-    displayWinner:        false
-    displayCorrectAnswer: true
-    displayAverage:       false
-    displaySecondStage:   true
+#    value: "cooperative-voting"
+#    displayChatRoom:      true
+#    displayOtherAnswers:  true
+#    displayAverage:       false
+#    displayWinner:        false
+#    displayCorrectAnswer: true
+#    displaySecondStage:   true
+#    secondStageType:      "voting"
+#    pointsRule:           "averageByVotes"
+
+#    value: "competitive-betting"
+#    displayChatRoom:      true
+#    displayOtherAnswers:  false
+#    displayAverage:       false
+#    displayWinner:        false
+#    displayCorrectAnswer: true
+#    displaySecondStage:   true
+#    secondStageType:      "betting"
+#    pointsRule:           "averageByVotes"
+
 
   Rounds.remove({})
   if Rounds.find().count() is 0
     Rounds.insert
       index: 0
-      question: "Population of USA in 2006"
-      correctanswer: 55
+      question: "What percent of the world's population lives in the U.S.? (U.S. Census Bureau, International Database, 6/2/2007)"
+      correctanswer: 4.57
       answers: {}
+      votes: {}
+      bets: {}
       status: "inprogress"
     Rounds.insert
       index: 1
-      question: "Population of USA in 2007"
-      correctanswer: 40
+      question: "What percent of U.S. households own at least one pet cat? (U.S. Pet Ownership & Demographics Sourcebook, 2002)"
+      correctanswer: 31.6
       answers: {}
+      votes: {}
+      bets: {}
       status: "inprogress"
     Rounds.insert
       index: 2
-      question: "Population of USA in 2008"
-      correctanswer: 35
+      question: "What percent of the world's population speaks Spanish as their first language? (Ethnologue: Languages of the World, 4/2007)"
+      correctanswer: 4.88
       answers: {}
+      votes: {}
+      bets: {}
       status: "inprogress"
 
   Answers.remove({})
@@ -59,35 +80,60 @@ Meteor.startup ->
   # Initialize timers
   Timers.remove({})
 
+  name = "main"
   timerMainDur = 60
   time = new Date()
   endTime = time.getTime() + 1000 * timerMainDur
   time.setTime(endTime)
-
-  if Timers.findOne({name: "main"})
-    Timers.update {name: "main"},
+  if Timers.findOne({name: name})
+    Timers.update {name: name},
       $set: {endTime: time}
-    Timers.update {name: "main"},
+    Timers.update {name: name},
       $set: {secondsLeft: timerMainDur}
-    Timers.update {name: "main"},
+    Timers.update {name: name},
       $set: {start: true}
   else
     Timers.insert
-      name: "main"
+      name: name
       endTime: time
       secondsLeft: timerMainDur
       start: true
 
-  timerNextDur = 10
-  if Timers.findOne({name: "next"})
-    Timers.update {name: "next"},
-      $set: {secondsLeft: timerNextDur}
-    Timers.update {name: "next"},
+  name = "second"
+  timerSecondDur = 60
+#  time = new Date()
+#  endTime = time.getTime() + 1000 * timerSecondDur
+#  time.setTime(endTime)
+  if Timers.findOne({name: name})
+#    Timers.update {name: name},
+#      $set: {endTime: time}
+    Timers.update {name: name},
+      $set: {secondsLeft: timerSecondDur}
+    Timers.update {name: name},
       $set: {start: false}
   else
     Timers.insert
-      name: "next"
+      name: name
+      endTime: time
+      secondsLeft: timerSecondDur
+      start: false
+
+  name = "next"
+  timerNextDur = 10
+  if Timers.findOne({name: name})
+    Timers.update {name: name},
+      $set: {secondsLeft: timerNextDur}
+    Timers.update {name: name},
+      $set: {start: false}
+  else
+    Timers.insert
+      name: name
       secondsLeft: timerNextDur
       start: false
 
+
   Votes.remove({})
+
+  Bets.remove({})
+
+  ChatMessages.remove({})

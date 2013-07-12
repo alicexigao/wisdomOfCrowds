@@ -28,3 +28,7 @@ Meteor.publish "timeleft", ->
 
 Meteor.publish "votes", ->
   Votes.find()
+
+Meteor.publish "bets", ->
+  Bets.find()
+

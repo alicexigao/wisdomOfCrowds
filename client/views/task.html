@@ -2,24 +2,18 @@
 
     <div class="row">
 
-        {{#if isTaskCompleted}}
-            <div class="span7">
-                {{> taskCompleted}}
-            </div>
-        {{else}}
             <div class="span7">
                 <div>
-                    {{> enterEstimates}}
+                    {{> roundInputs}}
                 </div>
                 <div>
                     {{> chatRoom}}
                 </div>
             </div>
-        {{/if}}
 
         <div class="span5">
             <div>
-                {{> history}}
+                {{> roundHistory}}
             </div>
         </div>
 

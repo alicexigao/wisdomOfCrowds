@@ -3,37 +3,72 @@
         <h3>Tutorial</h3>
 
         <p>
-        For this task, you will first be matched with other MTurk workers to play a multi-player real-time game.
+            You will be matched with other MTurk workers to play multiple games. In each game, all players will answer a
+            question, and they get points based on their answers.
+            After all games, each player's average points from all games will be converted to the player's bonus payment
+            at a fixed rate.
+        </p>
 
-        In this game, your group of MTurk workers will answer a series of factual questions.
 
-        The game has the following rules:
-        <ul>
+        <ol>
             <li>
-                During the game, you cannot communicate with the other players.
-                <!--You can communicate with the other players in the game using the chatroom provided.-->
+                {{#if displaySecondStage}}In the first stage, e{{else}}E{{/if}}ach player can submit, update, and finalize an answer to the question.
+            </li>
+            <li>
+                {{#if displayOtherAnswers}}
+                As soon as a player submits an answer, the answer is revealed to all players.
+                {{else}}
+                Before all answers are finalized, you cannot see other players' answers, only whether their answers are
+                pending, submitted, or finalized.
+                {{/if}}
+            </li>
+            <li>
+                The time limit is 1 minute. If the timer runs out before all answers are finalized, 50%
+                is used for any missing answer, and all answers are finalized.
+            </li>
+            <li>
+                {{#if displaySecondStage}}
+                Once all answers are finalized, the second stage starts.
+                {{else}}
+                Once all answers are finalized, the game ends, answers are revealed and players' points are calculated.
+                {{/if}}
             </li>
 
-            <li>During the game, you cannot see other players' answers.  You can only see whether another player's answer is pending, submitted or finalized.</li>
-            <li>There is a time limit for each game.  Once the timer runs out, the system will automatically submit an answer for you if you haven't already done so.</li>
-        </ul>
-        <!--<ul>-->
-            <!--<li>You can communicate with the other players in the game using the chatroom provided.</li>-->
-            <!--<li>During the game, you can see another player's answer as soon as he/she submits or revises it.</li>-->
-        <!--</ul>-->
+            {{#if displaySecondStage}}
 
-        </p>
+            {{#if secondStageIsVoting}}
+            <li>
+                In the second stage, each player can choose one answer to vote, and finalize the vote.
+            </li>
+            <li>
+                The time limit is 1 minute. If the timer runs out before all votes are finalized, a vote on the player's
+                own answer is used for any missing vote, and all votes are finalized.
+            </li>
+            <li>
+                Once all votes are finalized, the game ends and players' points are calculated.
+            </li>
+            {{/if}}
 
-        <p>
-        For each question, your reward depends on the average of all the answers, given by the following formula.
+            {{#if secondStageIsWagering}}
+            {{/if}}
 
-        Your bonus payment will be your average reward in the multiple rounds of the game.
+            {{/if}}
 
-        The closer the average is to the true answer, the higher your reward is.
+            <li>
+                {{#if pointsRuleIsOwnAnswer}}
+                100 points is awarded to the player whose answer is closest to the correct answer. Every other player
+                gets 10 points.
+                {{/if}}
 
-        For example, for the following scenario, your bonus payment is...
+                {{#if pointsRuleIsAverage}}
+                Every player gets the same bonus payment based on the average of the answers.
+                {{/if}}
 
-        </p>
+                {{#if pointsRuleIsAverageByVotes}}
+                Every player gets the same bonus payment based on the average of the answers weighted by the votes.
+                {{/if}}
+            </li>
+        </ol>
 
         <a class="btn btn-primary" id="goToQuiz">Go to the quiz</a>
 

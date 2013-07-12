@@ -1,49 +1,98 @@
-<template name="enterEstimates">
-    <h3>Question {{getRoundIndexDisplay}} of {{numRounds}}: {{getQuestion}}</h3>
-    {{> timerMain}}
+<template name="roundInputs">
+    <h4>Question {{getRoundIndexDisplay}} of {{numRounds}}: {{getQuestion}}</h4>
+
+    {{# if hasTwoStages}}
+        {{#if secondStageIsVoting}}
+        {{#if answersFinalized}}
+        {{#unless votesFinalized}}
+            {{> timerSecond}}
+        {{/unless}}
+        {{/if}}
+        {{/if}}
+
+        {{#if secondStageIsBetting}}
+        {{#if answersFinalized}}
+        {{#unless betsFinalized}}
+            {{> timerSecond}}
+        {{/unless}}
+        {{/if}}
+        {{/if}}
+    {{/if}}
+
+    {{#unless answersFinalized}}
+        {{> timerMain}}
+    {{/unless}}
+
     <form class="form-inline">
-        <span class="lead" for="inputEstimate">Your Answer:</span>
-        <input type="text" id="inputEstimate" class="input-small" placeholder="" {{isDisabled}}><span class="lead">%</span>
 
         {{#unless answersFinalized}}
-
+            <span class="lead" for="inputEstimate">Your Answer:</span>
+            <input type="text" id="inputEstimate" class="input-small" placeholder="" {{isDisabled}}><span class="lead">%</span>
             <button type="button" id="updateEstimate" class="btn btn-primary {{isDisabled}}" {{isDisabled}}>Update</button>
             {{#if hasAnswer}}
                 <button type="button" id="finalizeEstimate" class="btn btn-danger {{isDisabled}}" {{isDisabled}}>Finalize</button>
             {{/if}}
-
         {{/unless}}
 
         {{#if hasTwoStages}}
-            {{#if votesFinalized}}
-                {{> timerNext}}
-            {{/if}}
-        {{else}}
+            {{#if secondStageIsVoting}}
             {{#if answersFinalized}}
-                {{> timerNext}}
+            {{#unless votesFinalized}}
+                <span class="lead" for="castVote">Cast Your Vote:</span>
+                {{#if hasVote}}
+                    <button type="button" id="finalizeVote" class="btn btn-danger {{isDisabledVote}}" {{isDisabledVote}}>Finalize Vote</button>
+                {{/if}}
+            {{/unless}}
+            {{/if}}
+            {{/if}}
+
+            {{#if secondStageIsBetting}}
+            {{#if answersFinalized}}
+            {{#unless betsFinalized}}
+                <span class="lead">Choose answers to risk your points:</span>
+                {{#if hasBet}}
+                    <button type="button" id="finalizeBet" class="btn btn-danger {{isDisabledBet}}" {{isDisabledBet}}>Finalize Point Allocation</button>
+                {{/if}}
+            {{/unless}}
+            {{/if}}
             {{/if}}
         {{/if}}
 
         {{#if hasTwoStages}}
-            {{#if answersFinalized}}
-            {{#unless votesFinalized}}
-            {{#if hasVote}}
-                <button type="button" id="finalizeVote" class="btn btn-danger {{isDisabledVote}}" {{isDisabledVote}}>Finalize Vote</button>
-            {{/if}}
+            {{#if secondStageIsVoting}}
+            {{#if votesFinalized}}
+            {{#unless taskCompleted}}
+                {{> timerNext}}
             {{/unless}}
             {{/if}}
+            {{/if}}
+
+            {{#if secondStageIsBetting}}
+            {{#if betsFinalized}}
+            {{#unless taskCompleted}}
+                {{> timerNext}}
+            {{/unless}}
+            {{/if}}
+            {{/if}}
+        {{else}}
+            {{#if answersFinalized}}
+            {{#unless taskCompleted}}
+                {{> timerNext}}
+            {{/unless}}
+            {{/if}}
+        {{/if}}
+
+        {{#if taskCompleted}}
+            <button type="button" id="goToExitSurvey" class="btn btn-success">Go to exit survey</button>
         {{/if}}
 
     </form>
 
     <div>
-        <!--<label class="control-label lead">-->
-            <!--Answers:-->
-        <!--</label>-->
         <ul class="row" id="answerList">
             <li class="span1"></li>
 
-            {{> roundResults}}
+            {{> roundAnswers}}
         </ul>
     </div>
 

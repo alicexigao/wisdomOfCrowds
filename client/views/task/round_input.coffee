@@ -1,60 +1,98 @@
-Template.enterEstimates.events =
+Template.roundInputs.events =
+
 
   "click #updateEstimate": (ev) ->
     ev.preventDefault()
-    estimate = $("input#inputEstimate").val()
-    unless estimate
+
+    ans = $("input#inputEstimate").val().trim()
+
+    # validate answer
+    return unless ans
+    ansFloat = parseFloat(ans, 10)
+    if isNaN(ansFloat) or ansFloat < 0 or ansFloat > 100
+      bootbox.alert "Please enter a number in the range of 0 to 100 inclusive."
+      $("input#inputEstimate").val ""
       return
+    else
+      ansFloat = Math.round(ansFloat * 100) / 100
+      $("input#inputEstimate").val ""
 
     answerData =
-      answer: estimate
+      answer: ansFloat
       status: "submitted"
 
     Meteor.call 'updateAnswer', answerData, (error, id) ->
       if error
         return bootbox.alert error.reason
 
+
   "click #finalizeEstimate": (ev) ->
     ev.preventDefault()
-    estimate = $("input#inputEstimate").val()
+
+    ans = $("input#inputEstimate").val().trim()
+
+    # validate answer
+    ansFloat = parseFloat(ans, 10)
+    if ans
+      if isNaN(ansFloat) or ansFloat < 0 or ansFloat > 100
+        bootbox.alert "Please enter a number in the range of 0 to 100 inclusive."
+        $("input#inputEstimate").val ""
+        return
+      else
+        $("input#inputEstimate").val ""
+        ansFloat = Math.round(ansFloat * 100) / 100
+    else
+      ansFloat = null
+
     answerData =
-      answer: estimate
+      answer: ansFloat
       status: "finalized"
+      userId: Meteor.user()._id
 
     Meteor.call 'updateAnswer', answerData, (error, id) ->
       if error
         return bootbox.alert error.reason
 
-    data =
-      userId: Meteor.user()._id
-    Meteor.call 'saveAnswers', data, (error, id) ->
-      if error
-        return bootbox.alert error.reason
+    if Template.roundInputs.hasTwoStages()
+      # has two stages
 
-    if not Template.enterEstimates.hasTwoStages() and Template.enterEstimates.answersFinalized()
+      if Template.roundInputs.answersFinalized()
 
-      Meteor.call 'stopTimerMain', {}, (error, id) ->
-        if error
-          return bootbox.alert error.reason
+        Meteor.call 'stopTimerMain', {}, (error, id) ->
+          if error
+            return bootbox.alert error.reason
 
-      Meteor.call 'markRoundCompleted', {}, (error, id) ->
-        if error
-          return bootbox.alert error.reason
+        Meteor.call 'startTimerSecond', {}, (error, id) ->
+          if error
+            return bootbox.alert error.reason
+
+    else
+      # only has one stage
+      if Template.roundInputs.answersFinalized()
+
+        Meteor.call 'stopTimerMain', {}, (error, id) ->
+          if error
+            return bootbox.alert error.reason
+
+        Meteor.call 'markRoundCompleted', {}, (error, id) ->
+          if error
+            return bootbox.alert error.reason
+
+
 
   "click #finalizeVote": (ev) ->
     ev.preventDefault()
 
     voteData =
       userId: Meteor.user()._id
+
     Meteor.call 'finalizeVote', voteData, (error, id) ->
       if error
         return bootbox.alert error.reason
 
-    # Save finalized vote
+    if Template.roundInputs.votesFinalized()
 
-    if Template.enterEstimates.votesFinalized()
-
-      Meteor.call 'stopTimerMain', {}, (error, id) ->
+      Meteor.call 'stopTimerSecond', {}, (error, id) ->
         if error
           return bootbox.alert error.reason
 
@@ -63,11 +101,45 @@ Template.enterEstimates.events =
           return bootbox.alert error.reason
 
 
-Template.enterEstimates.hasAnswer = ->
+  "click #finalizeBet": (ev) ->
+    ev.preventDefault()
+
+    betData =
+      userId: Meteor.user()._id
+
+    Meteor.call 'finalizeBet', betData, (error, id) ->
+      if error
+        return bootbox.alert error.reason
+
+    if Template.roundInputs.betsFinalized()
+
+      Meteor.call 'stopTimerSecond', {}, (error, id) ->
+        if error
+          return bootbox.alert error.reason
+
+      Meteor.call 'markRoundCompleted', {}, (error, id) ->
+        if error
+          return bootbox.alert error.reason
+
+
+  "click #goToExitSurvey": (ev) ->
+    Meteor.Router.to('/exitsurvey')
+
+
+
+
+###########################
+# Functions for stage 1
+###########################
+
+Template.roundInputs.hasAnswer = ->
   userId = Meteor.user()._id
   return Answers.find({userId: userId}).count() > 0
 
-Template.enterEstimates.isDisabled = ->
+Template.roundInputs.answersFinalized = ->
+  return Answers.find({status: "finalized"}).count() is Meteor.users.find().count()
+
+Template.roundInputs.isDisabled = ->
   uid = Meteor.user()._id
   ans = Answers.findOne({userId: uid})
   if ans and ans.status is "finalized"
@@ -75,67 +147,105 @@ Template.enterEstimates.isDisabled = ->
   else
     return ""
 
-Template.enterEstimates.numRounds = ->
+Template.roundInputs.numRounds = ->
   Rounds.find().count()
 
-Template.enterEstimates.getRoundIndex = ->
+Template.roundInputs.getRoundIndex = ->
   currentRoundObj = CurrentRound.findOne()
   if currentRoundObj
     return currentRoundObj.index
   else
     return -1
 
-Template.enterEstimates.getRoundObj = ->
-  i = Template.enterEstimates.getRoundIndex()
+Template.roundInputs.getRoundObj = ->
+  i = Template.roundInputs.getRoundIndex()
   if i isnt -1
     roundObj = Rounds.find().fetch()[i]
     if roundObj
       return roundObj
   return -1
 
-Template.enterEstimates.getRoundIndexDisplay = ->
-  i = Template.enterEstimates.getRoundIndex()
+Template.roundInputs.getRoundIndexDisplay = ->
+  i = Template.roundInputs.getRoundIndex()
   if i isnt -1
     return i + 1
   return "Error retrieving index of current round"
 
-Template.enterEstimates.getQuestion = ->
-  round = Template.enterEstimates.getRoundObj()
+Template.roundInputs.getQuestion = ->
+  round = Template.roundInputs.getRoundObj()
   if round isnt -1
     return round.question
   return "Error retrieving question"
 
-Template.enterEstimates.correctAnswer = ->
-  roundObj = Template.enterEstimates.getRoundObj()
+Template.roundInputs.correctAnswer = ->
+  roundObj = Template.roundInputs.getRoundObj()
   if roundObj isnt -1
     return roundObj.correctanswer
   return "Error retrieving correct answer"
 
-Template.enterEstimates.answersFinalized = ->
-#  if Answers.find().count() is 0
-#    return false
-  return Answers.find({status: "finalized"}).count() is Meteor.users.find().count()
 
 
 
+###########################
+# Functions for stage 2 (voting)
+###########################
 
-Template.enterEstimates.hasVote = ->
+Template.roundInputs.hasTwoStages = ->
+  tre = Treatment.findOne()
+  if tre
+    return tre.displaySecondStage
+
+Template.roundInputs.hasVote = ->
   return Votes.findOne {userId: Meteor.user()._id}
-#  if Votes.findOne {userId: Meteor.user()._id}
-#    return true
-#  return false
 
-Template.enterEstimates.isDisabledVote = ->
+Template.roundInputs.votesFinalized = ->
+  return Votes.find({status: "finalized"}).count() is Meteor.users.find().count()
+
+Template.roundInputs.isDisabledVote = ->
   vote = Votes.findOne {userId: Meteor.user()._id}
   if vote and vote.status is "finalized"
     return "disabled"
   else
     return ""
 
-Template.enterEstimates.votesFinalized = ->
-  return Votes.find({status: "finalized"}).count() is Meteor.users.find().count()
+Template.roundInputs.secondStageIsVoting = ->
+  tre = Treatment.findOne()
+  if tre
+    return tre.displaySecondStage and tre.secondStageType is "voting"
 
-Template.enterEstimates.hasTwoStages = ->
-  obj = Treatment.findOne()
-  if obj
-    return obj.displaySecondStage
+Template.roundInputs.secondStageIsBetting = ->
+  tre = Treatment.findOne()
+  if tre
+    return tre.displaySecondStage and tre.secondStageType is "betting"
+
+
+###########################
+# Functions for stage 2 (betting)
+###########################
+
+Template.roundInputs.hasBet = ->
+  return Bets.findOne {userId: Meteor.user()._id}
+
+Template.roundInputs.isDisabledBet = ->
+  bet = Bets.findOne {userId: Meteor.user()._id}
+  if bet and bet.status is "finalized"
+    return "disabled"
+  else
+    return ""
+
+Template.roundInputs.betsFinalized = ->
+  return Bets.find({status: "finalized"}).count() is Meteor.users.find().count()
+
+
+
+
+Template.roundInputs.taskCompleted = ->
+  numQuestions = Rounds.find().count()
+  round =  Rounds.findOne({index: numQuestions - 1})
+  return unless round
+  if round.status is "completed"
+    clearInterval(Template.timerNext.intervalIdNext)
+    clearInterval(Template.timerMain.intervalIdMain)
+    clearInterval(Template.timerSecond.intervalIdSecond)
+    return true
+  return false
