@@ -50,6 +50,9 @@ Template.roundHistory.getOtherAnswersString = ->
     return str.substring(0, str.length - 1)
   return ""
 
+Template.roundHistory.displayWinner = ->
+  return Template.roundAnswers.displayWinner()
+
 Template.roundHistory.getWinningAnswerString = ->
   if Template.roundHistory.isRoundFinished(this)
     correctAnswer = this.correctanswer
@@ -61,19 +64,7 @@ Template.roundHistory.getWinningAnswerString = ->
     return bestAnswer + "%"
   return ""
 
-Template.roundHistory.getAverageAnswerString = ->
-  if Template.roundHistory.isRoundFinished(this)
-    avg = this.average
-    avg = parseInt(avg * 100) / 100
-    return avg + "%"
-  return ""
 
-Template.roundHistory.getAverageByVotesString = ->
-  if Template.roundHistory.isRoundFinished(this)
-    avg = this.averageByVotes
-    avg = parseInt(avg * 100) / 100
-    return avg + "%"
-  return ""
 
 Template.roundHistory.getCorrectAnswer = ->
   str = ""
@@ -82,17 +73,44 @@ Template.roundHistory.getCorrectAnswer = ->
     return str
   return ""
 
+
 Template.roundHistory.calcPoints = ->
   tre = Treatment.findOne()
+
   if tre and tre.pointsRule is "ownAnswer"
     # points based on individual answer
     if Template.roundHistory.isRoundFinished(this)
       uid = Meteor.user()._id
       len = this.winnerIdArray.length
       if uid in this.winnerIdArray
-        return 100 / len
+        pts = 100 / len
+        pts = Math.round(pts)
+        return pts
       else
         return 10
+
+  else if tre and tre.pointsRule is "ownAnswerByVotes"
+    uid = Meteor.user()._id
+    len = this.winnerIdArray.length
+    vote = this.votes[uid].vote
+    if vote in this.winnerIdArray
+      pts = 100 / len
+      pts = Math.round(pts)
+      return pts
+    else
+      return 10
+
+  else if tre and tre.pointsRule is "ownAnswerByBets"
+    uid = Meteor.user()._id
+    bets = this.bets[uid]
+    total = 0
+    odds = 10
+    for answerUID in Object.keys(bets)
+      if answerUID in this.winnerIdArray
+        total += bets[answerUID].amount * odds
+    if total is 0
+      return 10
+    return total
 
   else if tre and tre.pointsRule is "average"
     # points based on simple average
@@ -106,8 +124,10 @@ Template.roundHistory.calcPoints = ->
     pts = parseInt(pts * 100) / 100
     return pts
 
-  else if tre and tre.pointsRule is "averageByWagers"
-    return -1
+  else if tre and tre.pointsRule is "averageByBets"
+    pts = Template.roundHistory.getPoints(this.averageByBets, this.correctanswer)
+    pts = parseInt(pts * 100) / 100
+    return pts
 
 Template.roundHistory.getPoints = (ans, correct) ->
   if Math.abs(ans - correct) > 50
@@ -115,15 +135,37 @@ Template.roundHistory.getPoints = (ans, correct) ->
   else
     return 110 - 2 * Math.abs(ans - correct)
 
-Template.roundHistory.displayWinner = ->
-  return Template.roundAnswers.displayWinner()
+
+
+
 
 Template.roundHistory.displayAverage = ->
   tre = Treatment.findOne()
   return unless tre
   return tre.displayAverage
 
-Template.roundHistory.displayAverageByVotes = ->
+Template.roundHistory.getAverageHeader = ->
   tre = Treatment.findOne()
   return unless tre
-  return tre.pointsRule is "averageByVotes"
+  if tre.pointsRule is "average"
+    return "Average"
+  else if tre.pointsRule is "averageByVotes"
+    return "Average (by votes)"
+  else if tre.pointsRule is "averageByBets"
+    return "Average (by bets)"
+
+Template.roundHistory.getAverageString = ->
+  return "" unless Template.roundHistory.isRoundFinished(this)
+
+  tre = Treatment.findOne()
+  return "" unless tre
+
+  if tre.pointsRule is "average"
+    avg = this.average
+  else if tre.pointsRule is "averageByVotes"
+    avg = this.averageByVotes
+  else if tre.pointsRule is "averageByBets"
+    avg = this.averageByBets
+
+  avg = parseInt(avg * 100) / 100
+  return avg + "%"

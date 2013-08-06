@@ -9,7 +9,7 @@
     {{#if displayAverage}}
         <li class="answer badge badge-success">
             <p class="badgeRow">{{getAverage}}%</p>
-            <p>average</p>
+            <p>{{getAverageString}}</p>
         </li>
     {{/if}}
 
@@ -23,15 +23,18 @@
 
             {{#if answersFinalized}}
 
-                {{#if displayWinner}}
-                    {{#if isBestAnswer}}
-                        <p class="badgeRow">Winner</p>
-                    {{/if}}
-                {{/if}}
 
                 {{#if displaySecondStage}}
 
                     {{#if secondStageIsVoting}}
+
+                        {{#if displayWinner}}
+                        {{#if votesFinalized}}
+                        {{#if isBestAnswer}}
+                            <p class="badgeRow">Best Answer</p>
+                        {{/if}}
+                        {{/if}}
+                        {{/if}}
 
                         {{#if voteFinalized}}
                             {{#if hasVote _id}}
@@ -48,18 +51,38 @@
                     {{/if}}
 
                     {{#if secondStageIsBetting}}
+
+                        {{#if displayWinner}}
+                        {{#if betsFinalized}}
+                        {{#if isBestAnswer}}
+                            <p class="badgeRow">Best Answer</p>
+                        {{/if}}
+                        {{/if}}
+                        {{/if}}
+
                         <p class="badgeRow">
-                            {{#unless betsFinalized}}
+                            {{#unless betFinalized}}
                                 <input type="checkbox" name="bets" id="{{_id}}" {{isCheckedBet}}>
                             {{/unless}}
-                            {{#if isCheckedBet}}
+
+                            {{#unless betsFinalized}}
                                 <span>{{getBetAmount}}</span>
-                                {{#unless betsFinalized}}
-                                    <input type="button" class="increaseBet" value="&#x25B2;">
-                                    <input type="button" class="decreaseBet" value="&#x25BC;">
-                                {{/unless}}
-                            {{/if}}
+                            {{/unless}}
+
+                            {{#unless betFinalized}}
+                                <input type="button" class="increaseBet" value="&#x25B2;" {{getDisabledStringIncrease}}>
+                                <input type="button" class="decreaseBet" value="&#x25BC;" {{getDisabledStringDecrease}}>
+                            {{/unless}}
+
                         </p>
+                    {{/if}}
+
+                {{else}}
+
+                    {{#if displayWinner}}
+                    {{#if isBestAnswer}}
+                        <p class="badgeRow">Best Answer</p>
+                    {{/if}}
                     {{/if}}
 
                 {{/if}}

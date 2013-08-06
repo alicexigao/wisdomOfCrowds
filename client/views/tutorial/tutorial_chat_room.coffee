@@ -1,7 +1,7 @@
-Template.chatRoom.messages = ->
+Template.tutorialChatRoom.messages = ->
   ChatMessages.find()
 
-Template.chatRoom.events =
+Template.tutorialChatRoom.events =
   "submit form": (ev) ->
     ev.preventDefault()
 
@@ -20,17 +20,17 @@ Template.chatRoom.events =
     msgContent.val ""
     msgContent.focus()
 
-#    scroll to bottom
+    # scroll to bottom
     $('ul#messageArea').scrollTop($('ul#messageArea').prop("scrollHeight"))
 
-Template.chatRoom.timestampFormat = ->
+Template.tutorialChatRoom.timestampFormat = ->
   (new Date(this.timestamp)).toLocaleTimeString()
 
-Template.chatRoom.rendered = ->
-  #    scroll to bottom
+Template.tutorialChatRoom.rendered = ->
+  # scroll to bottom
   $('ul#messageArea').scrollTop($('ul#messageArea').prop("scrollHeight"))
 
-Template.chatRoom.displayChatRoom = ->
+Template.tutorialChatRoom.displayChatRoom = ->
   obj = Treatment.findOne()
   if obj
     return obj.displayChatRoom

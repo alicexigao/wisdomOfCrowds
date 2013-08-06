@@ -1,16 +1,25 @@
 
 this.Treatment = new Meteor.Collection('treatment')
 
-this.CurrentRound = new Meteor.Collection("currentRound")
+this.TutorialCounter = new Meteor.Collection("tutorialCounter")
+this.TutorialText = new Meteor.Collection("tutorialText")
+this.TutorialData = new Meteor.Collection("tutorialData")
 
+this.QuizAttempts = new Meteor.Collection('quizAttempts')
+this.ErrorMessages = new Meteor.Collection('errorMessages')
+
+this.PlayerStatus = new Meteor.Collection("playerStatus")
+
+this.Timers = new Meteor.Collection("timeleft")
+
+this.CurrentRound = new Meteor.Collection("currentRound")
 this.Rounds = new Meteor.Collection('rounds')
 this.Answers = new Meteor.Collection('answers')
 this.Votes = new Meteor.Collection('votes')
 this.Bets = new Meteor.Collection('bets')
 
-this.Timers = new Meteor.Collection("timeleft")
-
 this.ChatMessages = new Meteor.Collection('chatMessages')
+
 
 
 Meteor.methods
@@ -27,43 +36,55 @@ Meteor.methods
 
   countdownNext: (data) ->
     timerObj = Timers.findOne({name: "next"})
+    return unless timerObj
     return unless timerObj.start is true
 
-    if timerObj
-      currTime = new Date()
-      endTime = new Date(timerObj.endTime)
+    currTime = new Date()
+    endTime = new Date(timerObj.endTime)
 
-      if currTime < endTime
+    if currTime < endTime
 
-        # Time is not up yet
-        numSeconds = (endTime.getTime() - currTime.getTime()) / 1000
-        numSeconds = Math.floor(numSeconds)
-        Timers.update {name: "next"},
-          $set: {secondsLeft: numSeconds}
+      # Time is not up yet
+      numSeconds = (endTime.getTime() - currTime.getTime()) / 1000
+      numSeconds = Math.floor(numSeconds)
+      Timers.update {name: "next"},
+        $set: {secondsLeft: numSeconds}
 
-      else
+    else
 
-        # Stop timer NEXT
-        Timers.update {name: "next"},
-          $set: {start: false}
+      # Stop timer NEXT
+      Timers.update {name: "next"},
+        $set: {start: false}
 
-        # Go to next round
-        Answers.remove({})
-        Votes.remove({})
-        Bets.remove({})
-        CurrentRound.update({}, {$inc: {index: 1}})
+      # reset temporary objects
+      Answers.remove({})
+      Votes.remove({})
+      Bets.remove({})
 
-        # Reset and start main timer
-        timerMainDur = 60
-        time = new Date()
-        mainEndTime = time.getTime() + 1000 * timerMainDur
-        time.setTime(mainEndTime)
-        Timers.update {name: "main"},
-          $set: {endTime: time}
-        Timers.update {name: "main"},
-          $set: {secondsLeft: timerMainDur}
-        Timers.update {name: "main"},
-          $set: {start: true}
+      # incr round number
+      CurrentRound.update({}, {$inc: {index: 1}})
+
+      # Reset and start main timer
+      timerMainDur = 60
+      time = new Date()
+      mainEndTime = time.getTime() + 1000 * timerMainDur
+      time.setTime(mainEndTime)
+      Timers.update {name: "main"},
+        $set: {endTime: time}
+      Timers.update {name: "main"},
+        $set: {secondsLeft: timerMainDur}
+      Timers.update {name: "main"},
+        $set: {start: true}
+
+  startTimerMain: ->
+    timerMainDur = 60
+    time = new Date()
+    endTime = time.getTime() + 1000 * timerMainDur
+    time.setTime(endTime)
+    Timers.update {name: "main"},
+      $set: {endTime: time}
+    Timers.update {name: "main"},
+      $set: {start: true}
 
   stopTimerMain: ->
     Timers.update {name: "main"},
@@ -71,6 +92,7 @@ Meteor.methods
 
   countdownMain: (data) ->
     obj = Timers.findOne({name: "main"})
+    return unless obj
     return unless obj.start is true
 
     currTime = new Date()
@@ -108,8 +130,10 @@ Meteor.methods
       tre = Treatment.findOne()
       if tre and tre.displaySecondStage and tre.secondStageType is "voting"
         # Start timer second
-        Timers.update {name: "second"},
-          $set: {start: true}
+        Meteor.call "startTimerSecond"
+      else if tre and tre.displaySecondStage and tre.secondStageType is "betting"
+        # Start timer second
+        Meteor.call "startTimerSecond"
       else
         Meteor.call 'markRoundCompleted'
 
@@ -129,6 +153,7 @@ Meteor.methods
 
   countdownSecond: (data) ->
     obj = Timers.findOne({name: "second"})
+    return unless obj
     return unless obj.start is true
 
     if obj
@@ -174,6 +199,12 @@ Meteor.methods
             if bets.length > 0
               Bets.update {userId: user._id},
                 $set: {status: "finalized"}
+            else
+              Bets.insert
+                userId: user._id
+                answerId: user._id
+                amount: 1
+                status: "finalized"
 
           # save all bets
           Meteor.call 'saveAllBets'
@@ -209,39 +240,39 @@ Meteor.methods
         votes = round.votes[userId].numVotes
         sumVotes += ans * votes
         numVotes += votes
-        Rounds.update {index: roundNum},
-          $set: {averageByVotes: sumVotes / numVotes}
+      Rounds.update {index: roundNum},
+        $set: {averageByVotes: sumVotes / numVotes}
 
     if tre and tre.displaySecondStage and tre.secondStageType is "betting"
 
       # calc total bet amounts
-      betObj = round.bets
-
+      betAmt = {}
       for user in Meteor.users.find().fetch()
-        if betObj[user._id]
-          betObj[user._id].totalAmount = 0
-        else
-          betObj[user._id] = {totalAmount: 0}
+          betAmt[user._id] = {totalAmount: 0}
 
+      betObj = round.bets
       for userId in Object.keys(betObj)
-        for answerId in Object.keys(betObj[userId])
-          if answerId in Meteor.users.find().fetch()
-            amount = round.bets[userId][answerId].amount
-            betObj[answerId].totalAmount = betObj[answerId].totalAmount + amount
+        for answerUserId in Object.keys(betObj[userId])
+          amount = betObj[userId][answerUserId].amount
+          betAmt[answerUserId].totalAmount += amount
 
       Rounds.update {index: roundNum},
-        $set: {bets: betObj}
+        $set: {betAmounts: betAmt}
 
       # calc average by bets
-      betAmount = 0
-      sumBets = 0
+      round = Rounds.findOne {index: roundNum}
+
+      betsAndAnswers = 0
+      bets = 0
       for userId in Object.keys(round.answers)
+
         ans = parseInt(round.answers[userId].answer)
-        amount = round.bets[userId].betAmount
-        sumBets += ans * amount
-        betAmount += amount
-        Rounds.update {index: roundNum},
-          $set: {averageByBets: sumBets / betAmount}
+        amt = round.betAmounts[userId].totalAmount
+
+        betsAndAnswers += ans * amt
+        bets += amt
+      Rounds.update {index: roundNum},
+        $set: {averageByBets: betsAndAnswers / bets}
 
 
     # calc average and winner
@@ -439,8 +470,10 @@ Meteor.methods
         $inc: {amount: data.change}
 
   finalizeBet: (data) ->
-    Bets.update {userId: data.userId},
-      $set: {status: "finalized"}
+    bets = Bets.find({userId: data.userId}).fetch()
+    for bet in bets
+      Bets.update {userId: data.userId, answerId: bet.answerId},
+        $set: {status: "finalized"}
 
     Meteor.call 'saveBet', data
 
@@ -468,3 +501,127 @@ Meteor.methods
     roundNum = CurrentRound.findOne().index
     Rounds.update {index: roundNum},
       $set: {bets: betObj}
+
+
+
+  #############################
+  # Tutorial functions
+  #############################
+  incrTutorialPage: (data) ->
+    TutorialCounter.update {userId: data.userId},
+      $inc: {index: data.change}
+
+  tutorialUpdateAnswer: (data) ->
+    tre = Treatment.findOne()
+    return null unless tre
+
+    if data.answer isnt null
+      ansObj = TutorialData.findOne({userId: data.userId}).answers
+      ansObj[0].answer = data.answer
+      ansObj[0].status = data.status
+      TutorialData.update {userId: data.userId},
+        $set: {answers: ansObj}
+    else
+      ansObj = TutorialData.findOne({userId: data.userId}).answers
+      ansObj[0].status = data.status
+      TutorialData.update {userId: data.userId},
+        $set: {answers: ansObj}
+
+  finalizeAliceAnswer: (data) ->
+    tre = Treatment.findOne()
+    return null unless tre
+
+    ansObj =  TutorialData.findOne({userId: data.userId}).answers
+    if ansObj[0].answer is null
+      ansObj[0].answer = 50
+    ansObj[0].status = "finalized"
+
+    TutorialData.update {userId: data.userId},
+      $set: {answers: ansObj}
+
+    # update winning answer
+    if tre.displayWinner
+      tutObj = TutorialData.findOne({userId: data.userId})
+      correct = tutObj.correctAnswer
+      bestAnswer = -Infinity
+      for ansObj in tutObj.answers
+        if Math.abs(ansObj.answer - correct) < Math.abs(bestAnswer - correct)
+          bestAnswer = ansObj.answer
+      TutorialData.update {userId: data.userId},
+        $set: {winner: bestAnswer}
+
+    if tre.displayAverage
+      tutObj = TutorialData.findOne({userId: data.userId})
+      total = 0
+      average = 0
+      for ansObj in tutObj.answers
+        total += ansObj.answer
+      average = total / Object.keys(tutObj.answers).length
+      TutorialData.update {userId: data.userId},
+        $set: {average: average}
+
+  clearAliceAnswer: (data) ->
+    tre = Treatment.findOne()
+    return null unless tre
+
+    ansObj =  TutorialData.findOne({userId: data.userId}).answers
+    ansObj[0].answer = null
+    ansObj[0].status = "pending"
+
+    TutorialData.update {userId: data.userId},
+      $set: {answers: ansObj}
+    TutorialData.update {userId: data.userId},
+      $set: {winner: null}
+
+
+  #############################
+  # Quiz functions
+  #############################
+  gradeQuiz: (data) ->
+
+    if "q1" in data.list
+      deduct = 0
+    else
+      deduct = 1
+    total = 8
+    QuizAttempts.insert
+      userId: data.userId
+      list:   data.list
+      timestamp: new Date()
+      score:  total - deduct
+      total:  total
+
+    numAttempts = QuizAttempts.find({userId: data.userId}).count()
+    if ErrorMessages.findOne({userId: data.userId, type: "numAttempts"})
+      ErrorMessages.update {userId: data.userId, type: "numAttempts"},
+        $set: {numAttempts: numAttempts}
+    else
+      ErrorMessages.insert
+        userId: data.userId
+        type:   "numAttempts"
+        numAttempts: numAttempts
+
+    if deduct is 0
+      ErrorMessages.remove({userId: data.userId, type: "quiz"})
+      return true
+    else
+      msg = "Sorry, you've failed the quiz.  Please try again!"
+      if ErrorMessages.findOne({userId: data.userId, type: "quiz"})
+        ErrorMessages.update {userId: data.userId, type: "quiz"},
+          $set: {message: msg}
+      else
+        ErrorMessages.insert
+          userId: data.userId
+          type    : "quiz"
+          message : msg
+      return false
+
+
+  setStatusReady: (data) ->
+    PlayerStatus.update {userId: data.userId},
+      $set: {ready: true}
+    result = PlayerStatus.find({ready: true}).count() is Meteor.users.find().count()
+    Meteor.call "startTimerMain"
+    return result
+
+

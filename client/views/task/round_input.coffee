@@ -1,6 +1,5 @@
 Template.roundInputs.events =
 
-
   "click #updateEstimate": (ev) ->
     ev.preventDefault()
 
@@ -21,7 +20,7 @@ Template.roundInputs.events =
       answer: ansFloat
       status: "submitted"
 
-    Meteor.call 'updateAnswer', answerData, (error, id) ->
+    Meteor.call 'updateAnswer', answerData, (error, result) ->
       if error
         return bootbox.alert error.reason
 
@@ -49,7 +48,7 @@ Template.roundInputs.events =
       status: "finalized"
       userId: Meteor.user()._id
 
-    Meteor.call 'updateAnswer', answerData, (error, id) ->
+    Meteor.call 'updateAnswer', answerData, (error, result) ->
       if error
         return bootbox.alert error.reason
 
@@ -58,11 +57,11 @@ Template.roundInputs.events =
 
       if Template.roundInputs.answersFinalized()
 
-        Meteor.call 'stopTimerMain', {}, (error, id) ->
+        Meteor.call 'stopTimerMain', {}, (error, result) ->
           if error
             return bootbox.alert error.reason
 
-        Meteor.call 'startTimerSecond', {}, (error, id) ->
+        Meteor.call 'startTimerSecond', {}, (error, result) ->
           if error
             return bootbox.alert error.reason
 
@@ -70,11 +69,11 @@ Template.roundInputs.events =
       # only has one stage
       if Template.roundInputs.answersFinalized()
 
-        Meteor.call 'stopTimerMain', {}, (error, id) ->
+        Meteor.call 'stopTimerMain', {}, (error, result) ->
           if error
             return bootbox.alert error.reason
 
-        Meteor.call 'markRoundCompleted', {}, (error, id) ->
+        Meteor.call 'markRoundCompleted', {}, (error, result) ->
           if error
             return bootbox.alert error.reason
 
@@ -86,17 +85,17 @@ Template.roundInputs.events =
     voteData =
       userId: Meteor.user()._id
 
-    Meteor.call 'finalizeVote', voteData, (error, id) ->
+    Meteor.call 'finalizeVote', voteData, (error, result) ->
       if error
         return bootbox.alert error.reason
 
     if Template.roundInputs.votesFinalized()
 
-      Meteor.call 'stopTimerSecond', {}, (error, id) ->
+      Meteor.call 'stopTimerSecond', {}, (error, result) ->
         if error
           return bootbox.alert error.reason
 
-      Meteor.call 'markRoundCompleted', {}, (error, id) ->
+      Meteor.call 'markRoundCompleted', {}, (error, result) ->
         if error
           return bootbox.alert error.reason
 
@@ -107,17 +106,17 @@ Template.roundInputs.events =
     betData =
       userId: Meteor.user()._id
 
-    Meteor.call 'finalizeBet', betData, (error, id) ->
+    Meteor.call 'finalizeBet', betData, (error, result) ->
       if error
         return bootbox.alert error.reason
 
     if Template.roundInputs.betsFinalized()
 
-      Meteor.call 'stopTimerSecond', {}, (error, id) ->
+      Meteor.call 'stopTimerSecond', {}, (error, result) ->
         if error
           return bootbox.alert error.reason
 
-      Meteor.call 'markRoundCompleted', {}, (error, id) ->
+      Meteor.call 'markRoundCompleted', {}, (error, result) ->
         if error
           return bootbox.alert error.reason
 
@@ -234,7 +233,10 @@ Template.roundInputs.isDisabledBet = ->
     return ""
 
 Template.roundInputs.betsFinalized = ->
-  return Bets.find({status: "finalized"}).count() is Meteor.users.find().count()
+  for user in Meteor.users.find().fetch()
+    if Bets.find({userId: user._id}).count() < 1
+      return false
+  return Bets.find({status: "finalized"}).count() is Bets.find().count()
 
 
 

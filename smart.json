@@ -2,7 +2,12 @@
   "packages": {
     "router": {},
     "accounts-ui-bootstrap-dropdown": {},
-    "user-status": {},
-    "bootboxjs": {}
+    "user-status": {
+        "path": "../meteor-user-status"
+    },
+    "bootboxjs": {},
+    "turkserver": {
+        "path": "../turkserver-meteor"
+    }
   }
 }

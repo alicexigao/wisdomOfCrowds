@@ -1,0 +1,31 @@
+<template name="tutorial">
+    <div class="container">
+
+        <h3>
+            Tutorial ({{getPageNum}}/{{getTotalPageNum}})
+            <button class="btn btn-success" id="previousPage" {{disablePrevious}}>Previous</button>
+            <button class="btn btn-success" id="nextPage" {{disableNext}}>Next</button>
+            {{#if lastStep}}
+            <button class="btn btn-success" id="goToQuiz">Go To Quiz</button>
+            {{/if}}
+        </h3>
+
+        <div>
+            <div id="tutorialText">
+                <p class="bigfont">
+                    {{getTutorialText}}
+                </p>
+            </div>
+
+            <div class="line-separator"></div>
+
+            {{#if shouldDisplayInterface}}
+            <div id="tutorialInterface">
+                {{> tutorialTask}}
+            </div>
+            {{/if}}
+        </div>
+
+    </div>
+</template>
+

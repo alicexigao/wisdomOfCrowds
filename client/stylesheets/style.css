@@ -17,18 +17,38 @@ li.answer {
     font-size:  120%;
 }
 
-.not-finalized {
-    background-color: #FAA938;
-}
-
-.not-finalized-curr {
-    background-color: #C76D6B;
-}
-
-.curr {
-    color: #C76D6B;
-}
-
+/* Results table formatting */
 td {
     text-align: center;
+}
+
+/* Tutorial formatting */
+div#tutorialText {
+    display: block;
+    height: 120px;
+}
+
+.line-separator{
+    height:1px;
+    background:#717171;
+    border-bottom:1px solid #313030;
+}
+
+input#tutorialInputEstimate {
+    text-align: right;
+}
+
+/* Quiz */
+label {
+    vertical-align: middle;
+    font-size: 140%;
+    padding: 5px;
+}
+
+.bigfont {
+    font-size: 140%;
+}
+
+textarea {
+    width: 800px;
 }

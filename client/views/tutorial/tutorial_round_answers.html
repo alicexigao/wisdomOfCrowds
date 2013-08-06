@@ -1,0 +1,34 @@
+<template name="tutorialRoundAnswers">
+
+    {{#if shouldDisplayResult}}
+        <li class="answer badge badge-success">
+            <p class="badgeRow">{{getCorrectAnswer}}%</p>
+            <p>correct</p>
+        </li>
+
+        {{#if shouldDisplayAverage}}
+        <li class="answer badge badge-success">
+            <p class="badgeRow">{{getAverage}}%</p>
+            <p>average</p>
+        </li>
+        {{/if}}
+
+    {{/if}}
+
+    {{#each answers}}
+        {{#if usernameIsAlice}}
+        <li class="answer badge badge-important">
+        {{else}}
+        <li class="answer badge badge-warning">
+        {{/if}}
+            {{#if shouldDisplayWinner}}
+            {{#if isWinner}}
+                <p class="badgeRow">Best Answer</p>
+            {{/if}}
+            {{/if}}
+            <p class="badgeRow">{{getAnswer}}</p>
+            <p class="badgeRow">{{username}}</p>
+        </li>
+    {{/each}}
+
+</template>

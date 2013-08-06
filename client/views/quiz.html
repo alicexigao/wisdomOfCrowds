@@ -1,7 +1,61 @@
 <template name="quiz">
     <h3>Quiz</h3>
-    <button class="btn btn-primary" id="goToTutorial">Go back to the tutorial</button>
 
-    <button class="btn btn-primary" id="submitAnswers">Submit answers</button>
+    {{#if hasError}}
+        <p class="alert alert-error lead">{{getQuizError}}</p>
+    {{/if}}
+
+    <p class="bigfont">Please check all correct statements.  You can attempt the quiz 3 times, and you must select all
+        of and only the correct statements to pass the quiz.</p>
+
+    <label for="q1" class="bigfont">
+        <input type="checkbox" id="q1">
+        During the game, you cannot see other players' answers, but you can see the status of their answers (pending,
+        submitted, finalized).
+    </label>
+
+    <label for="q8" class="bigfont">
+        <input type="checkbox" id="q8">
+        Your answer must be a valid number between 0 to 100 inclusive.  If it has more than 2 decimal places, it will
+        be automatically truncated to 2 decimal places.
+    </label>
+
+    <label for="q3" class="bigfont">
+        <input type="checkbox" id="q3">
+        When the timer runs out, your answer is assumed to be 50% if you haven't submitted an answer yet, and all
+        answers are finalized automatically.
+    </label>
+
+    <label for="q5" class="bigfont">
+        <input type="checkbox" id="q5">
+        A game ends either when the timer runs out or all answers are finalized.
+    </label>
+
+    <label for="q6" class="bigfont">
+        <input type="checkbox" id="q6">
+        When a game ends, all players' answers, the
+        correct answer and the best answer (closest to the correct answer) are revealed.
+    </label>
+
+    <label for="q7" class="bigfont">
+        <input type="checkbox" id="q7">
+        Each game has a 1-minute time limit, and there is a 10-second break between games.
+    </label>
+
+    <label for="q9" class="bigfont">
+        <input type="checkbox" id="q9">
+        At any time, the results table on the right shows the results of all previous games.
+    </label>
+
+    <label for="q10" class="bigfont">
+        <input type="checkbox" id="q10">
+        You get 100 points if your answer is one of the best answer(s) (closest to the correct answer).
+        Otherwise, you get 10 points.
+    </label>
+
+
+    <button class="btn btn-success" id="goToTutorial">Go back to the tutorial</button>
+
+    <button class="btn btn-success" id="submitAnswers">Submit answers</button>
 
 </template>

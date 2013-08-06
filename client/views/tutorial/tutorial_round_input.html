@@ -1,0 +1,30 @@
+<template name="tutorialRoundInputs">
+    <h4>Question 1 of 10: What percentage of the world population lives in North America in 2005?</h4>
+
+    {{#if shouldDisplayResult}}
+        <p>Loading next question in 10 seconds...</p>
+    {{else}}
+        <p>Time Remaining: 1:00</p>
+    {{/if}}
+
+    <form class="form-inline">
+
+        {{#unless shouldDisplayResult}}
+            <span class="lead" for="tutorialInputEstimate">Your Answer:</span>
+            <input type="text" id="tutorialInputEstimate" class="input-small" placeholder="" {{shouldDisable}}><span class="lead">%</span>
+            <button type="button" id="tutorialUpdateEstimate" class="btn btn-primary" {{shouldDisable}}>Update</button>
+            {{#if hasCurrAnswer}}
+                <button type="button" id="tutorialFinalizeEstimate" class="btn btn-danger" {{shouldDisable}}>Finalized</button>
+            {{/if}}
+        {{/unless}}
+    </form>
+
+    <div>
+        <ul class="row" id="answerList">
+            <li class="span1"></li>
+
+            {{> tutorialRoundAnswers}}
+        </ul>
+    </div>
+
+</template>

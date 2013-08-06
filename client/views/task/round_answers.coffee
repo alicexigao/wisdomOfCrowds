@@ -6,7 +6,7 @@ Template.roundAnswers.events =
       userId: Meteor.user()._id
       answerId: this._id
 
-    Meteor.call 'updateVote', voteData, (error, id) ->
+    Meteor.call 'updateVote', voteData, (error, result) ->
       if error
         return bootbox.alert error.reason
 
@@ -25,7 +25,7 @@ Template.roundAnswers.events =
         amount: 1
 
       # add bet
-      Meteor.call 'addBet', betData, (error, id) ->
+      Meteor.call 'addBet', betData, (error, result) ->
         if error
           return bootbox.alert error.reason
 
@@ -36,7 +36,7 @@ Template.roundAnswers.events =
         answerId: this._id
 
       # remove bet
-      Meteor.call 'removeBet', betData, (error, id) ->
+      Meteor.call 'removeBet', betData, (error, result) ->
         if error
           return bootbox.alert error.reason
 
@@ -49,7 +49,7 @@ Template.roundAnswers.events =
       answerId: this._id
       change: 1
 
-    Meteor.call 'updateBet', betData, (error, id) ->
+    Meteor.call 'updateBet', betData, (error, result) ->
       if error
         return bootbox.alert error.reason
 
@@ -62,13 +62,13 @@ Template.roundAnswers.events =
       answerId: this._id
       change: -1
 
-    Meteor.call 'updateBet', betData, (error, id) ->
+    Meteor.call 'updateBet', betData, (error, result) ->
       if error
         return bootbox.alert error.reason
 
 
 Template.roundAnswers.users = ->
-  Meteor.users.find({}, {sort: {username: 1}})
+  Meteor.users.find({}, {sort: {rand: 1}})
 
 Template.roundAnswers.isCurrentUser = ->
   return Meteor.user()._id is this._id
@@ -100,29 +100,38 @@ Template.roundAnswers.answersFinalized = ->
   return Template.roundInputs.answersFinalized()
 
 Template.roundAnswers.isBestAnswer = ->
-  return this._id is Template.roundAnswers.userIdForBestAnswer()
+  roundNum = CurrentRound.findOne().index
+  round = Rounds.findOne({index: roundNum})
+  if round.winnerIdArray
+    return this._id in round.winnerIdArray
+  return false
 
-Template.roundAnswers.userIdForBestAnswer = ->
-  if Template.roundInputs.answersFinalized()
-    ansArray = Answers.find().fetch()
-    bestId = ""
-    bestAnswer = -Infinity
-    correctAnswer = Template.roundInputs.correctAnswer()
-    for ans in ansArray
-      if Math.abs(ans.answer - correctAnswer) < Math.abs(bestAnswer - correctAnswer)
-        bestId = ans.userId
-        bestAnswer = ans.answer
-  return bestId
+
+Template.roundAnswers.getAverageString = ->
+  tre = Treatment.findOne()
+  if tre.pointsRule is "average"
+    return "average"
+  else if tre.pointsRule is "averageByVotes"
+    return "average by votes"
+  else if tre.pointsRule is "averageByBets"
+    return "average by bets"
 
 Template.roundAnswers.getAverage = ->
-  if Template.roundInputs.answersFinalized()
-    ansArray = Answers.find().fetch()
-    sum = 0
-    for ans in ansArray
-      sum = sum + parseInt(ans.answer)
-  avg = sum / ansArray.length
+  roundNum = CurrentRound.findOne().index
+  round = Rounds.findOne({index: roundNum})
+
+  tre = Treatment.findOne()
+  if tre.pointsRule is "average"
+    avg = round.average
+  else if tre.pointsRule is "averageByVotes"
+    avg = round.averageByVotes
+  else if tre.pointsRule is "averageByBets"
+    avg = round.averageByBets
   avg = parseInt(avg * 100) / 100
   return avg
+
+
+
 
 Template.roundAnswers.correctAnswer = ->
   return Template.roundInputs.correctAnswer()
@@ -137,28 +146,39 @@ Template.roundAnswers.displayAnswer = ->
 
 Template.roundAnswers.displayWinner = ->
   obj = Treatment.findOne()
-  return unless obj
+  return false unless obj
   return obj.displayWinner
 
 Template.roundAnswers.displayCorrectAnswer = ->
   obj = Treatment.findOne()
   return false unless obj
-  if obj.displaySecondStage and Template.roundInputs.votesFinalized()
-    return true
-  else if !obj.displaySecondStage and Template.roundInputs.answersFinalized()
-    return true
+  if obj.displaySecondStage
+    if obj.secondStageType is "voting"
+      return Template.roundInputs.votesFinalized()
+    else if obj.secondStageType is "betting"
+      return Template.roundInputs.betsFinalized()
+  else
+    return Template.roundInputs.answersFinalized()
   return false
 
 Template.roundAnswers.displayAverage = ->
   obj = Treatment.findOne()
-  if obj
-    return obj.displayAverage and Template.roundInputs.answersFinalized()
+  return false unless obj
+  return false unless obj.displayAverage
+  if obj.displaySecondStage
+    if obj.secondStageType is "voting"
+      return Template.roundInputs.votesFinalized()
+    else if obj.secondStageType is "betting"
+      return Template.roundInputs.betsFinalized()
+  else
+    return Template.roundInputs.answersFinalized()
+
+
 
 Template.roundAnswers.displaySecondStage = ->
   obj = Treatment.findOne()
   if obj
     return obj.displaySecondStage
-
 
 
 
@@ -186,24 +206,38 @@ Template.roundAnswers.getNumVotes = ->
   return Votes.find({answerId: this._id}).count()
 
 Template.roundAnswers.displayNumVotes = ->
-  return Template.roundAnswers.votesFinalized()
+  tre = Treatment.findOne()
+  if tre
+    return tre.displayWinner is false and Template.roundAnswers.votesFinalized()
 
 Template.roundAnswers.isCheckedVote = ->
   if Template.roundAnswers.hasVote(this._id)
     return "checked"
   return ""
 
+
+
+
+Template.roundAnswers.betFinalized = ->
+  bets = Bets.find({userId: Meteor.user()._id}).fetch()
+  if bets.length is 0
+    return false
+  else
+    for bet in bets
+      if bet.status is "finalized"
+        continue
+      else
+        return false
+  return true
+
 Template.roundAnswers.betsFinalized = ->
   return Template.roundInputs.betsFinalized()
-
-
-
 
 Template.roundAnswers.getBetAmount = ->
   bet = Bets.findOne {userId: Meteor.user()._id, answerId: this._id}
   if bet
-    return "  " + bet.amount
-  else return ""
+    return bet.amount
+  else return 0
 
 Template.roundAnswers.hasBet = (answerId) ->
   return Bets.findOne {userId: Meteor.user()._id, answerId: answerId}
@@ -212,3 +246,27 @@ Template.roundAnswers.isCheckedBet = ->
   if Template.roundAnswers.hasBet(this._id)
     return "checked"
   return ""
+
+
+Template.roundAnswers.getDisabledStringIncrease = ->
+  if Template.roundAnswers.hasBet(this._id) and Template.roundAnswers.allowIncrease()
+    return ""
+  else return "disabled"
+
+Template.roundAnswers.getDisabledStringDecrease = ->
+  if Template.roundAnswers.hasBet(this._id)
+    return ""
+  else return "disabled"
+
+Template.roundAnswers.getTotalBetAmount = ->
+  bets = Bets.find({userId: Meteor.user()._id}).fetch()
+  return 0 unless bets
+  total = 0
+  for betObj in bets
+    total += betObj.amount
+  return total
+
+Template.roundAnswers.allowIncrease = ->
+  total = Template.roundAnswers.getTotalBetAmount()
+  return total < 10
+

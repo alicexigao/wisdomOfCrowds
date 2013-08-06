@@ -4,16 +4,13 @@
         <caption class="lead">Results</caption>
         <tr>
             <th>#</th>
-            <th>You</th>
-            <th>Others</th>
+            <th>Yours</th>
+            <!--<th>Others</th>-->
             {{#if displayWinner}}
-                <th>Winner</th>
+                <th>Best Answer</th>
             {{/if}}
             {{#if displayAverage}}
-                <th>Average</th>
-            {{/if}}
-            {{#if displayAverageByVotes}}
-                <th>Average<br/>(By Votes)</th>
+                <th>{{getAverageHeader}}</th>
             {{/if}}
             <th>Correct</th>
             <th>Your Points</th>
@@ -23,15 +20,12 @@
                 <tr>
                     <td>{{getIndex}}</td>
                     <td>{{getMyAnswerString}}</td>
-                    <td>{{getOtherAnswersString}}</td>
+                    <!--<td>{{getOtherAnswersString}}</td>-->
                     {{#if displayWinner}}
                         <td>{{getWinningAnswerString}}</td>
                     {{/if}}
                     {{#if displayAverage}}
-                        <td>{{getAverageAnswerString}}</td>
-                    {{/if}}
-                    {{#if displayAverageByVotes}}
-                        <td>{{getAverageByVotesString}}</td>
+                        <td>{{getAverageString}}</td>
                     {{/if}}
                     <td>{{getCorrectAnswer}}</td>
                     <td>{{calcPoints}}</td>

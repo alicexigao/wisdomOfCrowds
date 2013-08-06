@@ -1,6 +1,6 @@
 
 Template.timerNext.countdown = ->
-  Meteor.call 'countdownNext', null, (error, id) ->
+  Meteor.call 'countdownNext', null, (error, result) ->
     if error
       return bootbox.alert error.reason
 

@@ -22,6 +22,7 @@ Meteor.publish "usernames", ->
   Meteor.users.find {'profile.online': true},
     fields:
       username: 1
+      rand: 1
 
 Meteor.publish "timeleft", ->
   Timers.find()
@@ -32,3 +33,17 @@ Meteor.publish "votes", ->
 Meteor.publish "bets", ->
   Bets.find()
 
+Meteor.publish "tutorialCounter", ->
+  TutorialCounter.find()
+
+Meteor.publish "tutorialText", ->
+  TutorialText.find()
+
+Meteor.publish "tutorialData", ->
+  TutorialData.find()
+
+Meteor.publish "playerStatus", ->
+  PlayerStatus.find()
+
+Meteor.publish 'errorMessages', ->
+  ErrorMessages.find()
