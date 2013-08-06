@@ -1,23 +1,23 @@
 Meteor.startup ->
   Treatment.remove({})
   Treatment.insert
-#    value: "competitive-bestanswer"
-#    displayChatRoom:      false
-#    displayOtherAnswers:  false
-#    displayAverage:       false
-#    displayWinner:        true
-#    displayCorrectAnswer: true
-#    displaySecondStage:   false
-#    pointsRule:           "ownAnswer"
-
-    value: "cooperative-average"
-    displayChatRoom:      true
-    displayOtherAnswers:  true
-    displayAverage:       true
-    displayWinner:        false
+    value: "competitive-bestanswer"
+    displayChatRoom:      false
+    displayOtherAnswers:  false
+    displayAverage:       false
+    displayWinner:        true
     displayCorrectAnswer: true
     displaySecondStage:   false
-    pointsRule:           "average"
+    pointsRule:           "ownAnswer"
+
+#    value: "cooperative-average"
+#    displayChatRoom:      true
+#    displayOtherAnswers:  true
+#    displayAverage:       true
+#    displayWinner:        false
+#    displayCorrectAnswer: true
+#    displaySecondStage:   false
+#    pointsRule:           "average"
 
 #    value: "competitive-votebestanswer"
 #    displayChatRoom:      true

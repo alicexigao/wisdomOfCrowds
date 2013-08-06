@@ -1,5 +1,22 @@
 <template name="roundAnswers">
 
+    {{#if readyToRender}}
+
+    <div>
+        <ul class="row" id="answerList">
+            <li class="span1"></li>
+            {{> roundAnswer}}
+        </ul>
+    </div>
+
+    {{else}}
+        Loading...Please wait...
+    {{/if}}
+
+</template>
+
+<template name="roundAnswer">
+
     {{#if displayCorrectAnswer}}
         <li class="answer badge badge-success">
             <p class="badgeRow">{{correctAnswer}}%</p>

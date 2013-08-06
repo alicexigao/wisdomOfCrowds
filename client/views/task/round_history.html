@@ -1,5 +1,6 @@
 <template name="roundHistory">
 
+    {{#if readyToRender}}
     <table class="table table-striped">
         <caption class="lead">Results</caption>
         <tr>
@@ -16,7 +17,7 @@
             <th>Your Points</th>
         </tr>
         {{#each rounds}}
-            {{# if roundFinished}}
+            {{# if isRoundFinished this}}
                 <tr>
                     <td>{{getIndex}}</td>
                     <td>{{getMyAnswerString}}</td>
@@ -33,5 +34,8 @@
             {{/if}}
         {{/each}}
     </table>
+    {{else}}
+        Loading...Please wait...
+    {{/if}}
 
 </template>

@@ -55,7 +55,7 @@ Template.roundInputs.events =
     if Template.roundInputs.hasTwoStages()
       # has two stages
 
-      if Template.roundInputs.answersFinalized()
+      if Handlebars._default_helpers.answersFinalized()
 
         Meteor.call 'stopTimerMain', {}, (error, result) ->
           if error
@@ -67,7 +67,7 @@ Template.roundInputs.events =
 
     else
       # only has one stage
-      if Template.roundInputs.answersFinalized()
+      if Handlebars._default_helpers.answersFinalized()
 
         Meteor.call 'stopTimerMain', {}, (error, result) ->
           if error
@@ -135,7 +135,7 @@ Template.roundInputs.hasAnswer = ->
   userId = Meteor.user()._id
   return Answers.find({userId: userId}).count() > 0
 
-Template.roundInputs.answersFinalized = ->
+Handlebars.registerHelper "answersFinalized", ->
   return Answers.find({status: "finalized"}).count() is Meteor.users.find().count()
 
 Template.roundInputs.isDisabled = ->
@@ -149,38 +149,34 @@ Template.roundInputs.isDisabled = ->
 Template.roundInputs.numRounds = ->
   Rounds.find().count()
 
-Template.roundInputs.getRoundIndex = ->
-  currentRoundObj = CurrentRound.findOne()
-  if currentRoundObj
-    return currentRoundObj.index
-  else
-    return -1
 
-Template.roundInputs.getRoundObj = ->
-  i = Template.roundInputs.getRoundIndex()
-  if i isnt -1
-    roundObj = Rounds.find().fetch()[i]
-    if roundObj
-      return roundObj
-  return -1
+Template.roundInputs.readyToRender = ->
+  return false unless Treatment.findOne()
+  return false unless CurrentRound.findOne()
+  i = CurrentRound.findOne().index
+  return false unless Rounds.findOne({index: i})
+
+  return true
+
+getRoundIndex = ->
+  CurrentRound.findOne().index
+
+Handlebars.registerHelper "getRoundIndex", -> getRoundIndex()
+
+getRoundObj = ->
+  i = getRoundIndex()
+  Rounds.findOne({index: i})
+
+Handlebars.registerHelper "getRoundObj", -> getRoundObj()
 
 Template.roundInputs.getRoundIndexDisplay = ->
-  i = Template.roundInputs.getRoundIndex()
-  if i isnt -1
-    return i + 1
-  return "Error retrieving index of current round"
+  getRoundIndex() + 1
 
 Template.roundInputs.getQuestion = ->
-  round = Template.roundInputs.getRoundObj()
-  if round isnt -1
-    return round.question
-  return "Error retrieving question"
+  getRoundObj().question
 
-Template.roundInputs.correctAnswer = ->
-  roundObj = Template.roundInputs.getRoundObj()
-  if roundObj isnt -1
-    return roundObj.correctanswer
-  return "Error retrieving correct answer"
+Handlebars.registerHelper "correctAnswer", ->
+  getRoundObj().correctanswer
 
 
 
@@ -191,8 +187,7 @@ Template.roundInputs.correctAnswer = ->
 
 Template.roundInputs.hasTwoStages = ->
   tre = Treatment.findOne()
-  if tre
-    return tre.displaySecondStage
+  return tre.displaySecondStage
 
 Template.roundInputs.hasVote = ->
   return Votes.findOne {userId: Meteor.user()._id}
@@ -209,13 +204,11 @@ Template.roundInputs.isDisabledVote = ->
 
 Template.roundInputs.secondStageIsVoting = ->
   tre = Treatment.findOne()
-  if tre
-    return tre.displaySecondStage and tre.secondStageType is "voting"
+  return tre.displaySecondStage and tre.secondStageType is "voting"
 
 Template.roundInputs.secondStageIsBetting = ->
   tre = Treatment.findOne()
-  if tre
-    return tre.displaySecondStage and tre.secondStageType is "betting"
+  return tre.displaySecondStage and tre.secondStageType is "betting"
 
 
 ###########################

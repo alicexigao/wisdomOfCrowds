@@ -19,7 +19,7 @@ Meteor.publish "chatMessages", ->
   ChatMessages.find()
 
 Meteor.publish "usernames", ->
-  Meteor.users.find {'profile.online': true},
+  Meteor.users.find {"profile.online": true},
     fields:
       username: 1
       rand: 1

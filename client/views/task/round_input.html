@@ -1,4 +1,6 @@
 <template name="roundInputs">
+    {{#if readyToRender}}
+
     <h4>Question {{getRoundIndexDisplay}} of {{numRounds}}: {{getQuestion}}</h4>
 
     {{# if hasTwoStages}}
@@ -88,12 +90,8 @@
 
     </form>
 
-    <div>
-        <ul class="row" id="answerList">
-            <li class="span1"></li>
-
-            {{> roundAnswers}}
-        </ul>
-    </div>
+    {{else}}
+        <h3>Loading....Please wait...</h3>
+    {{/if}}
 
 </template>
