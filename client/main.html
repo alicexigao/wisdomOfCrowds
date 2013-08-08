@@ -5,9 +5,7 @@
     <div class="container">
         {{> header}}
         {{#if currentUser}}
-            <div class="row">
-                {{renderPage}}
-            </div>
+            {{renderPage}}
         {{else}}
             {{> accessDenied}}
         {{/if}}

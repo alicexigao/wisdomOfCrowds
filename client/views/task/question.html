@@ -1,0 +1,9 @@
+<template name="question">
+
+    {{#if readyToRender}}
+        <h4>Question {{getRoundIndexDisplay}} of {{numRounds}}: {{getQuestion}}</h4>
+    {{else}}
+        Loading...Please wait...
+    {{/if}}
+
+</template>

@@ -57,24 +57,15 @@ Meteor.methods
         $set: {start: false}
 
       # reset temporary objects
-      Answers.remove({})
-      Votes.remove({})
+#      Answers.remove({})
+#      Votes.remove({})
       Bets.remove({})
 
       # incr round number
       CurrentRound.update({}, {$inc: {index: 1}})
 
       # Reset and start main timer
-      timerMainDur = 60
-      time = new Date()
-      mainEndTime = time.getTime() + 1000 * timerMainDur
-      time.setTime(mainEndTime)
-      Timers.update {name: "main"},
-        $set: {endTime: time}
-      Timers.update {name: "main"},
-        $set: {secondsLeft: timerMainDur}
-      Timers.update {name: "main"},
-        $set: {start: true}
+      Meteor.call "startTimerMain"
 
   startTimerMain: ->
     timerMainDur = 60
@@ -114,24 +105,23 @@ Meteor.methods
 
       users = Meteor.users.find().fetch()
       # put in fake answer
+      roundIndex = CurrentRound.findOne().index
       for user in users
-        ans = Answers.findOne({userId: user._id})
+        ans = Answers.findOne({roundIndex: roundIndex, userId: user._id})
         if ans
-          Answers.update {userId: user._id},
+          Answers.update {roundIndex: roundIndex, userId: user._id},
             $set: {status: "finalized"}
         else
           Answers.insert
+            roundIndex: roundIndex
             userId: user._id
             answer: 50
             status: "finalized"
       # save all answers
-      Meteor.call 'saveAllAnswers'
+#      Meteor.call 'saveAllAnswers'
 
       tre = Treatment.findOne()
-      if tre and tre.displaySecondStage and tre.secondStageType is "voting"
-        # Start timer second
-        Meteor.call "startTimerSecond"
-      else if tre and tre.displaySecondStage and tre.secondStageType is "betting"
+      if tre and tre.showSecondStage
         # Start timer second
         Meteor.call "startTimerSecond"
       else
@@ -173,52 +163,55 @@ Meteor.methods
         Timers.update {name: "second"},
           $set: {start: false}
 
+        roundIndex = CurrentRound.findOne().index
         users = Meteor.users.find().fetch()
         tre = Treatment.findOne()
-        if tre and tre.displaySecondStage and tre.secondStageType is "voting"
+        if tre and tre.showSecondStage and tre.secondStageType is "voting"
 
           # put in fake votes
           for user in users
-            vote = Votes.findOne {userId: user._id}
+            vote = Votes.findOne {roundIndex: roundIndex, userId: user._id}
             if vote
-              Votes.update {userId: user._id},
+              Votes.update {roundIndex: roundIndex, userId: user._id},
                 $set: {status: "finalized"}
             else
               Votes.insert
+                roundIndex: roundIndex
                 userId: user._id
                 answerId: user._id
                 status: "finalized"
           # save all votes
-          Meteor.call 'saveAllVotes'
+#          Meteor.call 'saveAllVotes'
 
-        if tre and tre.displaySecondStage and tre.secondStageType is "betting"
+        if tre and tre.showSecondStage and tre.secondStageType is "betting"
 
           # put in fake bets
           for user in users
-            bets = Bets.find({userId: user._id}).fetch()
+            bets = Bets.find({roundIndex: roundIndex, userId: user._id}).fetch()
             if bets.length > 0
-              Bets.update {userId: user._id},
+              Bets.update {roundIndex: roundIndex, userId: user._id},
                 $set: {status: "finalized"}
             else
               Bets.insert
+                roundIndex: roundIndex
                 userId: user._id
                 answerId: user._id
                 amount: 1
                 status: "finalized"
 
           # save all bets
-          Meteor.call 'saveAllBets'
+#          Meteor.call 'saveAllBets'
 
         Meteor.call 'markRoundCompleted'
 
   # do things when the round is completed
   markRoundCompleted: (data) ->
-    roundNum = CurrentRound.findOne().index
-    round = Rounds.findOne {index: roundNum}
+    roundIndex = CurrentRound.findOne().index
+    round = Rounds.findOne {index: roundIndex}
 
     # if voting, calc num of votes and average by votes
     tre = Treatment.findOne()
-    if tre and tre.displaySecondStage and tre.secondStageType is "voting"
+    if tre and tre.showSecondStage and tre.secondStageType is "voting"
 
       # calc num of votes
       voteObj = round.votes
@@ -229,21 +222,22 @@ Meteor.methods
         numVotes = voteObj[voted].numVotes
         numVotes++
         voteObj[voted].numVotes = numVotes
-      Rounds.update {index: roundNum},
+      Rounds.update {index: roundIndex},
         $set: {votes: voteObj}
 
       # calc average by votes
       numVotes = 0
       sumVotes = 0
       for userId in Object.keys(round.answers)
-        ans = parseInt(round.answers[userId].answer)
+
+        ans = parseInt(Answers.findOne({roundIndex: roundIndex, userId: userId}))
         votes = round.votes[userId].numVotes
         sumVotes += ans * votes
         numVotes += votes
-      Rounds.update {index: roundNum},
+      Rounds.update {index: roundIndex},
         $set: {averageByVotes: sumVotes / numVotes}
 
-    if tre and tre.displaySecondStage and tre.secondStageType is "betting"
+    if tre and tre.showSecondStage and tre.secondStageType is "betting"
 
       # calc total bet amounts
       betAmt = {}
@@ -256,22 +250,22 @@ Meteor.methods
           amount = betObj[userId][answerUserId].amount
           betAmt[answerUserId].totalAmount += amount
 
-      Rounds.update {index: roundNum},
+      Rounds.update {index: roundIndex},
         $set: {betAmounts: betAmt}
 
       # calc average by bets
-      round = Rounds.findOne {index: roundNum}
+      round = Rounds.findOne {index: roundIndex}
 
       betsAndAnswers = 0
       bets = 0
       for userId in Object.keys(round.answers)
 
-        ans = parseInt(round.answers[userId].answer)
+        ans = parseInt(Answers.findOne({roundIndex: roundIndex, userId: userId}))
         amt = round.betAmounts[userId].totalAmount
 
         betsAndAnswers += ans * amt
         bets += amt
-      Rounds.update {index: roundNum},
+      Rounds.update {index: roundIndex},
         $set: {averageByBets: betsAndAnswers / bets}
 
 
@@ -279,31 +273,39 @@ Meteor.methods
     correct = round.correctanswer
     numAns = 0
     sumAns = 0
-    winnerAnswer = -Infinity
-    for userId in Object.keys(round.answers)
-      ans = parseInt(round.answers[userId].answer)
+    bestAns = -Infinity
+
+    users = Meteor.users.find().fetch()
+    for user in users
+      userId = user._id
+      ansObj = Answers.findOne({roundIndex: roundIndex, userId: userId}).answer
+      ans = parseInt(ansObj, 10)
       sumAns += ans
       numAns++
-      if Math.abs(ans - correct) < Math.abs(winnerAnswer - correct)
-        winnerAnswer = ans
+      if Math.abs(ans - correct) < Math.abs(bestAns - correct)
+        bestAns = ans
 
-    winnerIdArray = []
-    for userId in Object.keys(round.answers)
-      ans = parseInt(round.answers[userId].answer)
-      if ans is winnerAnswer
-        winnerIdArray.push userId
+    bestAnsUserids = []
+    for user in users
+      userId = user._id
+      ansObj = Answers.findOne({roundIndex: roundIndex, userId: userId}).answer
+      ans = parseInt(ansObj, 10)
+      if ans is bestAns
+        bestAnsUserids.push userId
 
-    Rounds.update {index: roundNum},
-      $set: {average: sumAns / numAns}
 
-    Rounds.update {index: roundNum},
-      $set: {winner: winnerAnswer}
-    Rounds.update {index: roundNum},
-      $set: {winnerIdArray: winnerIdArray}
+    avg = sumAns / numAns
+    Rounds.update {index: roundIndex},
+      $set: {average: avg}
+
+    Rounds.update {index: roundIndex},
+      $set: {winner: bestAns}
+    Rounds.update {index: roundIndex},
+      $set: {winnerIdArray: bestAnsUserids}
 
 
     # mark round as completed
-    Rounds.update {index: roundNum},
+    Rounds.update {index: roundIndex},
       $set: {status: "completed"}
 
     numQuestions = Rounds.find().count()
@@ -329,179 +331,156 @@ Meteor.methods
   # First stage functions
   #############################
   updateAnswer: (data) ->
-    user = Meteor.user()
-    if (!user)
-      throw new Meteor.Error(401, "You need to login.")
+    roundIndex = CurrentRound.findOne().index
+    userId = Meteor.userId()
 
-    cur = Answers.findOne {userId: user._id}
-    if cur
+    ansExists = Answers.findOne
+      roundIndex: roundIndex
+      userId: Meteor.userId()
+
+    if ansExists
       # already has answer for current user
-      if cur.status is "finalized"
-        # error if answer has been finalized
+      if ansExists.status is "finalized"
         throw new Meteor.Error(100, "Answer has been finalized")
 
-      if data.answer isnt null
-        # update current answer if
-        Answers.update {userId: user._id},
-          $set: {answer: data.answer}
+      # update answer
+      if data.answer
+        Answers.update
+          roundIndex: roundIndex
+          userId: userId
+        , $set:
+            answer: data.answer
 
-      Answers.update {userId: user._id},
-        $set: {status: data.status}
+      # update status
+      Answers.update
+        userId: userId
+        roundIndex: roundIndex
+      , $set:
+          status: data.status
 
     else
       # insert new answer
-      answerData =
-        userId: user._id
+      Answers.insert
+        roundIndex: roundIndex
+        userId: userId
         answer: data.answer
         status: data.status
-      Answers.insert answerData
 
-    if data.status is "finalized"
-      Meteor.call "saveAnswer", data
+#    if data.status is "finalized"
+#      Meteor.call "saveAnswer", data
 
   # save answers for a particular user
-  saveAnswer: (data) ->
-    roundNum = CurrentRound.findOne().index
-    ansData = Answers.findOne({userId: data.userId})
-
-    ansObj = Rounds.findOne({index: roundNum}).answers
-    ansObj[data.userId] = {answer: ansData.answer}
-
-    Rounds.update {index: roundNum},
-      $set: {answers: ansObj}
-
-  saveAllAnswers: ->
-    ansObj = {}
-    users = Meteor.users.find().fetch()
-    for user in users
-      ansRecord = Answers.findOne {userId: user._id}
-      ansObj[user._id] = {answer: ansRecord.answer}
-
-    roundNum = CurrentRound.findOne().index
-    Rounds.update {index: roundNum},
-      $set: {answers: ansObj}
+#  saveAnswer: (data) ->
+#    roundIndex = CurrentRound.findOne().index
+#    ansData = Answers.findOne({userId: data.userId})
+#
+#    ansObj = Rounds.findOne({index: roundIndex}).answers
+#    ansObj[data.userId] = {answer: ansData.answer}
+#
+#    Rounds.update {index: roundIndex},
+#      $set: {answers: ansObj}
+#
+#  saveAllAnswers: ->
+#    ansObj = {}
+#    users = Meteor.users.find().fetch()
+#    for user in users
+#      ansRecord = Answers.findOne {userId: user._id}
+#      ansObj[user._id] = {answer: ansRecord.answer}
+#
+#    roundNum = CurrentRound.findOne().index
+#    Rounds.update {index: roundNum},
+#      $set: {answers: ansObj}
 
 
   #############################
   # Voting functions
   #############################
   updateVote: (data) ->
-    vote = Votes.findOne {userId: data.userId}
+    roundIndex = CurrentRound.findOne().index
+    userId = Meteor.userId()
+
+    vote = Votes.findOne {roundIndex: roundIndex, userId: userId}
     if vote
       if vote.status is "finalized"
         # error if answer has been finalized
         throw new Meteor.Error(100, "Vote has been finalized")
 
-      Votes.update {userId: data.userId},
+      Votes.update {roundIndex: roundIndex, userId: userId},
         $set: {answerId: data.answerId}
-      Votes.update {userId: data.userId},
+      Votes.update {roundIndex: roundIndex, userId: userId},
         $set: {status: "submitted"}
 
     else
 
       Votes.insert
-        userId:   data.userId
+        roundIndex: roundIndex
+        userId:   userId
         answerId: data.answerId
         status:   "submitted"
 
+
   finalizeVote: (data) ->
-    Votes.update {userId: data.userId},
+    roundIndex = CurrentRound.findOne().index
+    Votes.update {roundIndex: roundIndex, userId: Meteor.userId()},
       $set: {status: "finalized"}
-
-    Meteor.call 'saveVote', data
-
-  saveVote: (data) ->
-    roundNum = CurrentRound.findOne().index
-    voteData = Votes.findOne({userId: data.userId})
-
-    voteObj = Rounds.findOne({index: roundNum}).votes
-    voteObj[data.userId] = {vote: voteData.answerId}
-
-    Rounds.update {index: roundNum},
-      $set: {votes: voteObj}
-
-  saveAllVotes: ->
-    voteObj = {}
-    users = Meteor.users.find().fetch()
-    for user in users
-      voteData = Votes.findOne({userId: user._id})
-      voteObj[user._id] =
-        vote: voteData.answerId
-        numVotes: 1
-
-    roundNum = CurrentRound.findOne().index
-    Rounds.update {index: roundNum},
-      $set: {votes: voteObj}
-
 
   #############################
   # Betting functions
   #############################
   addBet: (data) ->
-    bet = Bets.findOne {userId: data.userId, answerId: data.answerId}
+    roundIndex = CurrentRound.findOne().index
+    userId = Meteor.userId()
+
+    bet = Bets.findOne {roundIndex: roundIndex, userId: userId, answerId: data.answerId}
     if bet
       if bet.status is "finalized"
         # error if bet has been finalized
         throw new Meteor.Error(100, "Bet has been finalized")
-      Bets.update {userId: data.userId, answerId: data.answerId},
+      Bets.update {roundIndex: roundIndex, userId: userId, answerId: data.answerId},
         $set: {status: "submitted"}
-      Bets.update {userId: data.userId, answerId: data.answerId},
+      Bets.update {roundIndex: roundIndex, userId: userId, answerId: data.answerId},
         $set: {amount: data.amount}
     else
       Bets.insert
-        userId:   data.userId
+        roundIndex: roundIndex
+        userId:   userId
         answerId: data.answerId
         status:   "submitted"
         amount:   data.amount
 
   removeBet: (data) ->
-    bet = Bets.findOne {userId: data.userId, answerId: data.answerId}
+
+    bet = Bets.findOne
+      roundIndex: roundIndex
+      userId:  Meteor.userId()
+      answerId: data.answerId
     if bet
-      Bets.remove({userId: data.userId, answerId: data.answerId})
+      Bets.remove
+        roundIndex: roundIndex
+        userId:  Meteor.userId()
+        answerId: data.answerId
+
 
   updateBet: (data) ->
-    bet = Bets.findOne {userId: data.userId, answerId: data.answerId}
+
+    bet = Bets.findOne
+      roundIndex: roundIndex
+      userId: Meteor.userId()
+      answerId: data.answerId
     return unless bet
     newBet = parseInt(bet.amount) + parseInt(data.change)
     if newBet is 0
       Meteor.call 'removeBet', data
     else
-      Bets.update {userId: data.userId, answerId: data.answerId},
+      Bets.update {roundIndex: roundIndex, userId: Meteor.userId(), answerId: data.answerId},
         $inc: {amount: data.change}
 
+
   finalizeBet: (data) ->
-    bets = Bets.find({userId: data.userId}).fetch()
+    bets = Bets.find({roundIndex: roundIndex, userId: Meteor.userId()}).fetch()
     for bet in bets
-      Bets.update {userId: data.userId, answerId: bet.answerId},
+      Bets.update {roundIndex: roundIndex, userId: Meteor.userId(), answerId: bet.answerId},
         $set: {status: "finalized"}
-
-    Meteor.call 'saveBet', data
-
-  saveBet: (data) ->
-    roundNum = CurrentRound.findOne().index
-    betObj = Rounds.findOne({index: roundNum}).bets
-    betObj[data.userId] = {}
-
-    betData = Bets.find({userId: data.userId}).fetch()
-    for bet in betData
-      betObj[data.userId][bet.answerId] = {amount: bet.amount}
-
-    Rounds.update {index: roundNum},
-      $set: {bets: betObj}
-
-  saveAllBets: ->
-    betObj = {}
-    users = Meteor.users.find().fetch()
-    for user in users
-      betData = Bets.find({userId: user._id}).fetch()
-      for bet in betData
-        betObj[user._id] = {}
-        betObj[user._id][bet.answerId] = {amount: bet.amount}
-
-    roundNum = CurrentRound.findOne().index
-    Rounds.update {index: roundNum},
-      $set: {bets: betObj}
-
 
 
   #############################
@@ -540,7 +519,7 @@ Meteor.methods
       $set: {answers: ansObj}
 
     # update winning answer
-    if tre.displayWinner
+    if tre.showBestAns
       tutObj = TutorialData.findOne({userId: data.userId})
       correct = tutObj.correctAnswer
       bestAnswer = -Infinity
@@ -550,7 +529,7 @@ Meteor.methods
       TutorialData.update {userId: data.userId},
         $set: {winner: bestAnswer}
 
-    if tre.displayAverage
+    if tre.showAvg
       tutObj = TutorialData.findOne({userId: data.userId})
       total = 0
       average = 0

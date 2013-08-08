@@ -1,63 +1,105 @@
 Meteor.startup ->
   Treatment.remove({})
   Treatment.insert
-    value: "competitive-bestanswer"
-    displayChatRoom:      false
-    displayOtherAnswers:  false
-    displayAverage:       false
-    displayWinner:        true
-    displayCorrectAnswer: true
-    displaySecondStage:   false
-    pointsRule:           "ownAnswer"
+    value: "bestPrivate"
+    showBestAns:   true
+    showAvg:       false
+    showChatRoom:  false
+    showOtherAns:  false
+    showSecondStage:   false
+    pointsRule:        "ownAnswer"
+#
+#    value: "bestChat"
+#    showBestAns:   true
+#    showAvg:       false
+#    showChatRoom:  true
+#    showOtherAns:  false
+#    showSecondStage:   false
+#    pointsRule:        "ownAnswer"
 
-#    value: "cooperative-average"
-#    displayChatRoom:      true
-#    displayOtherAnswers:  true
-#    displayAverage:       true
-#    displayWinner:        false
-#    displayCorrectAnswer: true
-#    displaySecondStage:   false
-#    pointsRule:           "average"
+#    value: "bestPublic"
+#    showBestAns:   true
+#    showAvg:       false
+#    showChatRoom:  false
+#    showOtherAns:  true
+#    showSecondStage:   false
+#    pointsRule:        "ownAnswer"
+
+#    value: "bestPublicChat"
+#    showBestAns:   true
+#    showAvg:       false
+#    showChatRoom:  true
+#    showOtherAns:  true
+#    showSecondStage:   false
+#    pointsRule:        "ownAnswer"
+
+#    value: "avgPrivate"
+#    showBestAns:   false
+#    showAvg:       true
+#    showChatRoom:  false
+#    showOtherAns:  false
+#    showSecondStage:   false
+#    pointsRule:        "average"
+
+#    value: "avgChat"
+#    showBestAns:   false
+#    showAvg:       true
+#    showChatRoom:  true
+#    showOtherAns:  false
+#    showSecondStage:   false
+#    pointsRule:        "average"
+
+#    value: "avgPublic"
+#    showBestAns:   false
+#    showAvg:       true
+#    showChatRoom:  false
+#    showOtherAns:  true
+#    showSecondStage:   false
+#    pointsRule:        "average"
+
+#    value: "avgPublicChat"
+#    showChatRoom:  true
+#    showOtherAns:  true
+#    showAvg:       true
+#    showBestAns:   false
+#    showSecondStage:   false
+#    pointsRule:        "average"
 
 #    value: "competitive-votebestanswer"
-#    displayChatRoom:      true
-#    displayOtherAnswers:  false
-#    displayAverage:       false
-#    displayWinner:        true
-#    displayCorrectAnswer: true
-#    displaySecondStage:   true
-#    secondStageType:      "voting"
-#    pointsRule:           "ownAnswerByVotes"
+#    showChatRoom:  true
+#    showOtherAns:  false
+#    showAvg:       false
+#    showBestAns:   true
+#    showSecondStage:   true
+#    secondStageType:   "voting"
+#    pointsRule:        "ownAnswerByVotes"
 
-#    value: "cooperative-averagebyvotes"
-#    displayChatRoom:      true
-#    displayOtherAnswers:  true
-#    displayAverage:       true
-#    displayWinner:        false
-#    displayCorrectAnswer: true
-#    displaySecondStage:   true
-#    secondStageType:      "voting"
-#    pointsRule:           "averageByVotes"
+#    value: "avgPublicChatbyvotes"
+#    showChatRoom:  true
+#    showOtherAns:  true
+#    showAvg:       true
+#    showBestAns:   false
+#    showSecondStage:   true
+#    secondStageType:   "voting"
+#    pointsRule:        "averageByVotes"
 
 #    value: "competitive-bettingbestanswer"
-#    displayChatRoom:      true
-#    displayOtherAnswers:  false
-#    displayAverage:       false
-#    displayWinner:        true
-#    displayCorrectAnswer: true
-#    displaySecondStage:   true
-#    secondStageType:      "betting"
-#    pointsRule:           "ownAnswerByBets"
+#    showChatRoom:  true
+#    showOtherAns:  false
+#    showAvg:       false
+#    showBestAns:   true
+#    showSecondStage:   true
+#    secondStageType:   "betting"
+#    pointsRule:        "ownAnswerByBets"
 
-#    value: "cooperative-averagebybets"
-#    displayChatRoom:      true
-#    displayOtherAnswers:  false
-#    displayAverage:       true
-#    displayWinner:        false
-#    displayCorrectAnswer: true
-#    displaySecondStage:   true
-#    secondStageType:      "betting"
-#    pointsRule:           "averageByBets"
+#    value: "avgPublicChatbybets"
+#    showChatRoom:  true
+#    showOtherAns:  false
+#    showAvg:       true
+#    showBestAns:   false
+#    showSecondStage:   true
+#    secondStageType:   "betting"
+#    pointsRule:        "averageByBets"
 
 
   for user in Meteor.users.find().fetch()
@@ -198,7 +240,7 @@ Meteor.startup ->
 
   TutorialText.remove({})
   TutorialText.insert
-    type: "competitive-bestanswer"
+    type: "bestPrivate"
     text:
       0: "In this task, you will play 10 games with other MTurk workers.  In each game, you and other players will
           answer one question and get points based on your answers.  IMPORTANT: Please DO NOT use search engines
@@ -220,7 +262,7 @@ Meteor.startup ->
           your bonus payment (100 points = $1). This is the end of the tutorial.  Proceed to the quiz when you are ready."
 
   TutorialText.insert
-    type: "cooperative-average"
+    type: "avgPublicChat"
     text:
       0: "In this task, you will play 10 games with other MTurk workers.  In each game, you and other players will
           answer one question and get points based on your answers.  IMPORTANT: Please DO NOT use search engines

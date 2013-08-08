@@ -1,13 +1,48 @@
-<template name="roundAnswers">
+<template name="answers">
+    {{treatmentDisplay treatment context}}
+</template>
+
+<template name="ansOneStage">
 
     {{#if readyToRender}}
 
-    <div>
-        <ul class="row" id="answerList">
-            <li class="span1"></li>
-            {{> roundAnswer}}
+        <ul class="answerList">
+
+            {{#if answersFinalized}}
+                {{> correctAns}}
+            {{/if}}
+
+            {{#if showAvg}}
+                {{> averageAns}}
+            {{/if}}
+
+            {{#each users}}
+
+                {{#if isCurrentUser}}
+                <li class="answer badge badge-important">
+                {{else}}
+                <li class="answer badge badge-warning">
+                {{/if}}
+
+                    <!--Best Answer Label-->
+                    {{#if showBestAnsLabel}}
+                        <p class="badgeRow">Best Answer</p>
+                    {{/if}}
+
+                    <!--Answer Value or Status-->
+                    {{#if answersFinalized}}
+                        <p class="badgeRow">{{getAnsDurBreak}}</p>
+                    {{else}}
+                        <p class="badgeRow">{{getAnsDurRound}}</p>
+                    {{/if}}
+
+                    <!--User name-->
+                    <p class="badgeRow">{{username}}</p>
+
+                </li>
+
+            {{/each}}
         </ul>
-    </div>
 
     {{else}}
         Loading...Please wait...
@@ -15,110 +50,114 @@
 
 </template>
 
-<template name="roundAnswer">
+<template name="correctAns">
+    <li class="answer badge badge-success">
+        <p class="badgeRow">{{correctAnswer}}%</p>
+        <p>correct</p>
+    </li>
+</template>
 
-    {{#if displayCorrectAnswer}}
-        <li class="answer badge badge-success">
-            <p class="badgeRow">{{correctAnswer}}%</p>
-            <p>correct</p>
-        </li>
-    {{/if}}
-    {{#if displayAverage}}
-        <li class="answer badge badge-success">
-            <p class="badgeRow">{{getAverage}}%</p>
-            <p>{{getAverageString}}</p>
-        </li>
-    {{/if}}
-
-    {{#each users}}
-
-        {{#if isCurrentUser}}
-            <li class="answer badge badge-important">
-        {{else}}
-            <li class="answer badge badge-warning">
-        {{/if}}
-
-            {{#if answersFinalized}}
+<template name="averageAns">
+    <li class="answer badge badge-success">
+        <p class="badgeRow">{{getAverage}}%</p>
+        <p>{{getAverageString}}</p>
+    </li>
+</template>
 
 
-                {{#if displaySecondStage}}
+<template name="roundAnswers">
 
-                    {{#if secondStageIsVoting}}
+    {{#if readyToRender}}
 
-                        {{#if displayWinner}}
-                        {{#if votesFinalized}}
-                        {{#if isBestAnswer}}
-                            <p class="badgeRow">Best Answer</p>
-                        {{/if}}
-                        {{/if}}
-                        {{/if}}
+    <div>
+        <ul class="answerList">
 
-                        {{#if voteFinalized}}
-                            {{#if hasVote _id}}
-                                <p class="badgeRow"><i class="icon-star"></i></p>
-                            {{/if}}
-                        {{else}}
-                            <p class="badgeRow"><label><input type="radio" name="votes" {{isCheckedVote}}> Vote </label></p>
-                        {{/if}}
-
-                        {{#if displayNumVotes}}
-                            <p class="badgeRow">{{getNumVotes}} vote(s)</p>
-                        {{/if}}
-
-                    {{/if}}
-
-                    {{#if secondStageIsBetting}}
-
-                        {{#if displayWinner}}
-                        {{#if betsFinalized}}
-                        {{#if isBestAnswer}}
-                            <p class="badgeRow">Best Answer</p>
-                        {{/if}}
-                        {{/if}}
-                        {{/if}}
-
-                        <p class="badgeRow">
-                            {{#unless betFinalized}}
-                                <input type="checkbox" name="bets" id="{{_id}}" {{isCheckedBet}}>
-                            {{/unless}}
-
-                            {{#unless betsFinalized}}
-                                <span>{{getBetAmount}}</span>
-                            {{/unless}}
-
-                            {{#unless betFinalized}}
-                                <input type="button" class="increaseBet" value="&#x25B2;" {{getDisabledStringIncrease}}>
-                                <input type="button" class="decreaseBet" value="&#x25BC;" {{getDisabledStringDecrease}}>
-                            {{/unless}}
-
-                        </p>
-                    {{/if}}
-
-                {{else}}
-
-                    {{#if displayWinner}}
-                    {{#if isBestAnswer}}
-                        <p class="badgeRow">Best Answer</p>
-                    {{/if}}
-                    {{/if}}
-
-                {{/if}}
-                <p class="badgeRow">{{getAnswer}}%</p>
-
-            {{else}}
-
-                {{#if displayAnswer}}
-                    <p class="badgeRow">
-                        {{getAnswer}}{{#if hasAnswer}}%{{/if}}
-                    </p>
-                {{else}}
-                    <p class="badgeRow">{{getStatus}}</p>
-                {{/if}}
-
+            {{#if displayCorrectAnswer}}
+                {{> correctAns}}
             {{/if}}
-            <p class="badgeRow">{{username}}</p>
 
-        </li>
+            {{#if showAvg}}
+                {{> averageAns}}
+            {{/if}}
 
-    {{/each}}
+            {{#each users}}
+
+                {{#if isCurrentUser}}
+                <li class="answer badge badge-important">
+                {{else}}
+                <li class="answer badge badge-warning">
+                {{/if}}
+
+                    {{#if answersFinalized}}
+
+                        {{#if secondStageIsVoting}}
+
+                            {{#if showBestAns}}
+                            {{#if votesFinalized}}
+                            {{#if isBestAnswer}}
+                                <p class="badgeRow">Best Answer</p>
+                            {{/if}}
+                            {{/if}}
+                            {{/if}}
+
+                            {{#if voteFinalized}}
+                                {{#if hasVote _id}}
+                                <p class="badgeRow"><i class="icon-star"></i></p>
+                                {{/if}}
+                            {{else}}
+                                <p class="badgeRow"><label><input type="radio" name="votes" {{isCheckedVote}}> Vote </label></p>
+                            {{/if}}
+
+                            {{#if displayNumVotes}}
+                                <p class="badgeRow">{{getNumVotes}} vote(s)</p>
+                            {{/if}}
+
+                        {{/if}}
+
+                        {{#if secondStageIsBetting}}
+
+                            {{#if showBestAns}}
+                            {{#if betsFinalized}}
+                            {{#if isBestAnswer}}
+                            <p class="badgeRow">Best Answer</p>
+                            {{/if}}
+                            {{/if}}
+                            {{/if}}
+
+                            <p class="badgeRow">
+
+                                {{#unless betFinalized}}
+                                <input type="checkbox" name="bets" id="{{_id}}" {{isCheckedBet}}>
+                                {{/unless}}
+
+                                {{#unless betsFinalized}}
+                                <span>{{getBetAmount}}</span>
+                                {{/unless}}
+
+                                {{#unless betFinalized}}
+                                <input type="button" class="increaseBet" value="&#x25B2;" {{getDisabledStrForAnsIncrease}}>
+                                <input type="button" class="decreaseBet" value="&#x25BC;" {{getDisabledStrForAnsDecrease}}>
+                                {{/unless}}
+
+                            </p>
+                        {{/if}}
+
+                        <p class="badgeRow">{{getAnsDurBreak}}</p>
+
+                    {{else}}
+                        <p class="badgeRow">{{getAnsDurRound}}</p>
+                    {{/if}}
+
+                    <p class="badgeRow">{{username}}</p>
+
+                </li>
+
+            {{/each}}
+        </ul>
+    </div>
+
+    {{else}}
+        Loading...Please wait...
+    {{/if}}
+
 </template>

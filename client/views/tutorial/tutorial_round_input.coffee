@@ -17,7 +17,7 @@ Template.tutorialRoundInputs.events =
       $("input#tutorialInputEstimate").val ""
 
     answerData =
-      userId: Meteor.user()._id
+      userId: Meteor.userId()
       answer: ansFloat
       status: "submitted"
 
@@ -45,7 +45,7 @@ Template.tutorialRoundInputs.events =
       ansFloat = null
 
     answerData =
-      userId: Meteor.user()._id
+      userId: Meteor.userId()
       answer: ansFloat
       status: "finalized"
 
@@ -56,12 +56,12 @@ Template.tutorialRoundInputs.events =
 
 
 Template.tutorialRoundInputs.hasCurrAnswer = ->
-  tutObj = TutorialData.findOne {userId: Meteor.user()._id}
+  tutObj = TutorialData.findOne {userId: Meteor.userId()}
   return unless tutObj
   return tutObj.answers[0].answer
 
 Template.tutorialRoundInputs.shouldDisable = ->
-  tutObj = TutorialData.findOne {userId: Meteor.user()._id}
+  tutObj = TutorialData.findOne {userId: Meteor.userId()}
   return unless tutObj
   if tutObj.answers[0].status is "finalized"
     return "disabled"
@@ -71,8 +71,8 @@ Template.tutorialRoundInputs.shouldDisplayResult = ->
   tre = Treatment.findOne()
   return false unless tre
   index = Template.tutorial.getIndex()
-  if tre.value is "competitive-bestanswer"
+  if tre.value is "bestPrivate"
     return index >= 3
-  else if tre.value is "cooperative-average"
+  else if tre.value is "avgPublicChat"
     return index >= 3
 

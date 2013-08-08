@@ -2,25 +2,15 @@ Meteor.subscribe "treatment"
 
 Meteor.subscribe "chatMessages"
 
-Meteor.subscribe "answers"
-
 Meteor.subscribe "rounds"
 
 Meteor.subscribe "currentRound"
 
 Meteor.subscribe "usernames"
 
-Meteor.subscribe "timeleft"
+Meteor.subscribe "timers"
 
-Meteor.subscribe "votes"
-
-Meteor.subscribe "bets"
-
-Meteor.subscribe "tutorialCounter"
-
-Meteor.subscribe "tutorialText"
-
-Meteor.subscribe "tutorialData"
+Meteor.subscribe "tutorial"
 
 Meteor.subscribe "playerStatus", ->
     PlayerStatus.find().observeChanges
@@ -29,3 +19,5 @@ Meteor.subscribe "playerStatus", ->
           Meteor.Router.to('/task')
 
 Meteor.subscribe "errorMessages"
+
+Meteor.subscribe "userInputs"

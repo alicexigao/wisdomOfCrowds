@@ -20,6 +20,8 @@ Template.timerMain.getTimeLeft = ->
   return "0:00"
 
 
+
+
 Template.timerSecond.countdown = ->
   Meteor.call 'countdownSecond', null, (error, result) ->
     if error
@@ -40,6 +42,8 @@ Template.timerSecond.getTimeLeft = ->
     else
       return minutes + ":" + seconds
   return "0:00"
+
+
 
 
 Template.timerNext.countdown = ->

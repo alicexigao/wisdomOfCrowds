@@ -1,17 +1,19 @@
 <template name="roundHistory">
 
     {{#if readyToRender}}
+
     <table class="table table-striped">
         <caption class="lead">Results</caption>
         <tr>
             <th>#</th>
             <th>Yours</th>
             <!--<th>Others</th>-->
-            {{#if displayWinner}}
+            {{#if showBestAns}}
                 <th>Best Answer</th>
             {{/if}}
-            {{#if displayAverage}}
-                <th>{{getAverageHeader}}</th>
+            {{#if showAvg}}
+                <!--TODO: change this for two stage mechanisms-->
+                <th>Average</th>
             {{/if}}
             <th>Correct</th>
             <th>Your Points</th>
@@ -19,13 +21,13 @@
         {{#each rounds}}
             {{# if isRoundFinished this}}
                 <tr>
-                    <td>{{getIndex}}</td>
+                    <td>{{getIndexDisplay}}</td>
                     <td>{{getMyAnswerString}}</td>
                     <!--<td>{{getOtherAnswersString}}</td>-->
-                    {{#if displayWinner}}
+                    {{#if showBestAns}}
                         <td>{{getWinningAnswerString}}</td>
                     {{/if}}
-                    {{#if displayAverage}}
+                    {{#if showAvg}}
                         <td>{{getAverageString}}</td>
                     {{/if}}
                     <td>{{getCorrectAnswer}}</td>
@@ -34,6 +36,7 @@
             {{/if}}
         {{/each}}
     </table>
+
     {{else}}
         Loading...Please wait...
     {{/if}}

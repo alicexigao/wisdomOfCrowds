@@ -4,40 +4,40 @@ Template.tutorial.events =
 
   "click #nextPage": (ev) ->
     data =
-      userId: Meteor.user()._id
+      userId: Meteor.userId()
       change : 1
 
     Meteor.call "incrTutorialPage", data, (error, result) ->
       if error
         return bootbox.alert error.reason
 
-    if Template.tutorial.getTreatmentType() is "competitive-bestanswer" or Template.tutorial.getTreatmentType() is "cooperative-average"
+    if Template.tutorial.getTreatmentType() is "bestPrivate" or Template.tutorial.getTreatmentType() is "avgPublicChat"
 
       if Template.tutorial.getIndex() is 1
         data =
-          userId: Meteor.user()._id
+          userId: Meteor.userId()
         Meteor.call "clearAliceAnswer", data, (error, result) ->
           if error
             return bootbox.alert error.reason
       else if Template.tutorial.getIndex() is 3
         data =
-          userId: Meteor.user()._id
+          userId: Meteor.userId()
         Meteor.call "finalizeAliceAnswer", data, (error, result) ->
           if error
             return bootbox.alert error.reason
 
   "click #previousPage": (ev) ->
     data =
-      userId: Meteor.user()._id
+      userId: Meteor.userId()
       change : -1
     Meteor.call "incrTutorialPage", data, (error, result) ->
       if error
         return bootbox.alert error.reason
 
-    if Template.tutorial.getTreatmentType() is "competitive-bestanswer" or Template.tutorial.getTreatmentType() is "cooperative-average"
+    if Template.tutorial.getTreatmentType() is "bestPrivate" or Template.tutorial.getTreatmentType() is "avgPublicChat"
       if Template.tutorial.getIndex() is 2 or Template.tutorial.getIndex() is 1
         data =
-          userId: Meteor.user()._id
+          userId: Meteor.userId()
         Meteor.call "clearAliceAnswer", data, (error, result) ->
           if error
             return bootbox.alert error.reason
@@ -49,7 +49,7 @@ Template.tutorial.getTreatmentType = ->
   return tre.value
 
 Template.tutorial.getIndex = ->
-  counter = TutorialCounter.findOne({userId: Meteor.user()._id})
+  counter = TutorialCounter.findOne({userId: Meteor.userId()})
   return -1 unless counter
   return counter.index
 

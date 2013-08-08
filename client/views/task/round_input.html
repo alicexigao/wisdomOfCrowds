@@ -1,97 +1,140 @@
-<template name="roundInputs">
+<template name="round">
+    {{treatmentDisplay treatment context}}
+</template>
+
+<template name="oneStage">
+
     {{#if readyToRender}}
 
-    <h4>Question {{getRoundIndexDisplay}} of {{numRounds}}: {{getQuestion}}</h4>
+    {{> question}}
 
-    {{# if hasTwoStages}}
-        {{#if secondStageIsVoting}}
-        {{#if answersFinalized}}
-        {{#unless votesFinalized}}
-            {{> timerSecond}}
-        {{/unless}}
-        {{/if}}
-        {{/if}}
+    {{#if answersFinalized}}
+        {{#if taskCompleted}}
 
-        {{#if secondStageIsBetting}}
-        {{#if answersFinalized}}
-        {{#unless betsFinalized}}
-            {{> timerSecond}}
-        {{/unless}}
+            <!--All rounds completed-->
+            <button type="button" id="goToExitSurvey" class="btn btn-success">Go to exit survey</button>
+
+        {{else}}
+
+            <!--Break between rounds-->
+            {{> timerNext}}
         {{/if}}
-        {{/if}}
+    {{else}}
+
+        <!--During round-->
+        {{> timerMain}}
+        <form class="form-inline">
+            <span class="lead" for="inputAns">Your Answer:</span>
+            <input type="text" id="inputAns" class="input-small" {{getDisabledStrForAns}}><span class="lead">%</span>
+            <button type="button" id="updateAns" class="btn btn-primary {{getDisabledStrForAns}}" {{getDisabledStrForAns}}>Update</button>
+            {{#if currUserHasAns}}
+                <button type="button" id="finalizeAns" class="btn btn-danger {{getDisabledStrForAns}}" {{getDisabledStrForAns}}>Finalize</button>
+            {{/if}}
+        </form>
+
     {{/if}}
 
-    {{#unless answersFinalized}}
-        {{> timerMain}}
-    {{/unless}}
+    {{else}}
+        Loading...Please wait...
+    {{/if}}
 
-    <form class="form-inline">
+</template>
 
-        {{#unless answersFinalized}}
-            <span class="lead" for="inputEstimate">Your Answer:</span>
-            <input type="text" id="inputEstimate" class="input-small" placeholder="" {{isDisabled}}><span class="lead">%</span>
-            <button type="button" id="updateEstimate" class="btn btn-primary {{isDisabled}}" {{isDisabled}}>Update</button>
-            {{#if hasAnswer}}
-                <button type="button" id="finalizeEstimate" class="btn btn-danger {{isDisabled}}" {{isDisabled}}>Finalize</button>
-            {{/if}}
-        {{/unless}}
 
-        {{#if hasTwoStages}}
-            {{#if secondStageIsVoting}}
-            {{#if answersFinalized}}
-            {{#unless votesFinalized}}
-                <span class="lead" for="castVote">Cast Your Vote:</span>
-                {{#if hasVote}}
-                    <button type="button" id="finalizeVote" class="btn btn-danger {{isDisabledVote}}" {{isDisabledVote}}>Finalize Vote</button>
-                {{/if}}
-            {{/unless}}
-            {{/if}}
-            {{/if}}
+<template name="twoStagesVoting">
 
-            {{#if secondStageIsBetting}}
-            {{#if answersFinalized}}
-            {{#unless betsFinalized}}
-                <span class="lead">Choose answers to risk your points:</span>
-                {{#if hasBet}}
-                    <button type="button" id="finalizeBet" class="btn btn-danger {{isDisabledBet}}" {{isDisabledBet}}>Finalize Point Allocation</button>
-                {{/if}}
-            {{/unless}}
-            {{/if}}
-            {{/if}}
-        {{/if}}
+    {{#if readyToRender}}
 
-        {{#if hasTwoStages}}
-            {{#if secondStageIsVoting}}
-            {{#if votesFinalized}}
-            {{#unless taskCompleted}}
+    {{> question}}
+
+    {{#if answersFinalized}}
+        {{#if votesFinalized}}
+            {{#if taskCompleted}}
+
+                <!-- All rounds completed -->
+                <button type="button" id="goToExitSurvey" class="btn btn-success">Go to exit survey</button>
+            {{else}}
+
+                <!-- Break between rounds-->
                 {{> timerNext}}
-            {{/unless}}
-            {{/if}}
-            {{/if}}
-
-            {{#if secondStageIsBetting}}
-            {{#if betsFinalized}}
-            {{#unless taskCompleted}}
-                {{> timerNext}}
-            {{/unless}}
-            {{/if}}
             {{/if}}
         {{else}}
-            {{#if answersFinalized}}
-            {{#unless taskCompleted}}
-                {{> timerNext}}
-            {{/unless}}
+            <!--During voting stage-->
+            {{> timerSecond}}
+            <form class="form-inline">
+                <span class="lead" for="castVote">Cast Your Vote:</span>
+                {{#if hasVote}}
+                    <button type="button" id="finalizeVote" class="btn btn-danger {{shouldDisableVoteButton}}" {{shouldDisableVoteButton}}>Finalize Vote</button>
+                {{/if}}
+            </form>
+        {{/if}}
+    {{else}}
+
+        <!--During answering stage-->
+        {{> timerMain}}
+        <form class="form-inline">
+            <span class="lead" for="inputAns">Your Answer:</span>
+            <input type="text" id="inputAns" class="input-small" {{getDisabledStrForAns}}><span class="lead">%</span>
+            <button type="button" id="updateAns" class="btn btn-primary {{getDisabledStrForAns}}" {{getDisabledStrForAns}}>Update</button>
+            {{#if currUserHasAns}}
+                <button type="button" id="finalizeAns" class="btn btn-danger {{getDisabledStrForAns}}" {{getDisabledStrForAns}}>Finalize</button>
             {{/if}}
-        {{/if}}
-
-        {{#if taskCompleted}}
-            <button type="button" id="goToExitSurvey" class="btn btn-success">Go to exit survey</button>
-        {{/if}}
-
-    </form>
+        </form>
+    {{/if}}
 
     {{else}}
-        <h3>Loading....Please wait...</h3>
+        Loading...Please wait...
+    {{/if}}
+
+</template>
+
+<template name="twoStagesBetting">
+
+    {{#if readyToRender}}
+
+    {{> question}}
+
+    {{#if answersFinalized}}
+        {{#if betsFinalized}}
+            {{#if taskCompleted}}
+
+                <!--All rounds completed-->
+                <button type="button" id="goToExitSurvey" class="btn btn-success">Go to exit survey</button>
+
+            {{else}}
+
+                <!--Break between rounds-->
+                {{> timerNext}}
+
+            {{/if}}
+
+        {{else}}
+
+            <!--During betting stage-->
+            {{> timerSecond}}
+            <span class="lead">Choose answers to risk your points:</span>
+            {{#if hasBet}}
+                <button type="button" id="finalizeBet" class="btn btn-danger {{shouldDisableBetButton}}" {{shouldDisableBetButton}}>Finalize Point Allocation</button>
+            {{/if}}
+
+        {{/if}}
+
+    {{else}}
+
+        <!--During answering stage-->
+        {{> timerMain}}
+        <span class="lead" for="inputAns">Your Answer:</span>
+        <input type="text" id="inputAns" class="input-small" {{getDisabledStrForAns}}><span class="lead">%</span>
+        <button type="button" id="updateAns" class="btn btn-primary {{getDisabledStrForAns}}" {{getDisabledStrForAns}}>Update</button>
+        {{#if currUserHasAns}}
+            <button type="button" id="finalizeAns" class="btn btn-danger {{getDisabledStrForAns}}" {{getDisabledStrForAns}}>Finalize</button>
+        {{/if}}
+
+    {{/if}}
+
+
+    {{else}}
+        Loading...Please wait...
     {{/if}}
 
 </template>

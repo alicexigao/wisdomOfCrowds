@@ -1,11 +1,14 @@
+/* Chat room formatting*/
 ul#messageArea {
     height: 150px;
     overflow: auto;
     list-style: none;
 }
 
-ul#answerList {
-    list-style: none;
+/* Answers formatting */
+ul.answerList {
+    display: inline;
+    list-style-type: none;
 }
 
 p.badgeRow {
@@ -21,6 +24,7 @@ li.answer {
 td {
     text-align: center;
 }
+
 
 /* Tutorial formatting */
 div#tutorialText {

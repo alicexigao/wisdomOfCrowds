@@ -10,7 +10,7 @@ Template.quiz.events =
       checkedIds.push $(this).attr('id')
 
     data =
-      userId: Meteor.user()._id
+      userId: Meteor.userId()
       list: checkedIds
 
     Meteor.call "gradeQuiz", data, (error, result) ->
@@ -21,7 +21,7 @@ Template.quiz.events =
         return bootbox.alert ErrorMessages.findOne({type: "quiz"}).message
       else
         data =
-          userId: Meteor.user()._id
+          userId: Meteor.userId()
         Meteor.call "setStatusReady", data, (error, result) ->
           if error
             return bootbox.alert error.reason
@@ -32,9 +32,9 @@ Template.quiz.events =
 
 
 Template.quiz.getQuizError = ->
-  if ErrorMessages.findOne({userId: Meteor.user()._id, type: "quiz"})
-    return ErrorMessages.findOne({userId: Meteor.user()._id, type: "quiz"}).message
+  if ErrorMessages.findOne({userId: Meteor.userId(), type: "quiz"})
+    return ErrorMessages.findOne({userId: Meteor.userId(), type: "quiz"}).message
   else return ""
 
 Template.quiz.hasError = ->
-  return ErrorMessages.findOne({userId: Meteor.user()._id, type: "quiz"})
+  return ErrorMessages.findOne({userId: Meteor.userId(), type: "quiz"})

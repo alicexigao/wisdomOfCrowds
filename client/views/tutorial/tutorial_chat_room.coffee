@@ -30,7 +30,7 @@ Template.tutorialChatRoom.rendered = ->
   # scroll to bottom
   $('ul#messageArea').scrollTop($('ul#messageArea').prop("scrollHeight"))
 
-Template.tutorialChatRoom.displayChatRoom = ->
+Template.tutorialChatRoom.showChatRoom = ->
   obj = Treatment.findOne()
   if obj
-    return obj.displayChatRoom
+    return obj.showChatRoom
