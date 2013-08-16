@@ -1,12 +1,12 @@
+Meteor.subscribe "settings"
+
 Meteor.subscribe "treatment"
 
 Meteor.subscribe "chatMessages"
 
 Meteor.subscribe "rounds"
 
-Meteor.subscribe "currentRound"
-
-Meteor.subscribe "usernames"
+Meteor.subscribe "users"
 
 Meteor.subscribe "timers"
 

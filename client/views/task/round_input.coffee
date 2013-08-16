@@ -1,6 +1,7 @@
 Handlebars.registerHelper "treatment", ->
-  return unless Treatment.findOne()
-  Treatment.findOne().value
+  tre =  Handlebars._default_helpers.tre()
+  return unless tre
+  tre.value
 
 Handlebars.registerHelper "context", ->
 
@@ -23,6 +24,7 @@ roundToTwoDecimals = (ans) ->
   ansFloat = parseFloat(ans, 10)
   Math.round(ansFloat * 100) / 100
 
+
 updateAnswer = (ev) ->
   ans = $("#inputAns").val().trim()
   return unless ans
@@ -32,12 +34,25 @@ updateAnswer = (ev) ->
   ansData =
     status: "submitted"
 
-  if answerValid(ans)
-    ansData.answer = roundToTwoDecimals(ans)
+  if not answerValid(ans)
+    return bootbox.alert "Please enter a number in the range of 0 to 100 inclusive."
+
+  ansData.answer = roundToTwoDecimals(ans)
+
+  if Session.equals("page", "task")
     Meteor.call 'updateAnswer', ansData, (err, res) ->
       return bootbox.alert err.reason if err
   else
-    return bootbox.alert "Please enter a number in the range of 0 to 100 inclusive."
+    currUserId = Handlebars._default_helpers.currUserId()
+    if TutorialAnswers.findOne {userId: currUserId}
+      TutorialAnswers.update {userId: currUserId},
+        $set:
+          answer: ans
+    else
+      TutorialAnswers.insert
+        userId: currUserId
+        answer: ans
+        status: "submitted"
 
 finalizeAnsOneStage = (ev) ->
   ans = $("#inputAns").val().trim()
@@ -45,20 +60,42 @@ finalizeAnsOneStage = (ev) ->
 
   ansData =
     status: "finalized"
-  if ans
-    if answerValid(ans)
-      ansData.answer = roundToTwoDecimals(ans)
-      Meteor.call 'updateAnswer', ansData, (err, res) ->
-        return bootbox.alert err.reason if err
+
+  if ans and not answerValid(ans)
+    return bootbox.alert "Please enter a number in the range of 0 to 100 inclusive."
+
+  if ans and answerValid(ans)
+    ansData.answer = roundToTwoDecimals(ans)
+
+  if Session.equals("page", "tutorial")
+    currUserId = Handlebars._default_helpers.currUserId()
+    if TutorialAnswers.findOne {userId: currUserId}
+      if ans
+        TutorialAnswers.update {userId: currUserId},
+          $set:
+            answer: ans
+      TutorialAnswers.update {userId: currUserId},
+        $set:
+          status: ansData.status
     else
-      return bootbox.alert "Please enter a number in the range of 0 to 100 inclusive."
-  else
+      TutorialAnswers.insert
+        userId: currUserId
+        answer: ans
+        status: ansData.status
+  else if Session.equals("page", "task")
+
     Meteor.call 'updateAnswer', ansData, (err, res) ->
       return bootbox.alert err.reason if err
 
   if Handlebars._default_helpers.answersFinalized()
-    Meteor.call 'stopTimerMain'
-    Meteor.call 'markRoundCompleted'
+    if Session.equals("page", "task")
+
+      Meteor.call 'stopTimerFirst'
+      Meteor.call 'markRoundCompleted'
+
+    else if Session.equals("page", "tutorial")
+
+      Handlebars._default_helpers.calcBestAnsAndAvg()
 
 finalizeAnsTwoStages = (ev) ->
   ans = $("#inputAns").val().trim()
@@ -78,19 +115,16 @@ finalizeAnsTwoStages = (ev) ->
       return bootbox.alert err.reason if err
 
   if Handlebars._default_helpers.answersFinalized()
-    Meteor.call 'stopTimerMain'
+    Meteor.call 'stopTimerFirst'
     Meteor.call 'startTimerSecond'
 
-
-Template.oneStage.rendered = ->
-  # Give focus to the text box when loaded
-  $("#inputAns").focus()
-
+#Template.oneStage.rendered = ->
+#  # Give focus to the text box when loaded
+#  $("#inputAns").focus()
 
 Template.twoStagesVoting.rendered = ->
   # Give focus to the text box when loaded
   $("#inputAns").focus()
-
 
 Template.twoStagesBetting.rendered = ->
   # Give focus to the text box when loaded
@@ -166,28 +200,13 @@ Template.twoStagesBetting.events =
   "click #goToExitSurvey": (ev) ->
     Meteor.Router.to('/exitsurvey')
 
-
-
-getRoundIndex = ->
-  return unless CurrentRound.findOne()
-  CurrentRound.findOne().index
-
-Handlebars.registerHelper "getRoundIndex", -> getRoundIndex()
-
-getRoundObj = ->
-  i = getRoundIndex()
-  Rounds.findOne({index: i})
-
-Handlebars.registerHelper "getRoundObj", -> getRoundObj()
-
-
-
-
 readyToRender = ->
-  return false unless Treatment.findOne()
-  return false unless CurrentRound.findOne()
-  i = CurrentRound.findOne().index
-  return false unless Rounds.findOne({index: i})
+  tre = Handlebars._default_helpers.tre()
+  return false unless tre
+  return false unless Settings.findOne({key: "roundIndex"})
+  i = Settings.findOne({key: "roundIndex"}).value
+  rounds = Handlebars._default_helpers.rounds()
+  return false unless rounds.findOne({index: i})
   return true
 
 Handlebars.registerHelper "readyToRender", -> readyToRender()
@@ -197,16 +216,12 @@ Handlebars.registerHelper "readyToRender", -> readyToRender()
 # Functions for stage 1
 ###########################
 Handlebars.registerHelper "currUserHasAns", ->
-  roundIndex = getRoundIndex()
-  return Answers.findOne({roundIndex: roundIndex, userId: Meteor.userId()})
-
-Handlebars.registerHelper "answersFinalized", ->
-  roundIndex = getRoundIndex()
-  return Answers.find({roundIndex: roundIndex, status: "finalized"}).count() is Meteor.users.find().count()
+  currUserId = Handlebars._default_helpers.currUserId()
+  return Handlebars._default_helpers.ansObjForId(currUserId)
 
 Handlebars.registerHelper "currAnsFinalized", ->
-  roundIndex = getRoundIndex()
-  ans = Answers.findOne({roundIndex: roundIndex, userId: Meteor.userId()})
+  currUserId = Handlebars._default_helpers.currUserId()
+  ans = Handlebars._default_helpers.ansObjForId(currUserId)
   return ans and ans.status is "finalized"
 
 Handlebars.registerHelper "getDisabledStrForAns", ->
@@ -217,23 +232,24 @@ Handlebars.registerHelper "getDisabledStrForAns", ->
 
 
 
-
-
 ###########################
 # Functions for stage 2 (voting)
 ###########################
 
 Template.twoStagesVoting.hasVote = ->
-  roundIndex = getRoundIndex()
-  return Votes.findOne {roundIndex: roundIndex, userId: Meteor.userId()}
+  roundIndex = Handlebars._default_helpers.getRoundIndex()
+  currUserId = Handlebars._default_helpers.currUserId()
+  return Votes.findOne {roundIndex: roundIndex, userId: currUserId}
 
 Handlebars.registerHelper "votesFinalized", ->
-  roundIndex = getRoundIndex()
-  return Votes.find({roundIndex: roundIndex, status: "finalized"}).count() is Meteor.users.find().count()
+  roundIndex = Handlebars._default_helpers.getRoundIndex()
+  usersCursor = Handlebars._default_helpers.users()
+  return Votes.find({roundIndex: roundIndex, status: "finalized"}).count() is usersCursor.count()
 
 Template.twoStagesVoting.shouldDisableVoteButton = ->
-  roundIndex = getRoundIndex()
-  vote = Votes.findOne {roundIndex: roundIndex, userId: Meteor.userId()}
+  roundIndex = Handlebars._default_helpers.getRoundIndex()
+  currUserId = Handlebars._default_helpers.currUserId()
+  vote = Votes.findOne {roundIndex: roundIndex, userId: currUserId}
   if vote and vote.status is "finalized"
     return "disabled"
   else
@@ -244,19 +260,22 @@ Template.twoStagesVoting.shouldDisableVoteButton = ->
 ###########################
 
 Template.twoStagesBetting.hasBet = ->
-  roundIndex = getRoundIndex()
-  return Bets.findOne {roundIndex: roundIndex, userId: Meteor.userId()}
+  roundIndex = Handlebars._default_helpers.getRoundIndex()
+  currUserId = Handlebars._default_helpers.currUserId()
+  return Bets.findOne {roundIndex: roundIndex, userId: currUserId}
 
 Handlebars.registerHelper "betsFinalized", ->
-  roundIndex = getRoundIndex()
-  for user in Meteor.users.find().fetch()
+  roundIndex = Handlebars._default_helpers.getRoundIndex()
+  usersCursor = Handlebars._default_helpers.users()
+  for user in usersCursor.fetch()
     if Bets.find({roundIndex: roundIndex, userId: user._id}).count() < 1
       return false
   return Bets.find({roundIndex: roundIndex, status: "finalized"}).count() is Bets.find({roundIndex: roundIndex}).count()
 
 Template.twoStagesBetting.shouldDisableBetButton = ->
-  roundIndex = getRoundIndex()
-  bet = Bets.findOne {roundIndex: roundIndex, userId: Meteor.userId()}
+  roundIndex = Handlebars._default_helpers.getRoundIndex()
+  currUserId = Handlebars._default_helpers.currUserId()
+  bet = Bets.findOne {roundIndex: roundIndex, userId: currUserId}
   if bet and bet.status is "finalized"
     return "disabled"
   else
@@ -269,12 +288,13 @@ Template.twoStagesBetting.shouldDisableBetButton = ->
 ################################
 
 Handlebars.registerHelper "taskCompleted", ->
-  numQuestions = Rounds.find().count()
-  round =  Rounds.findOne({index: numQuestions - 1})
+  rounds = Handlebars._default_helpers.rounds()
+  numQuestions = rounds.find().count()
+  round =  rounds.findOne({index: numQuestions - 1})
   return unless round
   if round.status is "completed"
     clearInterval(Template.timerNext.intervalIdNext)
-    clearInterval(Template.timerMain.intervalIdMain)
+    clearInterval(Template.timerFirst.intervalIdMain)
     clearInterval(Template.timerSecond.intervalIdSecond)
     return true
   return false

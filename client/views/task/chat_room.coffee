@@ -1,5 +1,6 @@
 Template.chatRoom.messages = ->
-  ChatMessages.find()
+  chatColl = Handlebars._default_helpers.chat()
+  chatColl.find()
 
 Template.chatRoom.events =
   "submit form": (ev) ->
@@ -7,30 +8,30 @@ Template.chatRoom.events =
 
     msgContent = $("input#msgContent")
 
-    chatData =
-      author: Meteor.user().username
-      timestamp: (new Date()).toUTCString()
-      content: msgContent.val()
-
     if msgContent.val()
-      Meteor.call 'sendMsg', chatData, (error, result) ->
-        if error
-          return alert(error.reason)
+      data =
+        timestamp : new Date()
+        content   : msgContent.val()
+
+      if Session.equals("page", "tutorial")
+        TutorialChat.insert
+          userId    : Handlebars._default_helpers.currUserId()
+          username  : Handlebars._default_helpers.currUser().username
+          timestamp : data.timestamp
+          content   : data.content
+      else if Session.equals("page", "task")
+        Meteor.call 'sendMsg', data, (err, res) ->
+          return bootbox.alert err.reason if err
 
     msgContent.val ""
-    msgContent.focus()
-
-#    scroll to bottom
+    # scroll to bottom
     $('ul#messageArea').scrollTop($('ul#messageArea').prop("scrollHeight"))
 
 Template.chatRoom.timestampFormat = ->
   (new Date(this.timestamp)).toLocaleTimeString()
 
 Template.chatRoom.rendered = ->
-  #    scroll to bottom
+  # scroll to bottom
   $('ul#messageArea').scrollTop($('ul#messageArea').prop("scrollHeight"))
 
-Template.chatRoom.showChatRoom = ->
-  obj = Treatment.findOne()
-  if obj
-    return obj.showChatRoom
+

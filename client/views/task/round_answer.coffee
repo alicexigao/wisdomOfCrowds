@@ -6,7 +6,6 @@ Template.answers.treatmentDisplay = (treatment, context) ->
     when "competitive-votebestanswer", "avgPublicChatbyvotes", "competitive-bettingbestanswer", "avgPublicChatbybets"
       return new Handlebars.SafeString Template.roundAnswers(context)
 
-
 Template.roundAnswers.events =
   "click input:radio[name=votes]": (ev) ->
     ev.preventDefault()
@@ -65,46 +64,43 @@ Template.roundAnswers.events =
     Meteor.call 'updateBet', betData, (err, res) ->
       return bootbox.alert err.reason if err
 
-Handlebars.registerHelper "users", ->
-  Meteor.users.find({}, {sort: {rand: 1}})
-
 Handlebars.registerHelper "isCurrentUser", ->
-  Meteor.userId() is @_id
+  currUserId = Handlebars._default_helpers.currUserId()
+  return currUserId is @_id
 
 # get answer during the break between rounds
 Handlebars.registerHelper "getAnsDurBreak", ->
-  roundIndex = Handlebars._default_helpers.getRoundIndex()
-  ansObj = Answers.findOne({roundIndex: roundIndex, userId: @_id})
+  ansObj = Handlebars._default_helpers.ansObjForId(@_id)
   return ansObj.answer + "%"
 
 # get answer during round
 Handlebars.registerHelper "getAnsDurRound", ->
-  roundIndex = Handlebars._default_helpers.getRoundIndex()
-  ansObj = Answers.findOne({roundIndex: roundIndex, userId: @_id})
+  tre = Handlebars._default_helpers.tre()
+  ansObj = Handlebars._default_helpers.ansObjForId(@_id)
   return "pending" unless ansObj
-  if @_id is Meteor.userId()
+
+  currUserId = Handlebars._default_helpers.currUserId()
+  if currUserId is @_id
     # always display current user's answer
     return ansObj.answer + "%"
-  else if Treatment.findOne().showOtherAns
+  else if tre.showOtherAns
     return ansObj.answer + "%"
   else
     return ansObj.status
 
 Handlebars.registerHelper "showBestAnsLabel", ->
+  return false unless Handlebars._default_helpers.tre().showBestAns
   return false unless Handlebars._default_helpers.answersFinalized()
   round = Handlebars._default_helpers.getRoundObj()
-  if round.winnerIdArray
-    return @_id in round.winnerIdArray
+  if round.bestAnsUserIds
+    return @_id in round.bestAnsUserIds
   return false
-
-
 
 Template.roundAnswers.isBestAnswer = ->
   round = Handlebars._default_helpers.getRoundObj()
-  if round.winnerIdArray
-    return @_id in round.winnerIdArray
+  if round.bestAnsUserIds
+    return @_id in round.bestAnsUserIds
   return false
-
 
 Template.correctAns.correctAnswer = ->
   Handlebars._default_helpers.getRoundObj().correctanswer
@@ -132,9 +128,7 @@ Template.averageAns.getAverage = ->
   avg = parseInt(avg * 100) / 100
   return avg
 
-Template.roundAnswers.showBestAns = ->
-  obj = Handlebars._default_helpers.tre()
-  return obj.showBestAns
+
 
 Template.roundAnswers.displayCorrectAnswer = ->
   tre = Handlebars._default_helpers.tre()
@@ -143,6 +137,17 @@ Template.roundAnswers.displayCorrectAnswer = ->
   else if tre.secondStageType is "betting"
     return Handlebars._default_helpers.betsFinalized()
   return false
+
+Handlebars.registerHelper "showAvgAns", ->
+  tre = Handlebars._default_helpers.tre()
+  return false unless tre.showAvg
+  if tre.showSecondStage
+    if tre.secondStageType is "voting"
+      return Handlebars._default_helpers.votesFinalized()
+    else if tre.secondStageType is "betting"
+      return Handlebars._default_helpers.betsFinalized()
+  else
+    return Handlebars._default_helpers.answersFinalized()
 
 Template.roundAnswers.showAvg = ->
   tre = Handlebars._default_helpers.tre()
@@ -177,18 +182,18 @@ Template.roundAnswers.secondStageIsBetting = ->
 
 Template.roundAnswers.voteFinalized = ->
   roundIndex = Handlebars._default_helpers.getRoundIndex()
-  vote = Votes.findOne {roundIndex: roundIndex, userId: Meteor.userId()}
+  currUserId = Handlebars._default_helpers.currUserId()
+  vote = Votes.findOne {roundIndex: roundIndex, userId: currUserId}
   return vote and vote.status is "finalized"
 
 Template.roundAnswers.hasVote = (userId) ->
   roundIndex = Handlebars._default_helpers.getRoundIndex()
-  vote = Votes.findOne {roundIndex: roundIndex, userId: Meteor.userId()}
+  currUserId = Handlebars._default_helpers.currUserId()
+  vote = Votes.findOne {roundIndex: roundIndex, userId: currUserId}
   return vote and (vote.answerId is userId)
 
 Template.roundAnswers.displayNumVotes = ->
-  tre = Handlebars._default_helpers.tre()
-  if tre
-    return tre.showBestAns is false and Template.roundAnswers.votesFinalized()
+  return (not Handlebars._default_helpers.showBestAns) and Template.roundAnswers.votesFinalized()
 
 Template.roundAnswers.getNumVotes = ->
   roundIndex = Handlebars._default_helpers.getRoundIndex()
@@ -207,7 +212,8 @@ Template.roundAnswers.isCheckedVote = ->
 
 Template.roundAnswers.betFinalized = ->
   roundIndex = Handlebars._default_helpers.getRoundIndex()
-  bets = Bets.find({roundIndex: roundIndex, userId: Meteor.userId()}).fetch()
+  currUserId = Handlebars._default_helpers.currUserId()
+  bets = Bets.find({roundIndex: roundIndex, userId: currUserId}).fetch()
   if bets.length is 0
     return false
   else
@@ -220,14 +226,16 @@ Template.roundAnswers.betFinalized = ->
 
 Template.roundAnswers.getBetAmount = ->
   roundIndex = Handlebars._default_helpers.getRoundIndex()
-  bet = Bets.findOne {roundIndex: roundIndex, userId: Meteor.userId(), answerId: @_id}
+  currUserId = Handlebars._default_helpers.currUserId()
+  bet = Bets.findOne {roundIndex: roundIndex, userId: currUserId, answerId: @_id}
   if bet
     return bet.amount
   else return 0
 
 Template.roundAnswers.getTotalBetAmount = ->
   roundIndex = Handlebars._default_helpers.getRoundIndex()
-  bets = Bets.find({roundIndex: roundIndex, userId: Meteor.userId()}).fetch()
+  currUserId = Handlebars._default_helpers.currUserId()
+  bets = Bets.find({roundIndex: roundIndex, userId: currUserId}).fetch()
   return 0 unless bets
   total = 0
   for betObj in bets
@@ -239,7 +247,8 @@ Template.roundAnswers.allowIncrease = ->
   return total < 10
 
 ansHasBet = (answerId) ->
-  return Bets.findOne {roundIndex: roundIndex, userId: Meteor.userId(), answerId: answerId}
+  currUserId = Handlebars._default_helpers.currUserId()
+  return Bets.findOne {roundIndex: roundIndex, userId: currUserId, answerId: answerId}
 
 Template.roundAnswers.isCheckedBet = ->
   if Template.roundAnswers.ansHasBet(@_id)

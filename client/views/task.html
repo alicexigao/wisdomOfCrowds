@@ -1,5 +1,7 @@
 <template name="task">
 
+    {{#if readyToRender}}
+
     <div class="row">
         <div class="span7">
             <div>
@@ -8,9 +10,11 @@
             <div>
                 {{> answers}}
             </div>
+            {{#if showChatRoom}}
             <div>
                 {{> chatRoom}}
             </div>
+            {{/if}}
         </div>
         <div class="span5">
             <div>
@@ -18,5 +22,7 @@
             </div>
         </div>
     </div>
+
+    {{/if}}
 
 </template>

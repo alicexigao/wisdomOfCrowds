@@ -6,5 +6,6 @@ Template.question.getQuestion = ->
   Handlebars._default_helpers.getRoundObj().question
 
 Template.question.numRounds = ->
-  Rounds.find().count()
+  rounds = Handlebars._default_helpers.rounds()
+  rounds.find().count()
 

@@ -1,0 +1,40 @@
+<template name="tutorial">
+
+      {{#if readyToRender}}
+        <h3>
+            Tutorial ({{getPageNum}}/{{getTotalPageNum}})
+            <button class="btn btn-success" id="previousPage" {{disablePrevious}}>Previous</button>
+            <button class="btn btn-success" id="nextPage" {{disableNext}}>Next</button>
+            {{#if lastStep}}
+            <button class="btn btn-success" id="goToQuiz">Go To Quiz</button>
+            {{/if}}
+        </h3>
+
+        <div id="tutorialText">
+            <p class="bigfont">
+                {{getText}}
+            </p>
+        </div>
+
+        <div class="line-separator"></div>
+
+        {{#if showInterface}}
+            {{# if showClearYourAnswerButton}}
+                <div class="buttons">
+                    <span class="bigfont">
+                        To try a different answer, you can
+                    </span>
+                    <a class="btn btn-success" id="clearYourAnswer">clear your finalized answer</a>
+                </div>
+                <div class="line-separator"></div>
+            {{/if}}
+
+            <div id="tutorialInterface">
+                {{> task}}
+            </div>
+        {{/if}}
+
+      {{/if}}
+
+</template>
+

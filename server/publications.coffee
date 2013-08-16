@@ -1,8 +1,8 @@
-Meteor.publish "treatment", ->
-  Treatment.find()
+Meteor.publish "settings", ->
+  Settings.find()
 
-Meteor.publish "currentRound", ->
-  CurrentRound.find()
+Meteor.publish "treatment", ->
+  Treatment.find({value: "avgPublicChat"})
 
 Meteor.publish "rounds", ->
   Rounds.find {},
@@ -19,7 +19,7 @@ Meteor.publish "userInputs", ->
 Meteor.publish "chatMessages", ->
   ChatMessages.find()
 
-Meteor.publish "usernames", ->
+Meteor.publish "users", ->
   Meteor.users.find {"profile.online": true},
     fields:
       username: 1
@@ -27,15 +27,6 @@ Meteor.publish "usernames", ->
 
 Meteor.publish "timers", ->
   Timers.find()
-
-
-
-Meteor.publish "tutorial", ->
-  [
-    TutorialCounter.find(),
-    TutorialText.find(),
-    TutorialData.find()
-  ]
 
 Meteor.publish "playerStatus", ->
   PlayerStatus.find()

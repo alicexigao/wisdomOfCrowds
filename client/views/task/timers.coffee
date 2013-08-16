@@ -1,15 +1,21 @@
-Template.timerMain.countdown = ->
-  Meteor.call 'countdownMain', null, (error, result) ->
-    if error
-      return bootbox.alert error.reason
+Template.timerFirst.readyToRender = ->
+  return false unless Timers.findOne(
+    name: "first"
+  )
+  return true
 
-if Template.timerMain.intervalIdMain is undefined
-  Template.timerMain.intervalIdMain = Meteor.setInterval Template.timerMain.countdown, 1000
+Template.timerFirst.countdown = ->
+  Meteor.call 'countdownFirst', {}, (err, res) ->
+    return bootbox.alert err.reason if err
 
-Template.timerMain.getTimeLeft = ->
-  if Timers.findOne({name: "main"}) is undefined
-    return
-  numTotalSeconds = Timers.findOne({name: "main"}).secondsLeft
+if Template.timerFirst.intervalIdMain is undefined
+  Template.timerFirst.intervalIdMain = Meteor.setInterval Template.timerFirst.countdown, 1000
+
+Template.timerFirst.getTimeLeft = ->
+  numTotalSeconds = Timers.findOne(
+    name: "first"
+  ).secondsLeft
+
   if numTotalSeconds
     seconds = numTotalSeconds % 60
     minutes = (numTotalSeconds - seconds) / 60
@@ -23,9 +29,8 @@ Template.timerMain.getTimeLeft = ->
 
 
 Template.timerSecond.countdown = ->
-  Meteor.call 'countdownSecond', null, (error, result) ->
-    if error
-      return bootbox.alert error.reason
+  Meteor.call 'countdownSecond', null, (err, res) ->
+    return bootbox.alert err.reason if err
 
 if Template.timerSecond.intervalIdSecond is undefined
   Template.timerSecond.intervalIdSecond = Meteor.setInterval Template.timerSecond.countdown, 1000

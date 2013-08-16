@@ -1,10 +1,11 @@
 Template.roundHistory.readyToRender = ->
-  tre = Treatment.findOne()
+  tre = Handlebars._default_helpers.tre()
   return false unless tre
   return true
 
 Template.roundHistory.rounds = ->
-  Rounds.find({}, {sort: {index: 1}})
+  rounds = Handlebars._default_helpers.rounds()
+  rounds.find({}, {sort: {index: 1}})
 
 Template.roundHistory.isRoundFinished = (round) ->
   return round.status is "completed"
@@ -13,7 +14,8 @@ Template.roundHistory.getIndexDisplay = ->
   return this.index + 1
 
 Template.roundHistory.getMyAnswerString = ->
-  answer = Answers.findOne({roundIndex: this.index, userId: Meteor.userId()}).answer
+  currUserId = Handlebars._default_helpers.currUserId()
+  answer = Handlebars._default_helpers.ansObjForIndexId(this.index, currUserId).answer
   str = answer + "%"
 
   tre = Handlebars._default_helpers.tre()
@@ -24,7 +26,8 @@ Template.roundHistory.getMyAnswerString = ->
 
 Template.roundHistory.getNumVotes = ->
   roundIndex = Handlebars._default_helpers.getRoundIndex()
-  numVotes = Votes.find({roundIndex: roundIndex, answerId: Meteor.userId()}).count()
+  currUserId = Handlebars._default_helpers.currUserId()
+  numVotes = Votes.find({roundIndex: roundIndex, answerId: currUserId}).count()
   return numVotes
 
 #Template.roundHistory.getOtherAnswersString = ->
@@ -34,7 +37,7 @@ Template.roundHistory.getNumVotes = ->
 #      continue
 #    str += "#{this.answers[userId].answer}%"
 #
-#    tre = Treatment.findOne()
+#    tre = Handlebars._default_helpers.tre()
 #    if tre.showSecondStage and tre.secondStageType is "voting"
 #      numVotes = Template.roundHistory.getNumVotes()
 #      str += "(#{numVotes}),"
@@ -42,14 +45,11 @@ Template.roundHistory.getNumVotes = ->
 #      str += ","
 #  return str.substring(0, str.length - 1)
 
-Template.roundHistory.showBestAns = ->
-  tre = Handlebars._default_helpers.tre()
-  return tre.showBestAns
-
 Template.roundHistory.getWinningAnswerString = ->
   correctAnswer = this.correctanswer
   bestAnswer = -Infinity
-  Answers.find({roundIndex: this.index}).forEach (record) ->
+  ansColl = Handlebars._default_helpers.answers()
+  ansColl.find({roundIndex: this.index}).forEach (record) ->
     ans = record.answer
     if Math.abs(ans - correctAnswer) < Math.abs(bestAnswer - correctAnswer)
       bestAnswer = ans
@@ -61,11 +61,11 @@ Template.roundHistory.getCorrectAnswer = ->
 Template.roundHistory.calcPoints = ->
   tre = Handlebars._default_helpers.tre()
 
+  userId = Handlebars._default_helpers.currUserId()
   if tre.pointsRule is "ownAnswer"
     if Template.roundHistory.isRoundFinished(this)
-      userId = Meteor.userId()
-      len = this.winnerIdArray.length
-      if userId in this.winnerIdArray
+      len = this.bestAnsUserIds.length
+      if userId in this.bestAnsUserIds
         pts = 100 / len
         pts = Math.floor(pts)
         return pts
@@ -73,10 +73,9 @@ Template.roundHistory.calcPoints = ->
         return 10
 
   else if tre.pointsRule is "ownAnswerByVotes"
-    userId = Meteor.userId()
-    len = this.winnerIdArray.length
+    len = this.bestAnsUserIds.length
     vote = Votes.find({roundIndex: this.index, userId: userId}).answerId
-    if vote in this.winnerIdArray
+    if vote in this.bestAnsUserIds
       pts = 100 / len
       pts = Math.floor(pts)
       return pts
@@ -85,12 +84,11 @@ Template.roundHistory.calcPoints = ->
 
   else if tre.pointsRule is "ownAnswerByBets"
     # TODO: needs to update this
-    userId = Meteor.userId()
     bets = this.bets[userId]
     total = 0
     odds = 10
     for answerUID in Object.keys(bets)
-      if answerUID in this.winnerIdArray
+      if answerUID in this.bestAnsUserIds
         total += bets[answerUID].amount * odds
     if total is 0
       return 10

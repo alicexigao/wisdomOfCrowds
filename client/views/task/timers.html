@@ -1,5 +1,7 @@
-<template name="timerMain">
-    <p>Time Remaining: {{getTimeLeft}}</p>
+<template name="timerFirst">
+    {{#if readyToRender}}
+        <p>Time Remaining: {{getTimeLeft}}</p>
+    {{/if}}
 </template>
 
 <template name="timerSecond">

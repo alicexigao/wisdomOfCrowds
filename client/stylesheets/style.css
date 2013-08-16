@@ -29,7 +29,13 @@ td {
 /* Tutorial formatting */
 div#tutorialText {
     display: block;
-    height: 120px;
+    height: 90px;
+}
+
+div.buttons {
+    padding: 5px;
+    display: block;
+    height: 30px;
 }
 
 .line-separator{
