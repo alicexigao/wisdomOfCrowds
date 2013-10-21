@@ -3,11 +3,12 @@
     "router": {},
     "accounts-ui-bootstrap-dropdown": {},
     "user-status": {
-        "path": "../meteor-user-status"
+      "path": "../meteor-user-status"
     },
     "bootboxjs": {},
     "turkserver": {
-        "path": "../turkserver-meteor"
-    }
+      "path": "../turkserver-meteor"
+    },
+    "iron-router": {}
   }
 }

@@ -1,6 +1,8 @@
 <template name="tutorial">
 
-      {{#if readyToRender}}
+    {{#if readyToRender}}
+
+    <div class="container">
         <h3>
             Tutorial ({{getPageNum}}/{{getTotalPageNum}})
             <button class="btn btn-success" id="previousPage" {{disablePrevious}}>Previous</button>
@@ -19,22 +21,24 @@
         <div class="line-separator"></div>
 
         {{#if showInterface}}
-            {{# if showClearYourAnswerButton}}
-                <div class="buttons">
+        {{# if showClearYourAnswerButton}}
+        <div class="buttons">
                     <span class="bigfont">
                         To try a different answer, you can
                     </span>
-                    <a class="btn btn-success" id="clearYourAnswer">clear your finalized answer</a>
-                </div>
-                <div class="line-separator"></div>
-            {{/if}}
-
-            <div id="tutorialInterface">
-                {{> task}}
-            </div>
+            <a class="btn btn-success" id="clearYourAnswer">clear your finalized answer</a>
+        </div>
+        <div class="line-separator"></div>
         {{/if}}
 
-      {{/if}}
+        <div id="tutorialInterface">
+            {{> task}}
+        </div>
+        {{/if}}
+
+    </div>
+
+    {{/if}}
 
 </template>
 

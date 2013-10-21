@@ -1,39 +1,43 @@
 <template name="exitsurvey">
-    <h3>Exit Survey</h3>
 
-    <p class="bigfont">Thank you for playing the game!  Please complete this survey to submit this HIT.</p>
-    <br/>
+    <div class="container">
+        <h3>Exit Survey</h3>
 
-    <p class="bigfont">1. Did you use any online search engine or other resources to look up the answers to these
-        questions?  If yes, were you successful at finding an answer within the time limit?  Please give us an honest
-        answer, and your answer will not affect your base payment or your bonus payment in anyway.</p>
-    <textarea id="lookup"></textarea>
+        <p class="bigfont">Thank you for playing the game!  Please complete this survey to submit this HIT.</p>
+        <br/>
 
-    <p class="bigfont">2. How did you choose your answers to the questions? </p>
-    <label>
-        <input type="radio" name="strategy">
-        I chose an answer randomly.
-    </label>
-    <label>
-        <input type="radio" name="strategy">
-        I type in the first answer that came to my mind.
-    </label>
-    <label>
-        <input type="radio" name="strategy">
-        I thought about what other players would do and chose my answers accordingly.
-    </label>
-    <label>
-        <input type="radio" name="strategy" value="others">
-        Others
-    </label>
-    <textarea id="strategyComment" {{shouldDisable}}></textarea>
+        <p class="bigfont">1. Did you use any online search engine or other resources to look up the answers to these
+            questions?  If yes, were you successful at finding an answer within the time limit?  Please give us an honest
+            answer, and your answer will not affect your base payment or your bonus payment in anyway.</p>
+        <textarea id="lookup"></textarea>
 
-    <p class="bigfont">3. Did you enjoy the game or did you find it boring and tedious?</p>
-    <textarea id="enjoy"></textarea>
+        <p class="bigfont">2. How did you choose your answers to the questions? </p>
+        <label>
+            <input type="radio" name="strategy">
+            I chose an answer randomly.
+        </label>
+        <label>
+            <input type="radio" name="strategy">
+            I type in the first answer that came to my mind.
+        </label>
+        <label>
+            <input type="radio" name="strategy">
+            I thought about what other players would do and chose my answers accordingly.
+        </label>
+        <label>
+            <input type="radio" name="strategy" value="others">
+            Others
+        </label>
+        <textarea id="strategyComment" {{shouldDisable}}></textarea>
 
-    <p class="bigfont">4. Were the instructions and the game interface clear or confusing?  </p>
-    <textarea id="clarity"></textarea>
+        <p class="bigfont">3. Did you enjoy the game or did you find it boring and tedious?</p>
+        <textarea id="enjoy"></textarea>
 
-    <br/>
-    <button class="btn btn-success">Submit Answers</button>
+        <p class="bigfont">4. Were the instructions and the game interface clear or confusing?  </p>
+        <textarea id="clarity"></textarea>
+
+        <br/>
+        <button class="btn btn-success">Submit Answers</button>
+
+    </div>
 </template>

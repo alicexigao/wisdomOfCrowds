@@ -6,7 +6,8 @@ Meteor.publish "treatment", ->
 
 Meteor.publish "rounds", ->
   Rounds.find {},
-    sort: {index: 1}
+    sort:
+      index: 1
 
 # TODO: do not publish answers if they should not be revealed
 Meteor.publish "userInputs", ->

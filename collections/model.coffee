@@ -17,6 +17,9 @@ this.Bets = new Meteor.Collection('bets')
 
 this.ChatMessages = new Meteor.Collection('chatMessages')
 
+
+
+
 getRoundIndex = ->
   Settings.findOne({key: "roundIndex"}).value
 

@@ -1,7 +1,7 @@
 Template.quiz.events =
   "click #goToTutorial": (ev) ->
 
-    Meteor.Router.to("/tutorial")
+    Router.go("/tutorial")
 
   "click #submitAnswers": (ev) ->
 
@@ -26,9 +26,9 @@ Template.quiz.events =
           if error
             return bootbox.alert error.reason
           else if result is true
-            Meteor.Router.to('/task')
+            Router.go('/task')
           else
-            Meteor.Router.to("/lobby")
+            Router.go("/lobby")
 
 
 Template.quiz.getQuizError = ->

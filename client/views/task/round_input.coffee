@@ -146,7 +146,7 @@ Template.oneStage.events =
     finalizeAnsOneStage(ev)
 
   "click #goToExitSurvey": (ev) ->
-    Meteor.Router.to('/exitsurvey')
+    Router.go('/exitsurvey')
 
 Template.twoStagesVoting.events =
 
@@ -172,7 +172,7 @@ Template.twoStagesVoting.events =
       Meteor.call 'markRoundCompleted'
 
   "click #goToExitSurvey": (ev) ->
-    Meteor.Router.to('/exitsurvey')
+    Router.go('/exitsurvey')
 
 Template.twoStagesBetting.events =
 
@@ -198,7 +198,7 @@ Template.twoStagesBetting.events =
       Meteor.call 'markRoundCompleted'
 
   "click #goToExitSurvey": (ev) ->
-    Meteor.Router.to('/exitsurvey')
+    Router.go('/exitsurvey')
 
 readyToRender = ->
   tre = Handlebars._default_helpers.tre()
