@@ -1,12 +1,14 @@
 <template name="chatRoom">
-    <h4>Chat Room</h4>
-    <ul class="well" id="messageArea">
-        {{#each messages}}
+    <div class="divChatRoom">
+        <h4>Chat Room</h4>
+        <ul class="well" id="messageArea">
+            {{#each messages}}
             <li>{{username}} [{{timestampFormat}}]: {{content}}</li>
-        {{/each}}
-    </ul>
-    <form class="form-inline">
-        <input type="text" id="msgContent" class="input-xxlarge">
-        <button type="submit" id="sendMessage" class="btn btn-primary">Send</button>
-    </form>
+            {{/each}}
+        </ul>
+        <form class="form-inline">
+            <input type="text" id="msgContent" class="input-xxlarge">
+            <button type="submit" id="sendMessage" class="btn btn-primary">Send</button>
+        </form>
+    </div>
 </template>

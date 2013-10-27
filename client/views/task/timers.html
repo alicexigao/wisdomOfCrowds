@@ -1,13 +1,11 @@
 <template name="timerFirst">
-    {{#if readyToRender}}
-        <p>Time Remaining: {{getTimeLeft}}</p>
-    {{/if}}
-</template>
-
-<template name="timerSecond">
-    <p>Time Remaining: {{getTimeLeft}}</p>
+    <div class="timerDuringGame">
+        Time Remaining: {{getTimeLeft}}
+    </div>
 </template>
 
 <template name="timerNext">
-    <span>Loading next question in {{getTimeLeft}} seconds...</span>
+    <div class="timerDuringBreak">
+        Loading next question in {{getTimeLeft}} seconds...
+    </div>
 </template>

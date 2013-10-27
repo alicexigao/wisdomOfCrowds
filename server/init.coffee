@@ -91,45 +91,11 @@ Meteor.startup ->
     showSecondStage:   false
     pointsRule:        "average"
 
-#    value: "competitive-votebestanswer"
-#    showChatRoom:  true
-#    showOtherAns:  false
-#    showAvg:       false
-#    showBestAns:   true
-#    showSecondStage:   true
-#    secondStageType:   "voting"
-#    pointsRule:        "ownAnswerByVotes"
-
-#    value: "avgPublicChatbyvotes"
-#    showChatRoom:  true
-#    showOtherAns:  true
-#    showAvg:       true
-#    showBestAns:   false
-#    showSecondStage:   true
-#    secondStageType:   "voting"
-#    pointsRule:        "averageByVotes"
-
-#    value: "competitive-bettingbestanswer"
-#    showChatRoom:  true
-#    showOtherAns:  false
-#    showAvg:       false
-#    showBestAns:   true
-#    showSecondStage:   true
-#    secondStageType:   "betting"
-#    pointsRule:        "ownAnswerByBets"
-
-#    value: "avgPublicChatbybets"
-#    showChatRoom:  true
-#    showOtherAns:  false
-#    showAvg:       true
-#    showBestAns:   false
-#    showSecondStage:   true
-#    secondStageType:   "betting"
-#    pointsRule:        "averageByBets"
 
   for user in Meteor.users.find().fetch()
     Meteor.users.update {username: user.username},
       $set: {rand: Math.random()}
+
 
   Rounds.remove({})
   Rounds.insert
@@ -137,16 +103,31 @@ Meteor.startup ->
     question: "What percent of the world's population lives in the U.S.? (U.S. Census Bureau, International Database, 6/2/2007)"
     correctanswer: 4.57
     status: "inprogress"
+    page: "task"
   Rounds.insert
     index: 1
     question: "What percent of U.S. households own at least one pet cat? (U.S. Pet Ownership & Demographics Sourcebook, 2002)"
     correctanswer: 31.6
     status: "inprogress"
+    page: "task"
   Rounds.insert
     index: 2
     question: "What percent of the world's population speaks Spanish as their first language? (Ethnologue: Languages of the World, 4/2007)"
     correctanswer: 4.88
     status: "inprogress"
+    page: "task"
+  Rounds.insert
+    index: 0
+    question: "Fake Tutorial Question 1"
+    correctanswer: 30
+    status: "inprogress"
+    page: "tutorial"
+  Rounds.insert
+    index: 1
+    question: "Fake Tutorial Question 2"
+    correctanswer: 70
+    status: "inprogress"
+    page: "tutorial"
 
   Answers.remove({})
 
@@ -162,15 +143,7 @@ Meteor.startup ->
     name: name
     endTime: time
     secondsLeft: timerFirstDur
-    start: false
-#    start: true
-
-  name = "second"
-  timerSecondDur = 60
-  Timers.insert
-    name: name
-    secondsLeft: timerSecondDur
-    start: false
+    start: true
 
   name = "next"
   timerNextDur = 10
@@ -179,21 +152,16 @@ Meteor.startup ->
     secondsLeft: timerNextDur
     start: false
 
-  Votes.remove({})
-  Bets.remove({})
-
   ChatMessages.remove({})
-
   ErrorMessages.remove({})
   QuizAttempts.remove({})
 
-  PlayerStatus.remove({})
-  users = Meteor.users.find().fetch()
-  for user in users
-    PlayerStatus.insert
-      userId: user._id
-      ready: false
-
+#  PlayerStatus.remove({})
+#  users = Meteor.users.find().fetch()
+#  for user in users
+#    PlayerStatus.insert
+#      userId: user._id
+#      ready: false
 
 
 

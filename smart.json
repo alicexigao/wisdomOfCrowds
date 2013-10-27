@@ -1,7 +1,5 @@
 {
   "packages": {
-    "router": {},
-    "accounts-ui-bootstrap-dropdown": {},
     "user-status": {
       "path": "../meteor-user-status"
     },
@@ -9,6 +7,7 @@
     "turkserver": {
       "path": "../turkserver-meteor"
     },
-    "iron-router": {}
+    "iron-router": {},
+    "tutorials": {}
   }
 }

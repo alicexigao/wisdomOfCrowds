@@ -5,20 +5,10 @@ this.Treatment = new Meteor.Collection('treatment')
 this.QuizAttempts = new Meteor.Collection('quizAttempts')
 this.ErrorMessages = new Meteor.Collection('errorMessages')
 
-this.PlayerStatus = new Meteor.Collection("playerStatus")
-
-this.Timers = new Meteor.Collection("timeleft")
-
 this.Rounds = new Meteor.Collection('rounds')
-
 this.Answers = new Meteor.Collection('answers')
-this.Votes = new Meteor.Collection('votes')
-this.Bets = new Meteor.Collection('bets')
-
 this.ChatMessages = new Meteor.Collection('chatMessages')
-
-
-
+this.Timers = new Meteor.Collection("timeleft")
 
 getRoundIndex = ->
   Settings.findOne({key: "roundIndex"}).value
@@ -29,280 +19,173 @@ getTreatment = ->
 getOnlineUsers = ->
   Meteor.users.find {"profile.online": true}
 
+calcAvgAndBestAnswer = ->
+  roundIndex = getRoundIndex()
+
+  correct = Rounds.findOne({index: roundIndex}).correctanswer
+  numAns = 0
+  sumAns = 0
+  bestAns = -Infinity
+
+  for user in getOnlineUsers().fetch()
+    userId = user._id
+    ans = Answers.findOne({roundIndex: roundIndex, userId: userId}).answer
+    sumAns += ans
+    numAns++
+    if Math.abs(ans - correct) < Math.abs(bestAns - correct)
+      bestAns = ans
+
+  bestAnsUserIds = []
+  for user in getOnlineUsers().fetch()
+    userId = user._id
+    ans = Answers.findOne({roundIndex: roundIndex, userId: userId}).answer
+    if ans is bestAns
+      bestAnsUserIds.push userId
+
+  avg = sumAns / numAns
+  Rounds.update {index: roundIndex},
+    $set: {"average": avg}
+  Rounds.update {index: roundIndex},
+    $set: {"bestAns": bestAns}
+  Rounds.update {index: roundIndex},
+    $set: {"bestAnsUserIds": bestAnsUserIds}
+
+fakeAnswers = ->
+  # put in fake answers and finalize
+  roundIndex = getRoundIndex()
+  users = getOnlineUsers().fetch()
+  for user in users
+    ans = Answers.findOne({roundIndex: roundIndex, userId: user._id})
+    if ans
+      Answers.update {roundIndex: roundIndex, userId: user._id},
+        $set: {status: "finalized"}
+    else
+      Answers.insert
+        roundIndex: roundIndex
+        userId: user._id
+        answer: 50
+        status: "finalized"
+
+
+intervalIdFirst = undefined
+
+intervalIdNext = undefined
+
+
 Meteor.methods
   sendMsg: (data) ->
     if (!Meteor.user())
       throw new Meteor.Error(401, "You need to login to chat")
     chatData =
-      userId: Meteor.userId()
-      username: Meteor.user().username
-      timestamp: data.timestamp
-      content: data.content
+      page      : data.page
+      userId    : Meteor.userId()
+      username  : Meteor.user().username
+      timestamp : data.timestamp
+      content   : data.content
     ChatMessages.insert chatData
 
+  countdownFirst: ->
+    console.log "count down first"
 
+    # decrement timer
+    currTime = new Date()
+    endTimeString = Timers.findOne({name: "first"}).endTime
+    endTime = new Date(endTimeString)
 
-  countdownNext: (data) ->
-    timerObj = Timers.findOne({name: "next"})
-    return unless timerObj
-    return unless timerObj.start is true
+    numSeconds = 0
+    if currTime < endTime
+      numSeconds = (endTime.getTime() - currTime.getTime()) / 1000
+      numSeconds = Math.round(numSeconds)
+    Timers.update {name: "first"},
+      $set: {secondsLeft: numSeconds}
+
+    if numSeconds is 0
+      fakeAnswers()
+      Meteor.call 'endCurrRound', {}, (error, result) ->
+        return result
+
+  countdownNext: ->
+    console.log "count down next"
 
     currTime = new Date()
-    endTime = new Date(timerObj.endTime)
+    endTimeString = Timers.findOne({name: "next"}).endTime
+    endTime = new Date(endTimeString)
 
+    numSeconds = 0
     if currTime < endTime
-
-      # Time is not up yet
       numSeconds = (endTime.getTime() - currTime.getTime()) / 1000
-      numSeconds = Math.floor(numSeconds)
-      Timers.update {name: "next"},
-        $set: {secondsLeft: numSeconds}
+      numSeconds = Math.round(numSeconds)
+    Timers.update {name: "next"},
+      $set: {secondsLeft: numSeconds}
 
-    else
+    if numSeconds is 0
+      Meteor.call 'startNextRound', {}, (error, result) ->
+        return result
 
-      # Stop timer NEXT
-      Timers.update {name: "next"},
-        $set: {start: false}
+  startNextRound: ->
+    # stop timer next
+    if intervalIdNext isnt undefined
+      Meteor.clearInterval(intervalIdNext)
+      intervalIdNext = undefined
 
-      # incr round number
-      Settings.update {key: "roundIndex"},
-        $inc: {value: 1}
-
-      # Reset and start main timer
-      Meteor.call "startTimerFirst"
-
-  startTimerFirst: ->
-    timerFirstDur = 60
-    time = new Date()
-    endTime = time.getTime() + 1000 * timerFirstDur
-    time.setTime(endTime)
-    Timers.update {name: "main"},
-      $set: {endTime: time}
-    Timers.update {name: "main"},
-      $set: {start: true}
-
-  stopTimerFirst: ->
-    Timers.update {name: "main"},
-      $set: {start: false}
-
-  countdownFirst: (data) ->
-    timer = Timers.findOne({name: "main"})
-    return unless timer
-    return unless timer.start is true
-
-    currTime = new Date()
-    endTime = new Date(timer.endTime)
-
-    if currTime < endTime
-
-      # Time is not up yet
-      numSeconds = (endTime.getTime() - currTime.getTime()) / 1000
-      numSeconds = Math.floor(numSeconds)
-      Timers.update {name: "main"},
-        $set: {secondsLeft: numSeconds}
-
-    else
-
-      # Stop timer first
-      Timers.update {name: "main"},
-        $set: {start: false}
-
-      users = getOnlineUsers().fetch()
-      # put in fake answer and finalize
-      roundIndex = getRoundIndex()
-      for user in users
-        ans = Answers.findOne({roundIndex: roundIndex, userId: user._id})
-        if ans
-          Answers.update {roundIndex: roundIndex, userId: user._id},
-            $set: {status: "finalized"}
-        else
-          Answers.insert
-            roundIndex: roundIndex
-            userId: user._id
-            answer: 50
-            status: "finalized"
-
-      tre = getTreatment()
-      if tre and tre.showSecondStage
-        # Start timer second
-        Meteor.call "startTimerSecond"
-      else
-        # round is completed
-        Meteor.call 'markRoundCompleted'
-
-  startTimerSecond: ->
-    timerSecondDur = 60
-    time = new Date()
-    endTime = time.getTime() + 1000 * timerSecondDur
-    time.setTime(endTime)
-    Timers.update {name: "second"},
-      $set: {endTime: time}
-    Timers.update {name: "second"},
-      $set: {start: true}
-
-  stopTimerSecond: ->
-    Timers.update {name: "second"},
-      $set: {start: false}
-
-  countdownSecond: (data) ->
-    obj = Timers.findOne({name: "second"})
-    return unless obj
-    return unless obj.start is true
-
-    if obj
-      currTime = new Date()
-      endTime = new Date(obj.endTime)
-      if currTime < endTime
-
-        # Time is not up yet
-        numSeconds = (endTime.getTime() - currTime.getTime()) / 1000
-        numSeconds = Math.floor(numSeconds)
-        Timers.update {name: "second"},
-          $set: {secondsLeft: numSeconds}
-
-      else
-
-        # Stop this timer
-        Timers.update {name: "second"},
-          $set: {start: false}
-
-        roundIndex = getRoundIndex()
-        users = getOnlineUsers().fetch()
-        tre = getTreatment()
-        if tre and tre.showSecondStage and tre.secondStageType is "voting"
-
-          # put in fake votes
-          for user in users
-            vote = Votes.findOne {roundIndex: roundIndex, userId: user._id}
-            if vote
-              Votes.update {roundIndex: roundIndex, userId: user._id},
-                $set: {status: "finalized"}
-            else
-              Votes.insert
-                roundIndex: roundIndex
-                userId: user._id
-                answerId: user._id
-                status: "finalized"
-
-
-        if tre and tre.showSecondStage and tre.secondStageType is "betting"
-
-          # put in fake bets
-          for user in users
-            bets = Bets.find({roundIndex: roundIndex, userId: user._id}).fetch()
-            if bets.length > 0
-              Bets.update {roundIndex: roundIndex, userId: user._id},
-                $set: {status: "finalized"}
-            else
-              Bets.insert
-                roundIndex: roundIndex
-                userId: user._id
-                answerId: user._id
-                amount: 1
-                status: "finalized"
-
-        Meteor.call 'markRoundCompleted'
-
-  # do things when the round is completed
-  markRoundCompleted: (data) ->
+    # incr round index
+    # TODO: check if this is the last round
     roundIndex = getRoundIndex()
-    round = Rounds.findOne {index: roundIndex}
+    Settings.update {key: "roundIndex"}
+    , $set: {value: (roundIndex + 1)}
 
-    # if voting, calc num of votes and average by votes
-    tre = getTreatment()
-    if tre and tre.showSecondStage and tre.secondStageType is "voting"
+    # start timer first
+    time = new Date()
+    nextEndTime = time.getTime() + 1000 * 60
+    time.setTime(nextEndTime)
 
-      # calc average by votes
-      numVotes = 0
-      sumVotes = 0
-      for user in Meteor.users().find().fetch()
-        ans = Answers.findOne({roundIndex: roundIndex, userId: user._id}).answer
-        votes = Votes.find({roundIndex: roundIndex, answerId: user._id}).count()
-        sumVotes += ans * votes
-        numVotes += votes
-      avgByVotes = sumVotes / numVotes
-      Rounds.update {index: roundIndex},
-        $set: {averageByVotes: avgByVotes}
+    if Meteor.isServer
+      Timers.update {name: "first"}
+      , $set:
+        endTime: time
+        secondsLeft: 60
+      , (error, result) ->
+        if intervalIdFirst is undefined
+          intervalIdFirst = Meteor.setInterval (->
+            Meteor.call 'countdownFirst'
+          ), 1000
 
-    if tre and tre.showSecondStage and tre.secondStageType is "betting"
+  # end current round
+  endCurrRound: ->
 
-      betsAndAnswers = 0
-      bets = 0
-      for user in Meteor.users().find().fetch()
+    calcAvgAndBestAnswer()
 
-        ans = Answers.findOne({roundIndex: roundIndex, userId: user._id}).answer
-        betAmt = 0
-        Bets.find({roundIndex: roundIndex, answerId: user._id}).forEach (record) ->
-          betAmt += record.amount
-
-        betsAndAnswers += ans * betAmt
-        bets += betAmt
-      avgByBets = betsAndAnswers / bets
-      Rounds.update {index: roundIndex},
-        $set: {averageByBets: avgByBets}
-
-    # calc average and best answer
-    correct = round.correctanswer
-    numAns = 0
-    sumAns = 0
-    bestAns = -Infinity
-
-    for user in getOnlineUsers().fetch()
-      userId = user._id
-      ans = Answers.findOne({roundIndex: roundIndex, userId: userId}).answer
-      sumAns += ans
-      numAns++
-      if Math.abs(ans - correct) < Math.abs(bestAns - correct)
-        bestAns = ans
-
-    bestAnsUserIds = []
-    for user in getOnlineUsers().fetch()
-      userId = user._id
-      ans = Answers.findOne({roundIndex: roundIndex, userId: userId}).answer
-      if ans is bestAns
-        bestAnsUserIds.push userId
-
-    avg = sumAns / numAns
-    Rounds.update {index: roundIndex},
-      $set: {"average": avg}
-    Rounds.update {index: roundIndex},
-      $set: {"bestAns": bestAns}
-    Rounds.update {index: roundIndex},
-      $set: {"bestAnsUserIds": bestAnsUserIds}
-
-    # mark round as completed
+    roundIndex = getRoundIndex()
     Rounds.update {index: roundIndex},
       $set: {status: "completed"}
 
-    numQuestions = Rounds.find().count()
-    round =  Rounds.findOne({index: numQuestions - 1})
-    if round
-      if round.status is "completed"
+    # stop timer first
+    if intervalIdFirst isnt undefined
+      Meteor.clearInterval(intervalIdFirst)
+      intervalIdFirst = undefined
 
-      else
-        # Start timer NEXT
-        timerNextDur = 10
-        time = new Date()
-        nextEndTime = time.getTime() + 1000 * timerNextDur
-        time.setTime(nextEndTime)
-        Timers.update {name: "next"},
-          $set: {endTime: time}
-        Timers.update {name: "next"},
-          $set: {secondsLeft: timerNextDur}
-        Timers.update {name: "next"},
-          $set: {start: true}
+    # start timer next
+    time = new Date()
+    nextEndTime = time.getTime() + 1000 * 10
+    time.setTime(nextEndTime)
+
+    if Meteor.isServer
+      Timers.update {name: "next"}
+      , $set:
+        endTime: time
+        secondsLeft: 10
+      , (error, result) ->
+        if intervalIdNext is undefined
+          intervalIdNext = Meteor.setInterval (->
+            Meteor.call 'countdownNext'
+          ), 1000
 
 
-  #############################
-  # First stage functions
-  #############################
   updateAnswer: (data) ->
-    roundIndex = getRoundIndex()
-    userId = Meteor.userId()
-
     ansExists = Answers.findOne
-      roundIndex: roundIndex
-      userId: Meteor.userId()
+      roundIndex: data.roundIndex
+      userId    : data.userId
+      page      : data.page
 
     if ansExists
       # already has answer for current user
@@ -312,118 +195,31 @@ Meteor.methods
       # update answer
       if data.answer
         Answers.update
-          roundIndex: roundIndex
-          userId: userId
+          roundIndex: data.roundIndex
+          userId    : data.userId
         , $set:
-            answer: data.answer
+          answer  : data.answer
 
       # update status
       Answers.update
-        userId: userId
-        roundIndex: roundIndex
+        roundIndex: data.roundIndex
+        userId    : data.userId
       , $set:
-          status: data.status
+        status  : data.status
+        page    : data.page
 
     else
       # insert new answer
       Answers.insert
-        roundIndex: roundIndex
-        userId: userId
-        answer: data.answer
-        status: data.status
+        roundIndex: data.roundIndex
+        userId    : data.userId
+        answer    : data.answer
+        status    : data.status
+        page      : data.page
 
-
-  #############################
-  # Voting functions
-  #############################
-  updateVote: (data) ->
-    roundIndex = getRoundIndex()
-    userId = Meteor.userId()
-
-    vote = Votes.findOne {roundIndex: roundIndex, userId: userId}
-    if vote
-      if vote.status is "finalized"
-        # error if answer has been finalized
-        throw new Meteor.Error(100, "Vote has been finalized")
-
-      Votes.update {roundIndex: roundIndex, userId: userId},
-        $set: {answerId: data.answerId}
-      Votes.update {roundIndex: roundIndex, userId: userId},
-        $set: {status: "submitted"}
-
-    else
-
-      Votes.insert
-        roundIndex: roundIndex
-        userId:   userId
-        answerId: data.answerId
-        status:   "submitted"
-
-
-  finalizeVote: (data) ->
-    roundIndex = getRoundIndex()
-    Votes.update {roundIndex: roundIndex, userId: Meteor.userId()},
-      $set: {status: "finalized"}
-
-  #############################
-  # Betting functions
-  #############################
-  addBet: (data) ->
-    roundIndex = getRoundIndex()
-    userId = Meteor.userId()
-
-    bet = Bets.findOne {roundIndex: roundIndex, userId: userId, answerId: data.answerId}
-    if bet
-      if bet.status is "finalized"
-        # error if bet has been finalized
-        throw new Meteor.Error(100, "Bet has been finalized")
-      Bets.update {roundIndex: roundIndex, userId: userId, answerId: data.answerId},
-        $set: {status: "submitted"}
-      Bets.update {roundIndex: roundIndex, userId: userId, answerId: data.answerId},
-        $set: {amount: data.amount}
-    else
-      Bets.insert
-        roundIndex: roundIndex
-        userId:   userId
-        answerId: data.answerId
-        status:   "submitted"
-        amount:   data.amount
-
-  removeBet: (data) ->
-    bet = Bets.findOne
-      roundIndex: roundIndex
-      userId:  Meteor.userId()
-      answerId: data.answerId
-    if bet
-      Bets.remove
-        roundIndex: roundIndex
-        userId:  Meteor.userId()
-        answerId: data.answerId
-
-  updateBet: (data) ->
-    bet = Bets.findOne
-      roundIndex: roundIndex
-      userId: Meteor.userId()
-      answerId: data.answerId
-    return unless bet
-    newBet = parseInt(bet.amount) + parseInt(data.change)
-    if newBet is 0
-      Meteor.call 'removeBet', data
-    else
-      Bets.update {roundIndex: roundIndex, userId: Meteor.userId(), answerId: data.answerId},
-        $inc: {amount: data.change}
-
-  finalizeBet: (data) ->
-    bets = Bets.find({roundIndex: roundIndex, userId: Meteor.userId()}).fetch()
-    for bet in bets
-      Bets.update {roundIndex: roundIndex, userId: Meteor.userId(), answerId: bet.answerId},
-        $set: {status: "finalized"}
-
-
-
-  #############################
-  # Quiz functions
-  #############################
+#############################
+# Quiz functions
+#############################
   gradeQuiz: (data) ->
 
     if "q1" in data.list
@@ -464,11 +260,11 @@ Meteor.methods
       return false
 
 
-  setStatusReady: (data) ->
-    PlayerStatus.update {userId: data.userId},
-      $set: {ready: true}
-    result = PlayerStatus.find({ready: true}).count() is getOnlineUsers().count()
-    Meteor.call "startTimerFirst"
-    return result
+#  setStatusReady: (data) ->
+#    PlayerStatus.update {userId: data.userId},
+#      $set: {ready: true}
+#    result = PlayerStatus.find({ready: true}).count() is getOnlineUsers().count()
+#    Meteor.call "startTimerFirst"
+#    return result
 
 

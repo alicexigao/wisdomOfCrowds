@@ -20,15 +20,19 @@ Template.quiz.events =
         # failed quiz
         return bootbox.alert ErrorMessages.findOne({type: "quiz"}).message
       else
-        data =
-          userId: Meteor.userId()
-        Meteor.call "setStatusReady", data, (error, result) ->
-          if error
-            return bootbox.alert error.reason
-          else if result is true
-            Router.go('/task')
-          else
-            Router.go("/lobby")
+        # passed quiz
+        Router.go('/task')
+
+
+#        data =
+#          userId: Meteor.userId()
+#        Meteor.call "setStatusReady", data, (error, result) ->
+#          if error
+#            return bootbox.alert error.reason
+#          else if result is true
+#            Router.go('/task')
+#          else
+#            Router.go("/lobby")
 
 
 Template.quiz.getQuizError = ->
