@@ -12,7 +12,6 @@ Router.map ->
       @tutorialChat.stop()
       @tutorialAnswers.stop()
   @route "quiz"
-  @route "lobby"
   @route "task",
     before: ->
       @taskRounds = @subscribe("rounds", "task").wait()
@@ -33,9 +32,8 @@ Deps.autorun ->
 
   if state is "quiz"
     Router.go("/")
-  else if state is "lobby"
+  else if state is "lobby" # This route is defined by turkserver
     Router.go("/lobby")
   else if state is "experiment"
     Router.go("/task")
-
 

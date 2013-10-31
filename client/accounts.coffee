@@ -4,9 +4,9 @@ login = ->
   bootbox.prompt "Please enter a username", (username) ->
     Meteor.insecureUserLogin(username) if username?
 
-# Start initial login after stuff loaded
+# Start initial login after stuff loaded (and possible mturk login)
 Meteor.startup ->
-  Meteor.setTimeout login, 50
+  Meteor.setTimeout login, 500
 
   # TODO make sure this works inside MTurk iFrame
   # See http://stackoverflow.com/questions/6883827/detecting-active-window-in-an-iframe

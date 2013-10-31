@@ -9,9 +9,10 @@ coffeescript
 accounts-testing
 standard-app-packages
 bootboxjs
-# turkserver
 iron-router
 handlebars
 user-status
 stylus
 tutorials
+
+turkserver
