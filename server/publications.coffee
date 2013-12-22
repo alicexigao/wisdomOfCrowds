@@ -1,8 +1,22 @@
-Meteor.publish "settings", ->
-  Settings.find()
+Meteor.publish "settingsTaskQuestions", ->
+  Settings.find {key: "taskQuestion"},
+    fields:
+      key: 1
+      value: 1
+
+Meteor.publish "settingsTutorialQuestions", ->
+  Settings.find {key: "tutorialQuestion"},
+    fields:
+      key: 1
+      value: 1
+
+Meteor.publish "correctAnswer", (id) ->
+  Settings.find {_id: id},
+    fields:
+      answer: 1
 
 Meteor.publish "treatment", ->
-  Treatment.find({value: "avgPublicChat"})
+  Treatment.find({value: "bestChat"})
 
 Meteor.publish "users", ->
   Meteor.users.find {"profile.online": true},

@@ -10,19 +10,24 @@ this.Answers = new Meteor.Collection('answers')
 this.ChatMessages = new Meteor.Collection('chatMessages')
 this.Timers = new Meteor.Collection("timeleft")
 
-getRoundIndex = ->
-  Settings.findOne({key: "roundIndex"}).value
-
+# get treatment
 getTreatment = ->
   Treatment.findOne()
 
+# get round index
+getRoundIndex = ->
+  Rounds.findOne({active: true}).index
+
+# get online users
 getOnlineUsers = ->
   Meteor.users.find {"profile.online": true}
 
+# calculate average and best answer
 calcAvgAndBestAnswer = ->
   roundIndex = getRoundIndex()
+  questionId = Rounds.findOne({active: true}).questionId
 
-  correct = Rounds.findOne({index: roundIndex}).correctanswer
+  correct = Settings.findOne({_id: questionId}).answer
   numAns = 0
   sumAns = 0
   bestAns = -Infinity
@@ -35,6 +40,8 @@ calcAvgAndBestAnswer = ->
     if Math.abs(ans - correct) < Math.abs(bestAns - correct)
       bestAns = ans
 
+  avg = sumAns / numAns
+
   bestAnsUserIds = []
   for user in getOnlineUsers().fetch()
     userId = user._id
@@ -42,50 +49,46 @@ calcAvgAndBestAnswer = ->
     if ans is bestAns
       bestAnsUserIds.push userId
 
-  avg = sumAns / numAns
-  Rounds.update {index: roundIndex},
-    $set: {"average": avg}
-  Rounds.update {index: roundIndex},
-    $set: {"bestAns": bestAns}
-  Rounds.update {index: roundIndex},
-    $set: {"bestAnsUserIds": bestAnsUserIds}
+  Rounds.update
+    index: roundIndex
+  , $set:
+      "best": bestAns
+      "average": avg
+      "bestAnsUserIds": bestAnsUserIds
 
+# if answer exists, finalize it
+# else insert a finalized answer of 50
 fakeAnswers = ->
-  # put in fake answers and finalize
+  console.log "fake answers called"
   roundIndex = getRoundIndex()
   users = getOnlineUsers().fetch()
   for user in users
     ans = Answers.findOne({roundIndex: roundIndex, userId: user._id})
     if ans
-      Answers.update {roundIndex: roundIndex, userId: user._id},
+      console.log "finalize existing answer"
+      Answers.update
+        roundIndex: roundIndex
+        userId: user._id
+      ,
         $set: {status: "finalized"}
     else
+      console.log "insert new answer 50"
       Answers.insert
         roundIndex: roundIndex
         userId: user._id
         answer: 50
         status: "finalized"
+        page: "task"
 
 
 intervalIdFirst = undefined
-
 intervalIdNext = undefined
 
 
 Meteor.methods
-  sendMsg: (data) ->
-    if (!Meteor.user())
-      throw new Meteor.Error(401, "You need to login to chat")
-    chatData =
-      page      : data.page
-      userId    : Meteor.userId()
-      username  : Meteor.user().username
-      timestamp : data.timestamp
-      content   : data.content
-    ChatMessages.insert chatData
 
   countdownFirst: ->
-    console.log "count down first"
+    console.log "countdownFirst called"
 
     # decrement timer
     currTime = new Date()
@@ -99,14 +102,16 @@ Meteor.methods
     Timers.update {name: "first"},
       $set: {secondsLeft: numSeconds}
 
+    # if timer is done, end current round
     if numSeconds is 0
       fakeAnswers()
-      Meteor.call 'endCurrRound', {}, (error, result) ->
-        return result
+      Meteor.call 'endCurrRound'
+
 
   countdownNext: ->
-    console.log "count down next"
+    console.log "countdownNext called"
 
+    # decrement timer
     currTime = new Date()
     endTimeString = Timers.findOne({name: "next"}).endTime
     endTime = new Date(endTimeString)
@@ -118,21 +123,42 @@ Meteor.methods
     Timers.update {name: "next"},
       $set: {secondsLeft: numSeconds}
 
+    # if timer is done, start next round
     if numSeconds is 0
       Meteor.call 'startNextRound', {}, (error, result) ->
         return result
 
+
+#######################
+# start next round
+#######################
   startNextRound: ->
+    console.log "startNextRound called"
+
     # stop timer next
     if intervalIdNext isnt undefined
       Meteor.clearInterval(intervalIdNext)
       intervalIdNext = undefined
 
-    # incr round index
-    # TODO: check if this is the last round
+
+    # if this is the last round, stop
     roundIndex = getRoundIndex()
-    Settings.update {key: "roundIndex"}
-    , $set: {value: (roundIndex + 1)}
+    numRounds = Rounds.find({page: "task"}).count()
+    if roundIndex is numRounds - 1
+      return
+
+    # incr round index
+    Rounds.update
+      index: roundIndex
+      page: "task"
+    , $set:
+        active: false
+    , (error, result) ->
+      Rounds.update
+        index: roundIndex + 1
+        page: "task"
+      , $set:
+          active: true
 
     # start timer first
     time = new Date()
@@ -150,14 +176,13 @@ Meteor.methods
             Meteor.call 'countdownFirst'
           ), 1000
 
-  # end current round
+####################
+# end current round
+####################
   endCurrRound: ->
+    console.log "endCurrRound called"
 
     calcAvgAndBestAnswer()
-
-    roundIndex = getRoundIndex()
-    Rounds.update {index: roundIndex},
-      $set: {status: "completed"}
 
     # stop timer first
     if intervalIdFirst isnt undefined
@@ -181,6 +206,21 @@ Meteor.methods
           ), 1000
 
 
+
+  # save chat messages
+  sendMsg: (data) ->
+    if (!Meteor.user())
+      throw new Meteor.Error(401, "You need to login to chat")
+    chatData =
+      page      : data.page
+      userId    : Meteor.userId()
+      username  : Meteor.user().username
+      timestamp : data.timestamp
+      content   : data.content
+    ChatMessages.insert chatData
+
+
+  # update of finalize answer
   updateAnswer: (data) ->
     ansExists = Answers.findOne
       roundIndex: data.roundIndex

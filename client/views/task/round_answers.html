@@ -7,12 +7,12 @@
     <div>
         <!--Correct Answer-->
         {{#if answersFinalized}}
-        {{> correctAns}}
+            {{> correctAns}}
         {{/if}}
 
         <!--Average Answer-->
         {{#if showAvgAns}}
-        {{> averageAns}}
+            {{> averageAns}}
         {{/if}}
     </div>
 
@@ -58,7 +58,7 @@
 </template>
 
 <template name="correctAns">
-    <span class="lead">Corrent Answer: {{correctAnswer}}% &nbsp;&nbsp;&nbsp;</span>
+    <span class="lead">Correct Answer: {{correctAnswer}}% &nbsp;&nbsp;&nbsp;</span>
 </template>
 
 <template name="averageAns">

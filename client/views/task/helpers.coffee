@@ -2,14 +2,9 @@ Handlebars.registerHelper "readyToRender", ->
 #  console.log "ready to render called"
   tre = Handlebars._default_helpers.tre()
 #  console.log "treatment is " + tre
-  roundIndex = Settings.findOne({key: "roundIndex"})
-#  console.log "round index is " + roundIndex
   return false unless tre
-  return false unless roundIndex
 
-  i = roundIndex.value
-#  console.log "i is " + i
-  currRound = Rounds.findOne({index: i})
+  currRound = Rounds.findOne({active: true})
 #  console.log "currRound is " + currRound
   return false unless currRound
 
@@ -25,22 +20,31 @@ Handlebars.registerHelper "showBestAns", ->
   tre = Handlebars._default_helpers.tre()
   return tre.showBestAns
 
-# Get index of current round
-Handlebars.registerHelper "getRoundIndex", ->
-  if Session.equals("page", "tutorial")
-    return Session.get("tutorialRoundIndex")
-  else
-    return unless Settings.findOne({key: "roundIndex"})
-    Settings.findOne({key: "roundIndex"}).value
+
+
 
 # Get rounds collection
 Handlebars.registerHelper "rounds", ->
   Rounds
 
+# Get number of rounds
+Handlebars.registerHelper "numRounds", ->
+  Rounds.find().count()
+
+# Get current round index
+Handlebars.registerHelper "getRoundIndex", ->
+  if Session.equals("page", "tutorial")
+    return Session.get("tutorialRoundIndex")
+  else
+    return unless Rounds.findOne({active: true})
+    Rounds.findOne({active: true}).index
+
 # Get current round object
-Handlebars.registerHelper "getRoundObj", ->
-  i = Handlebars._default_helpers.getRoundIndex()
-  Rounds.findOne({index: i})
+Handlebars.registerHelper "getCurrRoundObj", ->
+  Rounds.findOne({active: true})
+
+
+
 
 Handlebars.registerHelper "userColl", ->
   if Session.equals("page", "tutorial")

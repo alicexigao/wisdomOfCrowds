@@ -1,13 +1,44 @@
+
+shuffle = (sourceArray) ->
+  n = 0
+  while n < sourceArray.length - 1
+    k = n + Math.floor(Math.random() * (sourceArray.length - n))
+    temp = sourceArray[k]
+    sourceArray[k] = sourceArray[n]
+    sourceArray[n] = temp
+    n++
+
+
 Meteor.startup ->
 
   Settings.remove({})
-  Settings.insert
-    key: "roundIndex"
-    value: 0
 
   Settings.insert
-    key: "numGames"
-    value: 10
+    key: "taskQuestion"
+    value: "What percent of the world's population lives in the U.S.? (U.S. Census Bureau, International Database, 6/2/2007)"
+    answer: 4.57
+
+  Settings.insert
+    key: "taskQuestion"
+    value: "What percent of U.S. households own at least one pet cat? (U.S. Pet Ownership & Demographics Sourcebook, 2002)"
+    answer: 31.6
+
+  Settings.insert
+    key: "taskQuestion"
+    value: "What percent of the world's population speaks Spanish as their first language? (Ethnologue: Languages of the World, 4/2007)"
+    answer: 4.88
+
+  Settings.insert
+    key: "tutorialQuestion"
+    value: "Fake Tutorial Question 1"
+    answer: 30
+
+  Settings.insert
+    key: "tutorialQuestion"
+    value: "Fake Tutorial Question 2"
+    answer: 70
+
+
 
   Treatment.remove({})
   Treatment.insert
@@ -98,24 +129,23 @@ Meteor.startup ->
 
 
   Rounds.remove({})
-  Rounds.insert
-    index: 0
-    question: "What percent of the world's population lives in the U.S.? (U.S. Census Bureau, International Database, 6/2/2007)"
-    correctanswer: 4.57
-    status: "inprogress"
-    page: "task"
-  Rounds.insert
-    index: 1
-    question: "What percent of U.S. households own at least one pet cat? (U.S. Pet Ownership & Demographics Sourcebook, 2002)"
-    correctanswer: 31.6
-    status: "inprogress"
-    page: "task"
-  Rounds.insert
-    index: 2
-    question: "What percent of the world's population speaks Spanish as their first language? (Ethnologue: Languages of the World, 4/2007)"
-    correctanswer: 4.88
-    status: "inprogress"
-    page: "task"
+
+  taskQuestions = Settings.find({key: "taskQuestion"}).fetch()
+  #TODO: make sure randomization is working properly
+  shuffle(taskQuestions)
+
+  i = 0
+  for question in taskQuestions
+    active = false
+    if i is 0
+      active = true
+    Rounds.insert
+      index: i
+      questionId: question._id
+      active: active
+      page: "task"
+    i++
+
   Rounds.insert
     index: 0
     question: "Fake Tutorial Question 1"

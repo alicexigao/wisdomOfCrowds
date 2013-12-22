@@ -43,13 +43,15 @@ Handlebars.registerHelper "getAnsDurRound", (userId) ->
 Handlebars.registerHelper "showBestAnsLabel", ->
   return false unless Handlebars._default_helpers.tre().showBestAns
   return false unless Handlebars._default_helpers.answersFinalized()
-  round = Handlebars._default_helpers.getRoundObj()
+  round = Handlebars._default_helpers.getCurrRoundObj()
   if round.bestAnsUserIds
     return @_id in round.bestAnsUserIds
   return false
 
 Template.correctAns.correctAnswer = ->
-  Handlebars._default_helpers.getRoundObj().correctanswer
+  questionId = Handlebars._default_helpers.getCurrRoundObj().questionId
+  Meteor.subscribe "correctAnswer", questionId
+  return Settings.findOne({_id: questionId}).answer
 
 Template.averageAns.getAverageString = ->
   tre = Handlebars._default_helpers.tre()
@@ -58,7 +60,7 @@ Template.averageAns.getAverageString = ->
         return "average"
 
 Template.averageAns.getAverage = ->
-  round = Handlebars._default_helpers.getRoundObj()
+  round = Handlebars._default_helpers.getCurrRoundObj()
   tre = Handlebars._default_helpers.tre()
   if tre.pointsRule is "average"
     avg = round.average

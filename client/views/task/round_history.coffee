@@ -1,11 +1,23 @@
 Template.roundHistory.rounds = ->
   Rounds.find({}, {sort: {index: 1}})
 
-Template.roundHistory.isRoundFinished = (round) ->
-  return round.status is "completed"
+Template.roundHistory.isRoundFinished = (index) ->
+  currRoundIndex = Handlebars._default_helpers.getRoundIndex()
+  if index < currRoundIndex
+    return true
+  else if index is currRoundIndex
+    if Handlebars._default_helpers.answersFinalized()
+      return true
+  return false
 
-Template.roundHistory.getIndexDisplay = ->
+Template.roundHistory.getRoundIndexDisplay = ->
   return this.index + 1
+
+Template.roundHistory.getCorrectAnswer = ->
+  questionId = this.questionId
+  Meteor.subscribe "correctAnswer", questionId
+  answer = Settings.findOne({_id: questionId}).answer
+  return answer + "%"
 
 Template.roundHistory.getMyAnswerString = ->
   currUserId = Handlebars._default_helpers.currUserId()
@@ -13,35 +25,41 @@ Template.roundHistory.getMyAnswerString = ->
   return unless ansObj
   return ansObj.answer + "%"
 
-Template.roundHistory.getWinningAnswerString = ->
-  correctAnswer = this.correctanswer
-  bestAnswer = -Infinity
-  ansColl = Handlebars._default_helpers.answers()
-  ansColl.find({roundIndex: this.index}).forEach (record) ->
-    ans = record.answer
-    if Math.abs(ans - correctAnswer) < Math.abs(bestAnswer - correctAnswer)
-      bestAnswer = ans
-  return bestAnswer + "%"
+Template.roundHistory.showBestAns = ->
+  tre = Handlebars._default_helpers.tre()
+  tre.showBestAns
 
-Template.roundHistory.getCorrectAnswer = ->
-  return this.correctanswer + "%"
+Template.roundHistory.showAvg = ->
+  tre = Handlebars._default_helpers.tre()
+  tre.showAvg
+
+Template.roundHistory.getBestAnswerString = ->
+  best = parseInt(this.best * 100, 10) / 100
+  return best + "%"
+
+Template.roundHistory.getAverageString = ->
+  avg = parseInt(this.average * 100, 10) / 100
+  return avg + "%"
 
 Template.roundHistory.calcPoints = ->
   tre = Handlebars._default_helpers.tre()
-
   userId = Handlebars._default_helpers.currUserId()
+
   if tre.pointsRule is "ownAnswer"
-    if Template.roundHistory.isRoundFinished(this)
-      len = this.bestAnsUserIds.length
-      if userId in this.bestAnsUserIds
-        pts = 100 / len
-        pts = Math.floor(pts)
-        return pts
-      else
-        return 10
+
+    return "" unless this.bestAnsUserIds
+
+    if this.bestAnsUserIds.indexOf(userId) >= 0
+      pts = 100 / this.bestAnsUserIds.length
+      pts = Math.floor(pts)
+      return pts
+    else
+      return 10
 
   else if tre.pointsRule is "average"
-    pts = Template.roundHistory.getPoints(this.average, this.correctanswer)
+
+    correctAnswer = Settings.findOne({_id: this.questionId}).answer
+    pts = Template.roundHistory.getPoints(this.average, correctAnswer)
     pts = parseInt(pts * 100, 10) / 100
     return pts
 
@@ -50,19 +68,3 @@ Template.roundHistory.getPoints = (ans, correct) ->
     return 10
   else
     return 110 - 2 * Math.abs(ans - correct)
-
-Template.roundHistory.showAvg = ->
-  tre = Handlebars._default_helpers.tre()
-  tre.showAvg
-
-Template.roundHistory.getAverageHeader = ->
-  tre = Handlebars._default_helpers.tre()
-  if tre.pointsRule is "average"
-    return "Average"
-
-Template.roundHistory.getAverageString = ->
-  tre = Handlebars._default_helpers.tre()
-  if tre.pointsRule is "average"
-    avg = this.average
-  avg = parseInt(avg * 100, 10) / 100
-  return avg + "%"

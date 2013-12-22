@@ -3,38 +3,41 @@
     <table class="table table-striped">
         <caption class="lead">Results</caption>
         <tr>
+
             <th>#</th>
 
-            <th>Yours</th>
+            <th>Your Answer</th>
 
-            <!--<th>Others</th>-->
+            <th>Correct Answer</th>
+
             {{#if showBestAns}}
                 <th>Best Answer</th>
             {{/if}}
 
             {{#if showAvg}}
-                <!--TODO: change this for two stage mechanisms-->
                 <th>Average</th>
             {{/if}}
-
-            <th>Correct</th>
 
             <th>Your Points</th>
 
         </tr>
         {{#each rounds}}
-            {{# if isRoundFinished this}}
+            {{# if isRoundFinished this.index}}
                 <tr>
-                    <td>{{getIndexDisplay}}</td>
+                    <td>{{getRoundIndexDisplay}}</td>
+
                     <td>{{getMyAnswerString}}</td>
-                    <!--<td>{{getOtherAnswersString}}</td>-->
+
+                    <td>{{getCorrectAnswer}}</td>
+
                     {{#if showBestAns}}
-                        <td>{{getWinningAnswerString}}</td>
+                        <td>{{getBestAnswerString}}</td>
                     {{/if}}
+
                     {{#if showAvg}}
                         <td>{{getAverageString}}</td>
                     {{/if}}
-                    <td>{{getCorrectAnswer}}</td>
+
                     <td>{{calcPoints}}</td>
                 </tr>
             {{/if}}

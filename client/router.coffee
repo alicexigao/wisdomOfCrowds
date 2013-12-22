@@ -1,25 +1,34 @@
 
+taskRounds  = null
+taskChat    = null
+taskAnswers = null
+
+tutorialRounds  = null
+tutorialChat    = null
+tutorialAnswers = null
+
 Router.map ->
   @route "homepage",
     path: "/"
   @route "tutorial",
     before: ->
-      @tutorialRounds = @subscribe("rounds", "tutorial")
-      @tutorialChat = @subscribe("chatMessages", "tutorial")
-      @tutorialAnswers = @subscribe("answers", "tutorial")
+      tutorialRounds = Meteor.subscribe("rounds", "tutorial")
+      tutorialChat = Meteor.subscribe("chatMessages", "tutorial")
+      tutorialAnswers = Meteor.subscribe("answers", "tutorial")
     unload: ->
-      @tutorialRounds.stop()
-      @tutorialChat.stop()
-      @tutorialAnswers.stop()
+      tutorialRounds.stop()
+      tutorialChat.stop()
+      tutorialAnswers.stop()
   @route "quiz"
   @route "task",
     before: ->
-      @taskRounds = @subscribe("rounds", "task").wait()
-      @taskChat = @subscribe("chatMessages", "task").wait()
-      @taskAnswers = @subscribe("answers", "task")
+      taskRounds = Meteor.subscribe("rounds", "task")
+      taskChat = Meteor.subscribe("chatMessages", "task")
+      taskAnswers = Meteor.subscribe("answers", "task")
     after: ->
 #      Template.timerFirst.startTimerFirst()
     unload: ->
+      console.log "task unload called"
       taskRounds.stop()
       taskChat.stop()
       taskAnswers.stop()

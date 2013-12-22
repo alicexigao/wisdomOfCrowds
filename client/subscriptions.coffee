@@ -1,4 +1,6 @@
-Meteor.subscribe "settings"
+Meteor.subscribe "settingsTaskQuestions"
+
+Meteor.subscribe "settingsTutorialQuestions"
 
 Meteor.subscribe "treatment"
 

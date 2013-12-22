@@ -31,8 +31,8 @@
       },
       "tutorials": {
         "git": "https://github.com/mizzao/meteor-tutorials.git",
-        "tag": "v0.2.0",
-        "commit": "c1850c60fcca078f7a27fa3c487cd9dd9dc1e2d1"
+        "tag": "v0.3.0",
+        "commit": "67b6519a8fc0889310c17605dee8225b76caf96f"
       },
       "accounts-testing": {
         "path": "../meteor-accounts-testing"
