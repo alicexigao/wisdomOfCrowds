@@ -1,41 +1,39 @@
-Template.tutorial.treatmentOne_steps = [
-  template: Template.tutorial_step0
-,
-  template: Template.tutorial_step1a
-  spot: ".currPlayerAnswer, .currPlayerInput"
-#  onLoad: -> console.log "something for step 1"
-,
-  template: Template.tutorial_step1b
-  spot: ".currPlayerInput"
-,
-  template: Template.tutorial_step2_1
-  spot: ".otherPlayerAnswers"
-,
-  template: Template.tutorial_step3
-  spot: ".timerDuringGame"
-,
-  template: Template.tutorial_step4_1
-,
-  template: Template.tutorial_step5_1
-]
+Handlebars.registerHelper "getTemplateAnswers", ->
+  return unless Handlebars._default_helpers.subsReady()
 
-Template.tutorial.treatmentFour_steps = [
-  template: Template.tutorial_step0
-,
-  template: Template.tutorial_step1a
-  spot: ".currPlayerAnswer"
-  onLoad: -> console.log "something for step 1"
-,
-  template: Template.tutorial_step2_4
-  spot: ".divChatRoom"
-,
-  template: Template.tutorial_step3
-  spot: ".timerDuringGame"
-,
-  template: Template.tutorial_step4_1
-,
-  template: Template.tutorial_step5_1
-]
+  tre = Handlebars._default_helpers.tre()
+  return unless tre
+  if tre.showOtherAns is false and tre.showChatRoom is false
+    return Template.tutorial_step_answers_1
+  else if tre.showOtherAns is true and tre.showChatRoom is false
+    return Template.tutorial_step_answers_2
+  else if tre.showOtherAns is false and tre.showChatRoom is true
+    return Template.tutorial_step_answers_3
+  else
+    return Template.tutorial_step_answers_4
+
+
+Deps.autorun ->
+  Template.tutorial.treatmentOne_steps = {
+    steps: [
+      template: Template.tutorial_step_intro
+      spot: ".task"
+    ,
+      template: Template.tutorial_step_youranswer
+      spot: ".currPlayerAnswer, .currPlayerInput"
+    ,
+      template: Handlebars._default_helpers.getTemplateAnswers()
+      spot: ".currPlayerAnswer, .otherPlayerAnswers"
+    ,
+      template: Template.tutorial_step_timelimit
+      spot: ".timerDuringGame"
+    ,
+      template: Template.tutorial_step4_break_1
+    ,
+      template: Template.tutorial_step5_rewardrule_1
+    ]
+  }
+
 
 Template.tutorial.rendered = ->
   Session.set("page", "tutorial")
@@ -43,8 +41,3 @@ Template.tutorial.rendered = ->
   return unless Timers.findOne({name: "first"})
   if Timers.findOne({name: "first"}).start is true
     Meteor.call "stopTimerFirst"
-
-
-Template.tutorial_step0.events =
-  "click .goToTask": (ev) ->
-    Router.go("/task")

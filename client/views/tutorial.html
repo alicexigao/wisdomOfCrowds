@@ -2,19 +2,22 @@
 
     {{#if readyToRender}}
 
-    <div class="container">
-        {{> task}}
-        {{tutorial treatmentOne_steps}}
-    </div>
+        <div class="container">
+            {{> task}}
+
+            {{tutorial treatmentOne_steps}}
+        </div>
 
     {{else}}
-    Loading tutorial... Please wait...
+
+        Loading tutorial... Please wait...
+
     {{/if}}
 
 </template>
 
 
-<template name="tutorial_step0">
+<template name="tutorial_step_intro">
     <p>
         In this task, you will play multiple games with other MTurk workers.  In each game, you and other players
         will answer a question and get points for your answers.
@@ -31,101 +34,148 @@
     <button class="goToTask">Go to task</button>
 </template>
 
-<template name="tutorial_step1a">
+<template name="tutorial_step_youranswer">
     <p>
-        You can type your answer in the provided box and click UPDATE to submit
-        or update your answer.  Your submitted answer is shown in the red box.
-
-        Your answer must be a valid number
-        from 0 to 100 inclusive, and it will be automatically truncated to 2 decimal places.
-    </p>
-</template>
-
-<template name="tutorial_step1b">
-    <p>
+        In a game, type your answer in the box and click UPDATE to submit it.
+        You can revise your answer as many time as you like during the game.
         Once you click FINALIZE to confirm your answer, it cannot be changed anymore.
     </p>
-</template>
-
-
-
-<template name="tutorial_step2_1">
     <p>
-        During the game, you can see the other players' usernames and the status of their answers (submitted,
-        updated, or finalized) in the yellow boxes,
-        but <strong>you cannot see their answers until the game is finished</strong>.
+        Your answer must be <strong>a number between 0 and 100 inclusive</strong>,
+        and it will be <strong>automatically rounded to 2 decimal places</strong>.
     </p>
 </template>
 
-<template name="tutorial_step2_2">
+<template name="tutorial_step_answers_1">
     <p>
-        During the game, you can see other players' answers in the yellow boxes as soon as they are submitted and
-        whenever they are updated or finalized.
+        During the game, you can see
+    </p>
+        <ul>
+        <li><strong>Your user name and answer in the red box</strong></li>
+        <li><strong>The other players' user names and the status of their answers (submitted or finalized)
+        in the yellow boxes</strong>.</li>
+        </ul>
+    <p>
+        However, <strong>the other players' answers are NOT SHOWN until the game is finished</strong>.
     </p>
 </template>
 
-<template name="tutorial_step2_3">
+<template name="tutorial_step_answers_2">
     <p>
-        During the game, you can see the other players' usernames and the status of their answers (submitted,
-        updated, or finalized) in the yellow boxes, but you cannot see their answers until the game is finished.
-        You can chat with the other players in the chatroom.
+        During the game, you can see
+    </p>
+    <ul>
+        <li><strong>Your user name and answer in the red box</strong></li>
+        <li><strong>The other players' user names and answers
+            in the yellow boxes</strong>.</li>
+    </ul>
+</template>
+
+<template name="tutorial_step_answers_3">
+    <p>
+        During the game, you can see
+    </p>
+    <ul>
+        <li><strong>Your user name and answer in the red box</strong></li>
+        <li><strong>The other players' user names and the status of their answers (submitted or finalized)
+            in the yellow boxes</strong>.</li>
+    </ul>
+    <p>
+        However, <strong>the other players' answers are NOT SHOWN until the game is finished</strong>.
+    </p>
+    <p>
+        You can also chat with the other players in the chat room.
     </p>
 </template>
 
-
-<template name="tutorial_step2_4">
+<template name="tutorial_step_answers_4">
     <p>
-        During the game, you can see other players' answers in the yellow boxes as soon as they are submitted and
-        whenever they are updated or finalized.  You can chat with the other players in the chatroom.
+        During the game, you can see
+    </p>
+    <ul>
+        <li><strong>Your user name and answer in the red box</strong></li>
+        <li><strong>The other players' user names and answers
+            in the yellow boxes</strong>.</li>
+    </ul>
+    <p>
+        You can also chat with the other players in the chat room.
+    </p>
+
+</template>
+
+
+<template name="tutorial_step_timelimit">
+    <p>
+        Each game is limited to <strong>1 minute</strong>. When the timer runs out, if your answer is not finalized,
+        then your answer will be a randomly chosen integer between 0 to 100 inclusive and it will be finalized
+        automatically.
     </p>
 </template>
 
-<template name="tutorial_step3">
+<template name="tutorial_step4_break_1">
+
     <p>
-        Each game is limited to <strong>1 minute</strong>. If the timer runs out before all answers are finalized,
-        50% is used for any missing answer and all answers are finalized automatically.
+        A game ends when all answers are finalized or the timer runs out, whichever is earlier.
+
+        There is a 10 second break before the next game starts.
+
+        During this break, you can see
     </p>
-</template>
-
-<template name="tutorial_step4_1">
+    <ul>
+        <li>all players' answers</li>
+        <li>the correct answer</li>
+        <li>the best answer(s) (closes to the correct answer)</li>
+    </ul>
     <p>
-        Once all answers are finalized or the timer runs out, the game ends.
-
-        There is a 10 second break between games.
-
-        During this break, you can look at all players' answers, the correct answer, and the best answer(s)
-        (closest to the correct answer).
-
         At any time, the table on the right shows the results of all previous games.
     </p>
+
 </template>
 
 <template name="tutorial_step4_2">
+
     <p>
         Once all answers are finalized or the timer runs out, the game ends.
 
-        There is a 10 second break between games.
+        There is a 10 second break before the next game starts.
 
-        During this break, you can look at all players' answers, the correct answer, and the average of all
-        the answers.
-
+        During this break, you can see
+    </p>
+    <ul>
+        <li>all players' answers</li>
+        <li>the correct answer</li>
+        <li>the average of all answers</li>
+    </ul>
+    <p>
         At any time, the table on the right shows the results of all previous games.
     </p>
+
 </template>
 
 
-<template name="tutorial_step5_1">
+<template name="tutorial_step5_rewardrule_1">
     <p>
-        If your answer is one of the best answer(s), you will be rewarded depending on the accuracy of your answer.
-        Otherwise, you get 10 points.  When all games are finished, the AVERAGE of your points from all games will
-        be converted to your bonus payment (100 points = $1). This is the end of the tutorial.
+        If your answer is one of the best answer(s), your points will depend on the accuracy of your answer.
+        Otherwise, you will get 10 points.
+    </p>
+    <p>
+        When all games are finished, the AVERAGE of your points from all games will
+        be converted to your bonus payment (100 points = $1).
+    </p>
+    <p>
+        This is the end of the tutorial.
     </p>
 </template>
 
 <template name="tutorial_step5_2">
     <p>
-        Every player will get the same payment which depends on the accuracy of the average answer.
+        Each player's points will depend on the accuracy of the average of all answers.
+    </p>
+    <p>
         When all games are finished, the AVERAGE of your points from all games will be converted to your bonus
-        payment (100 points = $1). This is the end of the tutorial.
+        payment (100 points = $1).
+    </p>
+    <p>
+        This is the end of the tutorial.
     </p>
 </template>

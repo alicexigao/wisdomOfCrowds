@@ -1,11 +1,12 @@
 Handlebars.registerHelper "readyToRender", ->
 #  console.log "ready to render called"
+
   tre = Handlebars._default_helpers.tre()
 #  console.log "treatment is " + tre
   return false unless tre
 
   currRound = Rounds.findOne({active: true})
-#  console.log "currRound is " + currRound
+#  console.log "currRound is #{JSON.stringify(currRound)}"
   return false unless currRound
 
   return true
@@ -88,7 +89,10 @@ Handlebars.registerHelper "finalizedAns", ->
 
 Handlebars.registerHelper "answersFinalized", ->
   usersCursor = Handlebars._default_helpers.users()
+  return unless usersCursor
   finalizedAnsCursor = Handlebars._default_helpers.finalizedAns()
+  return unless finalizedAnsCursor
+
   return finalizedAnsCursor.count() is usersCursor.count()
 
 

@@ -1,4 +1,5 @@
 
+
 shuffle = (sourceArray) ->
   n = 0
   while n < sourceArray.length - 1
@@ -9,7 +10,7 @@ shuffle = (sourceArray) ->
     n++
 
 
-Meteor.startup ->
+if Meteor.isServer
 
   Settings.remove({})
 
@@ -37,8 +38,6 @@ Meteor.startup ->
     key: "tutorialQuestion"
     value: "Fake Tutorial Question 2"
     answer: 70
-
-
 
   Treatment.remove({})
   Treatment.insert
@@ -122,7 +121,6 @@ Meteor.startup ->
     showSecondStage:   false
     pointsRule:        "average"
 
-
   for user in Meteor.users.find().fetch()
     Meteor.users.update {username: user.username},
       $set: {rand: Math.random()}
@@ -146,22 +144,23 @@ Meteor.startup ->
       page: "task"
     i++
 
-  Rounds.insert
-    index: 0
-    question: "Fake Tutorial Question 1"
-    correctanswer: 30
-    status: "inprogress"
-    page: "tutorial"
-  Rounds.insert
-    index: 1
-    question: "Fake Tutorial Question 2"
-    correctanswer: 70
-    status: "inprogress"
-    page: "tutorial"
+  tutorialQuestions = Settings.find({key: "tutorialQuestion"}).fetch()
+  shuffle(tutorialQuestions)
+
+  i = 0
+  for question in tutorialQuestions
+    active = false
+    if i is 0
+      active = true
+    Rounds.insert
+      index: i
+      questionId: question._id
+      active: active
+      page: "tutorial"
+    i++
 
   Answers.remove({})
 
-  # Initialize timers
   Timers.remove({})
 
   name = "first"
@@ -185,27 +184,6 @@ Meteor.startup ->
   ChatMessages.remove({})
   ErrorMessages.remove({})
   QuizAttempts.remove({})
-
-#  PlayerStatus.remove({})
-#  users = Meteor.users.find().fetch()
-#  for user in users
-#    PlayerStatus.insert
-#      userId: user._id
-#      ready: false
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

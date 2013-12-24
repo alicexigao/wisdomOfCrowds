@@ -1,15 +1,4 @@
 
-this.Settings = new Meteor.Collection('settings')
-this.Treatment = new Meteor.Collection('treatment')
-
-this.QuizAttempts = new Meteor.Collection('quizAttempts')
-this.ErrorMessages = new Meteor.Collection('errorMessages')
-
-this.Rounds = new Meteor.Collection('rounds')
-this.Answers = new Meteor.Collection('answers')
-this.ChatMessages = new Meteor.Collection('chatMessages')
-this.Timers = new Meteor.Collection("timeleft")
-
 # get treatment
 getTreatment = ->
   Treatment.findOne()
@@ -52,9 +41,9 @@ calcAvgAndBestAnswer = ->
   Rounds.update
     index: roundIndex
   , $set:
-      "best": bestAns
-      "average": avg
-      "bestAnsUserIds": bestAnsUserIds
+    "best": bestAns
+    "average": avg
+    "bestAnsUserIds": bestAnsUserIds
 
 # if answer exists, finalize it
 # else insert a finalized answer of 50
@@ -152,13 +141,13 @@ Meteor.methods
       index: roundIndex
       page: "task"
     , $set:
-        active: false
+      active: false
     , (error, result) ->
       Rounds.update
         index: roundIndex + 1
         page: "task"
       , $set:
-          active: true
+        active: true
 
     # start timer first
     time = new Date()
@@ -207,7 +196,7 @@ Meteor.methods
 
 
 
-  # save chat messages
+# save chat messages
   sendMsg: (data) ->
     if (!Meteor.user())
       throw new Meteor.Error(401, "You need to login to chat")
@@ -220,7 +209,7 @@ Meteor.methods
     ChatMessages.insert chatData
 
 
-  # update of finalize answer
+# update of finalize answer
   updateAnswer: (data) ->
     ansExists = Answers.findOne
       roundIndex: data.roundIndex
