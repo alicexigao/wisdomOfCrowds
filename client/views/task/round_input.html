@@ -28,9 +28,12 @@
         <form class="form-inline currPlayerInput">
             <span class="lead" for="inputAns">Your Answer:</span>
             <input type="text" id="inputAns" class="input-small" {{getDisabledStrForAns}}><span class="lead">%</span>
-            <button type="button" id="updateAns" class="btn btn-primary {{getDisabledStrForAns}}" {{getDisabledStrForAns}}>Update</button>
+
             {{#if currUserHasAns}}
+                <button type="button" id="updateAns" class="btn btn-primary {{getDisabledStrForAns}}" {{getDisabledStrForAns}}>Revise</button>
                 <button type="button" id="finalizeAns" class="btn btn-danger {{getDisabledStrForAns}}" {{getDisabledStrForAns}}>Finalize</button>
+            {{else}}
+                <button type="button" id="updateAns" class="btn btn-primary {{getDisabledStrForAns}}" {{getDisabledStrForAns}}>Submit</button>
             {{/if}}
         </form>
 

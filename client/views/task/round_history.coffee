@@ -45,7 +45,7 @@ Template.roundHistory.calcPoints = ->
   tre = Handlebars._default_helpers.tre()
   userId = Handlebars._default_helpers.currUserId()
 
-  if tre.pointsRule is "ownAnswer"
+  if tre.rewardRule is "best"
 
     return "" unless this.bestAnsUserIds
 
@@ -56,7 +56,7 @@ Template.roundHistory.calcPoints = ->
     else
       return 10
 
-  else if tre.pointsRule is "average"
+  else if tre.rewardRule is "average"
 
     correctAnswer = Settings.findOne({_id: this.questionId}).answer
     pts = Template.roundHistory.getPoints(this.average, correctAnswer)

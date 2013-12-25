@@ -42,85 +42,63 @@ if Meteor.isServer
   Treatment.remove({})
   Treatment.insert
     value: "bestPrivate"
-    comm: "private"
-    pay: "best"
-    showBestAns:   true
-    showAvg:       false
+    rewardRule:    "best"
     showChatRoom:  false
     showOtherAns:  false
-    showSecondStage:   false
-    pointsRule:        "ownAnswer"
-  Treatment.insert
-    value: "bestChat"
-    comm: "chat"
-    pay: "best"
     showBestAns:   true
     showAvg:       false
+  Treatment.insert
+    value: "bestPrivateChat"
+    rewardRule:    "best"
     showChatRoom:  true
     showOtherAns:  false
-    showSecondStage:   false
-    pointsRule:        "ownAnswer"
+    showBestAns:   true
+    showAvg:       false
   Treatment.insert
     value: "bestPublic"
-    comm: "public"
-    pay: "best"
-    showBestAns:   true
-    showAvg:       false
+    rewardRule:    "best"
     showChatRoom:  false
     showOtherAns:  true
-    showSecondStage:   false
-    pointsRule:        "ownAnswer"
+    showBestAns:   true
+    showAvg:       false
   Treatment.insert
     value: "bestPublicChat"
-    comm: "publicChat"
-    pay: "best"
+    rewardRule:    "best"
+    showChatRoom:  true
+    showOtherAns:  true
     showBestAns:   true
     showAvg:       false
-    showChatRoom:  true
-    showOtherAns:  true
-    showSecondStage:   false
-    pointsRule:        "ownAnswer"
   Treatment.insert
     value: "avgPrivate"
-    comm: "private"
-    pay: "best"
+    rewardRule:    "average"
     showBestAns:   false
     showAvg:       true
     showChatRoom:  false
     showOtherAns:  false
-    showSecondStage:   false
-    pointsRule:        "average"
   Treatment.insert
-    value: "avgChat"
-    comm: "chat"
-    pay: "best"
-    showBestAns:   false
-    showAvg:       true
+    value: "avgPrivateChat"
+    rewardRule:    "average"
     showChatRoom:  true
     showOtherAns:  false
-    showSecondStage:   false
-    pointsRule:        "average"
+    showBestAns:   false
+    showAvg:       true
   Treatment.insert
     value: "avgPublic"
-    comm: "public"
-    pay: "best"
-    showBestAns:   false
-    showAvg:       true
+    rewardRule:    "average"
     showChatRoom:  false
     showOtherAns:  true
-    showSecondStage:   false
-    pointsRule:        "average"
+    showBestAns:   false
+    showAvg:       true
   Treatment.insert
     value: "avgPublicChat"
-    comm: "publicChat"
-    pay: "best"
+    rewardRule:    "average"
     showChatRoom:  true
     showOtherAns:  true
     showAvg:       true
     showBestAns:   false
-    showSecondStage:   false
-    pointsRule:        "average"
 
+
+  # Users
   for user in Meteor.users.find().fetch()
     Meteor.users.update {username: user.username},
       $set: {rand: Math.random()}

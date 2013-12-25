@@ -7,7 +7,7 @@ Handlebars.registerHelper "context", ->
 
 Template.round.treatmentDisplay = (treatment, context) ->
   switch treatment
-    when "bestPrivate", "bestChat", "bestPublic", "bestPublicChat", "avgPrivate", "avgChat", "avgPublic", "avgPublicChat"
+    when "bestPrivate", "bestPrivateChat", "bestPublic", "bestPublicChat", "avgPrivate", "avgPrivateChat", "avgPublic", "avgPublicChat"
       return new Handlebars.SafeString Template.oneStage(context)
 
 
@@ -44,21 +44,6 @@ updateAnswer = (ev) ->
   Meteor.call 'updateAnswer', ansData, (err, res) ->
     return bootbox.alert err.reason if err
 
-#  if Session.equals("page", "task")
-#    Meteor.call 'updateAnswer', ansData, (err, res) ->
-#      return bootbox.alert err.reason if err
-#  else
-#    if TutorialAnswers.findOne {roundIndex: roundIndex, userId: currUserId}
-#      TutorialAnswers.update {roundIndex: roundIndex, userId: currUserId},
-#        $set:
-#          answer: ans
-#    else
-#      TutorialAnswers.insert
-#        roundIndex: roundIndex
-#        userId: currUserId
-#        answer: ans
-#        status: "submitted"
-
 finalizeAnsOneStage = (ev) ->
   ans = $("#inputAns").val().trim()
   $("#inputAns").val ""
@@ -81,13 +66,8 @@ finalizeAnsOneStage = (ev) ->
     return bootbox.alert err.reason if err
 
   if Handlebars._default_helpers.answersFinalized()
-    if Session.equals("page", "task")
 
       Meteor.call 'endCurrRound'
-
-    else if Session.equals("page", "tutorial")
-
-      Handlebars._default_helpers.calcBestAnsAndAvg()
 
 Template.oneStage.events =
 
@@ -108,9 +88,6 @@ Template.oneStage.events =
     Router.go('/exitsurvey')
 
 
-###########################
-# Functions for stage 1
-###########################
 Handlebars.registerHelper "currUserHasAns", ->
   currUserId = Handlebars._default_helpers.currUserId()
   return Handlebars._default_helpers.ansObjForId(currUserId)
@@ -125,13 +102,6 @@ Handlebars.registerHelper "getDisabledStrForAns", ->
     return "disabled"
   else
     return ""
-
-
-
-
-################################
-# Check if task is completed
-################################
 
 Handlebars.registerHelper "taskCompleted", ->
   numQuestions = Rounds.find().count()

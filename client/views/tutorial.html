@@ -5,7 +5,7 @@
         <div class="container">
             {{> task}}
 
-            {{tutorial treatmentOne_steps}}
+            {{tutorial tutorial_steps}}
         </div>
 
     {{else}}
@@ -21,7 +21,11 @@
     <p>
         In this task, you will play multiple games with other MTurk workers.  In each game, you and other players
         will answer a question and get points for your answers.
-
+    </p>
+    <p>
+        You will receive <strong>a base payment of $1.00</strong> for completing this task.
+        Moreover, <strong>your bonus payment</strong> will be converted from
+        <strong>the average of yours points in all games</strong> where 100 points = $1.00.
     </p>
     <p>
         <strong>
@@ -31,27 +35,44 @@
         research project.  Rather, we hope you treat this as a game and just <strong>have fun</strong>.
     </p>
 
-    <button class="goToTask">Go to task</button>
+    <!--<button class="goToTask">Go to task</button>-->
 </template>
 
 <template name="tutorial_step_youranswer">
     <p>
-        In a game, type your answer in the box and click UPDATE to submit it.
-        You can revise your answer as many time as you like during the game.
-        Once you click FINALIZE to confirm your answer, it cannot be changed anymore.
+        You can type your answer in the box and <strong>submit</strong> it.
+        You can <strong>revise</strong> your answer as many time as you like during the game.
+        Once you <strong>finalize</strong> your answer, it cannot be changed anymore.
     </p>
     <p>
         Your answer must be <strong>a number between 0 and 100 inclusive</strong>,
         and it will be <strong>automatically rounded to 2 decimal places</strong>.
     </p>
+
+    <p>
+        <strong>TRY IT YOURSELF:</strong>
+    </p>
+    <ul>
+        <li>Try to submit, revise and finalize your answer.</li>
+        <li>Try to submit an answer out of the valid range (0 to 100) or with more than 2 decimal places.</li>
+        <li>You can <a class="btn btn-info clearAnswer">clear a finalized answer</a>.</li>
+    </ul>
+
 </template>
 
-<template name="tutorial_step_answers_1">
+
+
+<template name="tutorial_step_answers_private">
+    <p>
+        During the game, <strong>the status of each player's answer (submitted or finalized) is SHOWN to all other
+        players (whenever it changes).  However, the answer of each player is NOT SHOWN to any other player until the
+        game is finished.</strong>
+    </p>
     <p>
         During the game, you can see
     </p>
         <ul>
-        <li><strong>Your user name and answer in the red box</strong></li>
+        <li><strong>Your user name and answer in the red box</strong>.</li>
         <li><strong>The other players' user names and the status of their answers (submitted or finalized)
         in the yellow boxes</strong>.</li>
         </ul>
@@ -60,59 +81,82 @@
     </p>
 </template>
 
-<template name="tutorial_step_answers_2">
+<template name="tutorial_step_answers_public">
+    <p>
+        During the game, <strong>the answer of each player is SHOWN to all other players (when it's submitted, and
+        whenever it is revised or finalized).</strong>
+    </p>
     <p>
         During the game, you can see
     </p>
     <ul>
-        <li><strong>Your user name and answer in the red box</strong></li>
+        <li><strong>Your user name and answer in the red box</strong>.</li>
         <li><strong>The other players' user names and answers
             in the yellow boxes</strong>.</li>
     </ul>
 </template>
 
-<template name="tutorial_step_answers_3">
+<template name="tutorial_step_answers_privateChat">
+    <p>
+        During the game, <strong>the status of each player's answer (submitted or finalized) is SHOWN to all other
+        players (whenever it changes).  However, the answer of each player is NOT SHOWN to any other player until the
+        game is finished.</strong>
+    </p>
+    <p>
+        You can also chat with the other players in the chat room.
+    </p>
     <p>
         During the game, you can see
     </p>
     <ul>
-        <li><strong>Your user name and answer in the red box</strong></li>
+        <li><strong>Your user name and answer in the red box</strong>.</li>
         <li><strong>The other players' user names and the status of their answers (submitted or finalized)
             in the yellow boxes</strong>.</li>
     </ul>
     <p>
-        However, <strong>the other players' answers are NOT SHOWN until the game is finished</strong>.
+        <strong>TRY IT YOURSELF:</strong>
+    </p>
+    <ul>
+        <li>Try to send messages in the chat room.</li>
+    </ul>
+</template>
+
+<template name="tutorial_step_answers_publicChat">
+    <p>
+        During the game, <strong>the answer of each player is SHOWN to all other players (when it's submitted, and
+        whenever it is revised or finalized).</strong>
     </p>
     <p>
         You can also chat with the other players in the chat room.
     </p>
-</template>
-
-<template name="tutorial_step_answers_4">
     <p>
         During the game, you can see
     </p>
     <ul>
-        <li><strong>Your user name and answer in the red box</strong></li>
+        <li><strong>Your user name and answer in the red box</strong>.</li>
         <li><strong>The other players' user names and answers
             in the yellow boxes</strong>.</li>
     </ul>
     <p>
-        You can also chat with the other players in the chat room.
+        <strong>TRY IT YOURSELF:</strong>
     </p>
-
+    <ul>
+        <li>Try to send messages in the chat room.</li>
+    </ul>
 </template>
 
 
 <template name="tutorial_step_timelimit">
     <p>
-        Each game is limited to <strong>1 minute</strong>. When the timer runs out, if your answer is not finalized,
-        then your answer will be a randomly chosen integer between 0 to 100 inclusive and it will be finalized
-        automatically.
+        Each game is limited to <strong>1 minute</strong>.
+    </p>
+    <p>
+        If you haven't submitted an answer when the timer runs out, then we will <strong>choose a random integer
+        between 0 to 100 inclusive as your answer and finalize it automatically</strong>.
     </p>
 </template>
 
-<template name="tutorial_step4_break_1">
+<template name="tutorial_step_break_best">
 
     <p>
         A game ends when all answers are finalized or the timer runs out, whichever is earlier.
@@ -132,12 +176,12 @@
 
 </template>
 
-<template name="tutorial_step4_2">
+<template name="tutorial_step_break_average">
 
     <p>
-        Once all answers are finalized or the timer runs out, the game ends.
+        A game ends when all answers are finalized or the timer runs out, whichever is earlier.
 
-        There is a 10 second break before the next game starts.
+        There is a <strong>10 second break</strong> before the next game starts.
 
         During this break, you can see
     </p>
@@ -153,27 +197,27 @@
 </template>
 
 
-<template name="tutorial_step5_rewardrule_1">
+<template name="tutorial_step_rewardrule_1">
     <p>
         If your answer is one of the best answer(s), your points will depend on the accuracy of your answer.
         Otherwise, you will get 10 points.
     </p>
     <p>
-        When all games are finished, the AVERAGE of your points from all games will
-        be converted to your bonus payment (100 points = $1).
+        <strong>Your bonus payment</strong> will be converted from
+        <strong>the average of yours points in all games</strong> where 100 points = $1.00.
     </p>
     <p>
         This is the end of the tutorial.
     </p>
 </template>
 
-<template name="tutorial_step5_2">
+<template name="tutorial_step_rewardrule_2">
     <p>
-        Each player's points will depend on the accuracy of the average of all answers.
+        Every player's points will depend on the accuracy of the average of all answers.
     </p>
     <p>
-        When all games are finished, the AVERAGE of your points from all games will be converted to your bonus
-        payment (100 points = $1).
+        <strong>Your bonus payment</strong> will be converted from
+        <strong>the average of yours points in all games</strong> where 100 points = $1.00.
     </p>
     <p>
         This is the end of the tutorial.

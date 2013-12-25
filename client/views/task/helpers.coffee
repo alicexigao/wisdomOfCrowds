@@ -57,7 +57,7 @@ Handlebars.registerHelper "users", ->
   if Session.equals("page", "tutorial")
     return TutorialUsers.find({}, {sort: {rand: 1}})
   else if Session.equals("page", "task")
-    return Meteor.users.find({}, {sort: {rand: 1}})
+    return Meteor.users.find({"profile.online": true}, {sort: {rand: 1}})
 
 Handlebars.registerHelper "currUser", ->
   if Session.equals("page", "tutorial")
@@ -111,46 +111,6 @@ Handlebars.registerHelper "clearBestAnsAndAvg", ->
   ,
     $set:
       bestAnsUserIds: undefined
-
-
-Handlebars.registerHelper "calcBestAnsAndAvg", ->
-  tutorialRoundIndex = Session.get("tutorialRoundIndex")
-
-  correct = TutorialRounds.findOne(
-    index: tutorialRoundIndex
-  ).correctanswer
-  numAns = 0
-  sumAns = 0
-  bestAns = -Infinity
-
-  for user in TutorialUsers.find().fetch()
-    userId = user._id
-    ans = TutorialAnswers.findOne(
-      userId: userId
-    ).answer
-    sumAns += ans
-    numAns++
-    if Math.abs(ans - correct) < Math.abs(bestAns - correct)
-      bestAns = ans
-
-  bestAnsUserids = []
-  for user in TutorialUsers.find().fetch()
-    userId = user._id
-    ans = TutorialAnswers.findOne(
-      userId: userId
-    ).answer
-    if ans is bestAns
-      bestAnsUserids.push userId
-
-  avg = sumAns / numAns
-  TutorialRounds.update {index: tutorialRoundIndex},
-    $set: {average: avg}
-
-  TutorialRounds.update {index: tutorialRoundIndex},
-    $set: {bestAns: bestAns}
-  TutorialRounds.update {index: tutorialRoundIndex},
-    $set: {bestAnsUserIds: bestAnsUserids}
-
 
 Handlebars.registerHelper "chat", ->
   ChatMessages

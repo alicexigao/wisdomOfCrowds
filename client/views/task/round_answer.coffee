@@ -1,7 +1,7 @@
 
 Template.answers.treatmentDisplay = (treatment, context) ->
   switch treatment
-    when "bestPrivate", "bestChat", "bestPublic", "bestPublicChat", "avgPrivate", "avgChat", "avgPublic", "avgPublicChat"
+    when "bestPrivate", "bestPrivateChat", "bestPublic", "bestPublicChat", "avgPrivate", "avgPrivateChat", "avgPublic", "avgPublicChat"
       return new Handlebars.SafeString Template.ansOneStage(context)
 
 Handlebars.registerHelper "isCurrentUser", ->
@@ -55,14 +55,14 @@ Template.correctAns.correctAnswer = ->
 
 Template.averageAns.getAverageString = ->
   tre = Handlebars._default_helpers.tre()
-  switch tre.pointsRule
+  switch tre.rewardRule
       when "average"
         return "average"
 
 Template.averageAns.getAverage = ->
   round = Handlebars._default_helpers.getCurrRoundObj()
   tre = Handlebars._default_helpers.tre()
-  if tre.pointsRule is "average"
+  if tre.rewardRule is "average"
     avg = round.average
   avg = parseInt(avg * 100) / 100
   return avg
