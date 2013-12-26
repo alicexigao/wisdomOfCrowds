@@ -6,7 +6,6 @@
 preserve-inputs
 bootstrap
 coffeescript
-accounts-testing
 standard-app-packages
 bootboxjs
 iron-router
