@@ -44,7 +44,13 @@ intervalIdNext = undefined
 
 Meteor.methods
 
-  calcAvgAndBestAnswer: (users) ->
+  calcRoundAverage: ->
+    Rounds.update
+      index: 0
+    , $set:
+      "average": 0.56
+
+calcAvgAndBestAnswer: (users) ->
 
     roundIndex = getRoundIndex()
     questionId = Rounds.findOne({active: true}).questionId

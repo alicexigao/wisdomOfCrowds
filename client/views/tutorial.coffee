@@ -70,6 +70,9 @@ Deps.autorun ->
         Meteor.call "updateTutorialAnswer", {userId: userIdBob, status: "finalized"}
         Meteor.call "updateTutorialAnswer", {userId: userIdCarol, status: "finalized"}
         Meteor.call "updateTutorialAnswer", {userId: currUserId, status: "finalized"}
+
+        # Uncomment this and you will see that the tutorial reloads and displays the first step here.
+#        Meteor.call "calcRoundAverage"
     ,
       template: Handlebars._default_helpers.getTemplateRewardRule()
     ]
