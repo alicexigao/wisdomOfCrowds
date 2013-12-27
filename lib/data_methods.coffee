@@ -9,7 +9,7 @@ getRoundIndex = ->
 
 # get online users
 getOnlineUsers = ->
-  Meteor.users.find {"profile.online": true}
+  Meteor.users.find {"status.online": true}
 
 # calculate average and best answer
 

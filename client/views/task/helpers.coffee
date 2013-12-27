@@ -57,7 +57,7 @@ Handlebars.registerHelper "users", ->
   if Session.equals("page", "tutorial")
     return TutorialUsers.find({}, {sort: {rand: 1}})
   else if Session.equals("page", "task")
-    return Meteor.users.find({"profile.online": true}, {sort: {rand: 1}})
+    return Meteor.users.find({"status.online": true}, {sort: {rand: 1}})
 
 Handlebars.registerHelper "currUser", ->
   if Session.equals("page", "tutorial")
