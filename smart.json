@@ -3,7 +3,7 @@
     "user-status": {
       "path": "../meteor-user-status"
     },
-    "bootboxjs": {},
+    "bootboxjs": "3.2.2",
     "turkserver": {
       "path": "../turkserver-meteor"
     },
