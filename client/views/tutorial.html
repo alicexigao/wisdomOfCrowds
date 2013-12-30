@@ -144,75 +144,70 @@
         Each game is limited to <strong>1 minute</strong>.
     </p>
     <p>
+        <strong>A game ends when all answers are finalized or the timer runs out</strong>, whichever is earlier.
+    </p>
+    <p>
         If you haven't submitted an answer when the timer runs out, then we will <strong>choose a random integer
         between 0 to 100 inclusive as your answer and finalize it automatically</strong>.
     </p>
 </template>
 
 <template name="tutorial_step_break_best">
-
     <p>
-        A game ends when all answers are finalized or the timer runs out, whichever is earlier.
-
-        There is a 10 second break before the next game starts.
-
+        When a game is finished, there is a <strong>10 second break</strong> before the next game starts.
         During this break, you can see
     </p>
     <ul>
         <li>all players' answers</li>
         <li>the correct answer</li>
-        <li>the best answer(s) (closes to the correct answer)</li>
+        <li><strong>the best answer(s) (closest to the correct answer)</strong></li>
     </ul>
     <p>
-        At any time, the table on the right shows the results of all previous games.
+        At any time, the table on the right shows <strong>the results of all finished games</strong>.
     </p>
-
 </template>
 
 <template name="tutorial_step_break_average">
-
     <p>
-        A game ends when all answers are finalized or the timer runs out, whichever is earlier.
-
-        There is a <strong>10 second break</strong> before the next game starts.
-
+        When a game is finished, there is a <strong>10 second break</strong> before the next game starts.
         During this break, you can see
     </p>
     <ul>
         <li>all players' answers</li>
         <li>the correct answer</li>
-        <li>the average of all answers</li>
+        <li><strong>the average of all answers</strong></li>
     </ul>
     <p>
-        At any time, the table on the right shows the results of all previous games.
+        At any time, the table on the right shows <strong>the results of all finished games</strong>.
     </p>
-
 </template>
-
 
 <template name="tutorial_step_rewardrule_1">
     <p>
-        If your answer is one of the best answer(s), your points will depend on the accuracy of your answer.
-        Otherwise, you will get 10 points.
+        If your answer is one of the best answer(s) (closest to the correct answer), you will get
+        (100 / number of best answers) points for each game.  Otherwise, you will get 10 points for each game.
     </p>
     <p>
         <strong>Your bonus payment</strong> will be converted from
         <strong>the average of yours points in all games</strong> where 100 points = $1.00.
-    </p>
-    <p>
-        This is the end of the tutorial.
     </p>
 </template>
 
 <template name="tutorial_step_rewardrule_2">
     <p>
-        Every player's points will depend on the accuracy of the average of all answers.
+        Every player's points for this game depend on the average of all answers.
+        Each player will get (110 - 2 * |average answer - correct answer|) points for each game.
+    </p>
+</template>
+
+<template name="tutorial_step_bonusrule">
+    <p>
+        When all games are finished, <strong>your bonus payment for this task</strong> will be converted from
+        <strong>the average of your points in all games</strong> at a rate of <strong>100 points = $1.00</strong>.
+
+        For example, if your average points in all games is 75, then your bonus payment for this task will be $0.75.
     </p>
     <p>
-        <strong>Your bonus payment</strong> will be converted from
-        <strong>the average of yours points in all games</strong> where 100 points = $1.00.
-    </p>
-    <p>
-        This is the end of the tutorial.
+        This is the end of the tutorial. Click finish to proceed to the quiz.
     </p>
 </template>

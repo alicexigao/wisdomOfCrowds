@@ -4,25 +4,20 @@
 
 <template name="oneStage">
 
-    {{> question}}
-
     {{#if answersFinalized}}
 
+        <!--Round completed-->
+
         {{#if taskCompleted}}
-
-        <!--All rounds completed-->
-        <button type="button" id="goToExitSurvey" class="btn btn-success">Go to exit survey</button>
-
+            <button type="button" id="goToExitSurvey" class="btn btn-success">Go to exit survey</button>
         {{else}}
-
-        <!--Break between rounds-->
-        {{> timerNext}}
-
+            {{> timerNext}}
         {{/if}}
 
     {{else}}
 
-        <!--During round-->
+        <!--Round in progress-->
+
         {{> timerFirst}}
 
         <form class="form-inline currPlayerInput">

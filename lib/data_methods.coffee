@@ -4,19 +4,21 @@ getTreatment = ->
   Treatment.findOne()
 
 # get round index
-getRoundIndex = ->
+getRoundIndex = (page) ->
   # TODO: Is this every used for the tutorial?  Won't work for tutorial for now.
-  Rounds.findOne({active: true, page: "task"}).index
+  Rounds.findOne({active: true, page: page}).index
 
 # get online users
 getOnlineUsers = ->
   Meteor.users.find {"status.online": true}
 
 # if answer exists, finalize it
-# else insert a finalized answer of 50
+# else insert a randomized finalized answer
 fakeAnswers = ->
+
   console.log "fake answers called"
-  roundIndex = getRoundIndex()
+
+  roundIndex = getRoundIndex("task")
   users = getOnlineUsers().fetch()
   for user in users
     ans = Answers.findOne({roundIndex: roundIndex, userId: user._id})
@@ -38,34 +40,40 @@ fakeAnswers = ->
 intervalIdFirst = undefined
 intervalIdNext = undefined
 
-calcAvgAndBestAnswer = (usersCursor) ->
+# calculate average and best answer
+calcAvgAndBestAnswer = (users, page) ->
 
   if Meteor.isServer
 
-    roundIndex = getRoundIndex()
-    questionId = Rounds.findOne({active: true}).questionId
+    roundIndex = getRoundIndex(page)
+    console.log "current round " + roundIndex
+    questionId = Rounds.findOne({active: true, page: page}).questionId
     questionObj = Settings.findOne({_id: questionId})
     correct = questionObj.answer
+    console.log "correct answer " + correct
     numAns = 0
     sumAns = 0
     bestAns = -Infinity
 
-    for user in usersCursor.fetch()
+    for user in users
       ansObj = Answers.findOne({roundIndex: roundIndex, userId: user._id})
       ans = ansObj.answer
       sumAns += ans
       numAns++
       if Math.abs(ans - correct) < Math.abs(bestAns - correct)
         bestAns = ans
+    console.log "best answer " + bestAns
 
     bestAnsUserIds = []
-    for user in usersCursor.fetch()
-      userId = user._id
-      ans = Answers.findOne({roundIndex: roundIndex, userId: userId}).answer
+    for user in users
+      ansObj = Answers.findOne({roundIndex: roundIndex, userId: user._id})
+      ans = ansObj.answer
       if ans is bestAns
-        bestAnsUserIds.push userId
+        bestAnsUserIds.push user._id
+    console.log "best ans user ids " + bestAnsUserIds
 
     avg = sumAns / numAns
+    console.log "average " + avg
 
     Rounds.update
       index: roundIndex
@@ -77,14 +85,9 @@ calcAvgAndBestAnswer = (usersCursor) ->
 
 Meteor.methods
 
-  calcRoundAverage: ->
-    Rounds.update
-      index: 0
-    , $set:
-      "average": 0.56
-
-  countdownFirst: ->
-    console.log "countdownFirst called"
+  # count down the main timer during a round
+  countdownMain: ->
+    console.log "countdownMain called"
 
     # decrement timer
     currTime = new Date()
@@ -103,8 +106,9 @@ Meteor.methods
       fakeAnswers()
       Meteor.call 'endCurrRound'
 
-  countdownNext: ->
-    console.log "countdownNext called"
+  # count down the timer during a break
+  countdownBreak: ->
+    console.log "countdownBreak called"
 
     # decrement timer
     currTime = new Date()
@@ -123,9 +127,6 @@ Meteor.methods
       Meteor.call 'startNextRound', {}, (error, result) ->
         return result
 
-#######################
-# start next round
-#######################
   startNextRound: ->
     console.log "startNextRound called"
 
@@ -135,7 +136,7 @@ Meteor.methods
       intervalIdNext = undefined
 
     # if this is the last round, stop
-    roundIndex = getRoundIndex()
+    roundIndex = getRoundIndex("task")
     console.log "current round " + roundIndex
     numRounds = Rounds.find({page: "task"}).count()
     if roundIndex is numRounds - 1
@@ -169,17 +170,15 @@ Meteor.methods
       , (error, result) ->
         if intervalIdFirst is undefined
           intervalIdFirst = Meteor.setInterval (->
-            Meteor.call 'countdownFirst'
+            Meteor.call 'countdownMain'
           ), 1000
 
-####################
-# end current round
-####################
+  # end current round
   endCurrRound: () ->
     console.log "endCurrRound called"
 
-    users = getOnlineUsers()
-    calcAvgAndBestAnswer(users)
+    users = getOnlineUsers().fetch()
+    calcAvgAndBestAnswer(users, "task")
 
     # stop timer first
     if intervalIdFirst isnt undefined
@@ -200,7 +199,7 @@ Meteor.methods
       , (error, result) ->
         if intervalIdNext is undefined
           intervalIdNext = Meteor.setInterval (->
-            Meteor.call 'countdownNext'
+            Meteor.call 'countdownBreak'
           ), 1000
 
 # save chat messages
@@ -253,38 +252,40 @@ Meteor.methods
         page      : data.page
 
 
-  clearTutorialCurrUserAnswer: (userId) ->
-    Answers.remove({userId: userId, page: "tutorial"})
 
-  # update tutorial answers
-  updateTutorialAnswer: (data) ->
+  ###########################
+  # Tutorial methods
+  ###########################
+  updateTutorialStatus: (data) ->
     ansObj = Answers.findOne({userId: data.userId, page: "tutorial"})
-    unless ansObj
-      console.log "ansObj does not exist, insert new answer"
-      answer = Math.floor(Math.random()*100)
-      Answers.insert
-        roundIndex: 0
-        userId    : data.userId
-        answer    : answer
-        status    : data.status
-        page      : "tutorial"
-    else if ansObj and not ansObj.answer
-      console.log "answer does not exist, choose new answer and update"
-      answer = Math.floor(Math.random()*100)
+    if ansObj
       Answers.update
         userId: data.userId
         page: "tutorial"
       , $set:
-        answer: answer
         status: data.status
-    else if ansObj and ansObj.answer
+
+  calcAvgAndBest: (users) ->
+    calcAvgAndBestAnswer(users, "tutorial")
+
+  # update tutorial answers
+  updateTutorialAnswer: (data) ->
+    ansObj = Answers.findOne({userId: data.userId, page: "tutorial"})
+    if ansObj
       console.log "answer exists, update status"
       Answers.update
         userId: data.userId
         page: "tutorial"
       , $set:
         status: data.status
-
+    else if data.createAnswer is true
+        console.log "answer does not exist"
+        Answers.insert
+          roundIndex: 0
+          userId: data.userId
+          answer: Math.floor(Math.random() * 100)
+          status: data.status
+          page: "tutorial"
 
 #############################
 # Quiz functions

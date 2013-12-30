@@ -1,6 +1,6 @@
 <template name="roundHistory">
 
-    <table class="table table-striped">
+    <table class="table table-striped gameHistory">
         <caption class="lead">Results</caption>
         <tr>
 
@@ -21,6 +21,7 @@
             <th>Your Points</th>
 
         </tr>
+
         {{#each rounds}}
             {{# if isRoundFinished this.index}}
                 <tr>

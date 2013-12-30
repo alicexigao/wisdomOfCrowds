@@ -4,57 +4,57 @@
 
 <template name="ansOneStage">
 
-    <div class="correctAndAverageAns">
-        {{#if answersFinalized}}
+    {{#if answersFinalized}}
+
+        <div class="correctAndAverageAns">
             <!--Correct Answer-->
             {{> correctAns}}
-
             <!--Average Answer-->
             {{#if showAvgAns}}
                 {{> averageAns}}
             {{/if}}
+        </div>
 
-        {{/if}}
-
-    </div>
+    {{/if}}
 
     <ul class="answerList">
 
         {{#each users}}
 
-        {{#if isCurrentUser}}
+            {{#if isCurrentUser}}
 
-        <li class="answer badge badge-important currPlayerAnswer">
-            <!--Best Answer Label-->
-            {{#if showBestAnsLabel}}
-            <p class="badgeRow">Best Answer</p>
+                <li class="answer badge badge-important currPlayerAnswer">
+                    <!--Best Answer Label-->
+                    {{#if showBestAnsLabel}}
+                    <p class="badgeRow">Best Answer</p>
+                    {{/if}}
+
+                    <!--Answer Value or Status-->
+                    <p class="badgeRow">{{showAnswer}}</p>
+
+                    <!--User name-->
+                    <p class="badgeRow">{{username}}</p>
+                </li>
+
+            {{else}}
+
+                <li class="answer badge badge-warning otherPlayerAnswers">
+                    <!--Best Answer Label-->
+                    {{#if showBestAnsLabel}}
+                    <p class="badgeRow">Best Answer</p>
+                    {{/if}}
+
+                    <!--Answer Value or Status-->
+                    <p class="badgeRow">{{showAnswer}}</p>
+
+                    <!--User name-->
+                    <p class="badgeRow">{{username}}</p>
+                </li>
+
             {{/if}}
-
-            <!--Answer Value or Status-->
-            <p class="badgeRow">{{showAnswer}}</p>
-
-            <!--User name-->
-            <p class="badgeRow">{{username}}</p>
-        </li>
-
-        {{else}}
-
-        <li class="answer badge badge-warning otherPlayerAnswers">
-            <!--Best Answer Label-->
-            {{#if showBestAnsLabel}}
-            <p class="badgeRow">Best Answer</p>
-            {{/if}}
-
-            <!--Answer Value or Status-->
-            <p class="badgeRow">{{showAnswer}}</p>
-
-            <!--User name-->
-            <p class="badgeRow">{{username}}</p>
-        </li>
-
-        {{/if}}
 
         {{/each}}
+
     </ul>
 
 </template>
