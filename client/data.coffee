@@ -16,7 +16,13 @@ Deps.autorun ->
   # need to put this in this kind of block because
   # Meteor.startup gets called before the current user is loaded
   if Meteor.user()
-    if not TutorialUsers.findOne({username: Meteor.user().username})
-      TutorialUsers.insert
-        username: Meteor.user().username
-        rand: Math.random()
+    if Meteor.user().username
+      if not TutorialUsers.findOne({username: Meteor.user().username})
+        TutorialUsers.insert
+          username: Meteor.user().username
+          rand: Math.random()
+    else
+      if not TutorialUsers.findOne({username: Meteor.userId()})
+        TutorialUsers.insert
+          username: Meteor.userId()
+          rand: Math.random()

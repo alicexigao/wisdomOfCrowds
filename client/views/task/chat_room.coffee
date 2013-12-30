@@ -25,6 +25,13 @@ Template.chatRoom.events =
 Template.chatRoom.timestampFormat = ->
   (new Date(this.timestamp)).toLocaleTimeString()
 
+Template.chatRoom.userIdentifier = ->
+  # if username is not set, display userId instead
+  if this.username
+    return username
+  else
+    return this.userId
+
 Template.chatRoom.rendered = ->
   # scroll to bottom
   $('ul#messageArea').scrollTop($('ul#messageArea').prop("scrollHeight"))

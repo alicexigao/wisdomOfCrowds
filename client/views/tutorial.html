@@ -1,18 +1,11 @@
 <template name="tutorial">
 
-    {{#if readyToRender}}
+    <div class="container">
+        {{> task}}
 
-        <div class="container">
-            {{> task}}
+        {{tutorial tutorial_steps}}
+    </div>
 
-            {{tutorial tutorial_steps}}
-        </div>
-
-    {{else}}
-
-        Loading tutorial... Please wait...
-
-    {{/if}}
 
 </template>
 

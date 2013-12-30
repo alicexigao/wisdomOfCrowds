@@ -1,17 +1,6 @@
-Handlebars.registerHelper "readyToRender", ->
-#  console.log "ready to render called"
 
-  tre = Handlebars._default_helpers.tre()
-#  console.log "treatment is " + tre
-  return false unless tre
-
-  currRound = Rounds.findOne({active: true})
-#  console.log "currRound is #{JSON.stringify(currRound)}"
-  return false unless currRound
-
-  return true
-
-
+Handlebars.registerHelper "hasActiveRound", ->
+  Rounds.find({active: true}).count() > 0
 
 # Get treatment
 Handlebars.registerHelper "tre", ->
@@ -20,9 +9,6 @@ Handlebars.registerHelper "tre", ->
 Handlebars.registerHelper "showBestAns", ->
   tre = Handlebars._default_helpers.tre()
   return tre.showBestAns
-
-
-
 
 # Get rounds collection
 Handlebars.registerHelper "rounds", ->
@@ -44,9 +30,6 @@ Handlebars.registerHelper "getRoundIndex", ->
 Handlebars.registerHelper "getCurrRoundObj", ->
   Rounds.findOne({active: true})
 
-
-
-
 Handlebars.registerHelper "userColl", ->
   if Session.equals("page", "tutorial")
     TutorialUsers
@@ -55,21 +38,29 @@ Handlebars.registerHelper "userColl", ->
 
 Handlebars.registerHelper "users", ->
   if Session.equals("page", "tutorial")
-    return TutorialUsers.find({}, {sort: {rand: 1}})
+    TutorialUsers.find({}, {sort: {rand: 1}})
   else if Session.equals("page", "task")
-    return Meteor.users.find({"status.online": true}, {sort: {rand: 1}})
+    Meteor.users.find({"status.online": true})
+#    Meteor.users.find({"status.online": true}, {sort: {rand: 1}})
 
 Handlebars.registerHelper "currUser", ->
-  if Session.equals("page", "tutorial")
-    TutorialUsers.findOne({username: Meteor.user().username})
-  else
+  if Session.equals("page", "task")
     Meteor.user()
+  else if Session.equals("page", "tutorial")
+    if Meteor.user().username
+      TutorialUsers.findOne({username: Meteor.user().username})
+    else
+      TutorialUsers.findOne({username: Meteor.userId()})
 
 Handlebars.registerHelper "currUserId", ->
   if Session.equals("page", "tutorial")
-    currUser = TutorialUsers.findOne({username: Meteor.user().username})
+    currUser = null
+    if Meteor.user().username
+      currUser = TutorialUsers.findOne({username: Meteor.user().username})
+    else
+      currUser = TutorialUsers.findOne({username: Meteor.userId()})
     currUser._id
-  else
+  else if Session.equals("page", "task")
     Meteor.userId()
 
 Handlebars.registerHelper "answers", ->
@@ -82,19 +73,15 @@ Handlebars.registerHelper "ansObjForId", (id) ->
 Handlebars.registerHelper "ansObjForIndexId", (index, id) ->
   Answers.findOne {roundIndex: index, userId: id}
 
-Handlebars.registerHelper "finalizedAns", ->
-  index = Handlebars._default_helpers.getRoundIndex()
-  ansColl = Handlebars._default_helpers.answers()
-  ansColl.find {roundIndex: index, status: "finalized"}
-
 Handlebars.registerHelper "answersFinalized", ->
   usersCursor = Handlebars._default_helpers.users()
-  return unless usersCursor
-  finalizedAnsCursor = Handlebars._default_helpers.finalizedAns()
-  return unless finalizedAnsCursor
-
-  return finalizedAnsCursor.count() is usersCursor.count()
-
+  return false unless usersCursor
+  for user in usersCursor.fetch()
+    ansObj = Handlebars._default_helpers.ansObjForId(user._id)
+    return false unless ansObj
+    if ansObj.status isnt "finalized"
+      return false
+  return true
 
 Handlebars.registerHelper "clearBestAnsAndAvg", ->
   tutorialRoundIndex = Session.get("tutorialRoundIndex")

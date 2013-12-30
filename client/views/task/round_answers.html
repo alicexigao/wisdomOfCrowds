@@ -5,15 +5,17 @@
 <template name="ansOneStage">
 
     <div class="correctAndAverageAns">
-        <!--Correct Answer-->
         {{#if answersFinalized}}
+            <!--Correct Answer-->
             {{> correctAns}}
+
+            <!--Average Answer-->
+            {{#if showAvgAns}}
+                {{> averageAns}}
+            {{/if}}
+
         {{/if}}
 
-        <!--Average Answer-->
-        {{#if showAvgAns}}
-            {{> averageAns}}
-        {{/if}}
     </div>
 
     <ul class="answerList">

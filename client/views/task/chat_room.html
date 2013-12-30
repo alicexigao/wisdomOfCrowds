@@ -3,7 +3,7 @@
         <h4>Chat Room</h4>
         <ul class="well" id="messageArea">
             {{#each messages}}
-            <li>{{username}} [{{timestampFormat}}]: {{content}}</li>
+            <li>{{userIdentifier}} [{{timestampFormat}}]: {{content}}</li>
             {{/each}}
         </ul>
         <form class="form-inline">

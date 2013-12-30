@@ -4,10 +4,10 @@ if Meteor.isServer
     Treatment.find({value: "avgPublicChat"})
 
   Meteor.publish "users", ->
-    Meteor.users.find {"status.online": true},
-      fields:
-        username: 1
-        rand: 1
+    Meteor.users.find {"status.online": true}
+#      fields:
+#        username: 1
+#        rand: 1
 
   Meteor.publish "settingsTaskQuestions", ->
     Settings.find {key: "taskQuestion"},

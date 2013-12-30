@@ -5,14 +5,12 @@ getTreatment = ->
 
 # get round index
 getRoundIndex = ->
-  Rounds.findOne({active: true}).index
+  # TODO: Is this every used for the tutorial?  Won't work for tutorial for now.
+  Rounds.findOne({active: true, page: "task"}).index
 
 # get online users
 getOnlineUsers = ->
   Meteor.users.find {"status.online": true}
-
-# calculate average and best answer
-
 
 # if answer exists, finalize it
 # else insert a finalized answer of 50
@@ -37,9 +35,44 @@ fakeAnswers = ->
         status: "finalized"
         page: "task"
 
-
 intervalIdFirst = undefined
 intervalIdNext = undefined
+
+calcAvgAndBestAnswer = (usersCursor) ->
+
+  if Meteor.isServer
+
+    roundIndex = getRoundIndex()
+    questionId = Rounds.findOne({active: true}).questionId
+    questionObj = Settings.findOne({_id: questionId})
+    correct = questionObj.answer
+    numAns = 0
+    sumAns = 0
+    bestAns = -Infinity
+
+    for user in usersCursor.fetch()
+      ansObj = Answers.findOne({roundIndex: roundIndex, userId: user._id})
+      ans = ansObj.answer
+      sumAns += ans
+      numAns++
+      if Math.abs(ans - correct) < Math.abs(bestAns - correct)
+        bestAns = ans
+
+    bestAnsUserIds = []
+    for user in usersCursor.fetch()
+      userId = user._id
+      ans = Answers.findOne({roundIndex: roundIndex, userId: userId}).answer
+      if ans is bestAns
+        bestAnsUserIds.push userId
+
+    avg = sumAns / numAns
+
+    Rounds.update
+      index: roundIndex
+    , $set:
+      "best": bestAns
+      "average": avg
+      "bestAnsUserIds": bestAnsUserIds
 
 
 Meteor.methods
@@ -49,41 +82,6 @@ Meteor.methods
       index: 0
     , $set:
       "average": 0.56
-
-calcAvgAndBestAnswer: (users) ->
-
-    roundIndex = getRoundIndex()
-    questionId = Rounds.findOne({active: true}).questionId
-
-    correct = Settings.findOne({_id: questionId}).answer
-    numAns = 0
-    sumAns = 0
-    bestAns = -Infinity
-
-    for user in users
-      userId = user._id
-      ans = Answers.findOne({roundIndex: roundIndex, userId: userId}).answer
-      sumAns += ans
-      numAns++
-      if Math.abs(ans - correct) < Math.abs(bestAns - correct)
-        bestAns = ans
-
-    avg = sumAns / numAns
-
-    bestAnsUserIds = []
-    for user in users
-      userId = user._id
-      ans = Answers.findOne({roundIndex: roundIndex, userId: userId}).answer
-      if ans is bestAns
-        bestAnsUserIds.push userId
-
-    Rounds.update
-      index: roundIndex
-    , $set:
-      "best": bestAns
-      "average": avg
-      "bestAnsUserIds": bestAnsUserIds
-
 
   countdownFirst: ->
     console.log "countdownFirst called"
@@ -136,14 +134,15 @@ calcAvgAndBestAnswer: (users) ->
       Meteor.clearInterval(intervalIdNext)
       intervalIdNext = undefined
 
-
     # if this is the last round, stop
     roundIndex = getRoundIndex()
+    console.log "current round " + roundIndex
     numRounds = Rounds.find({page: "task"}).count()
     if roundIndex is numRounds - 1
       return
 
     # incr round index
+    console.log "advance to next round"
     Rounds.update
       index: roundIndex
       page: "task"
@@ -157,6 +156,7 @@ calcAvgAndBestAnswer: (users) ->
         active: true
 
     # start timer first
+    console.log "starting timer first"
     time = new Date()
     nextEndTime = time.getTime() + 1000 * 60
     time.setTime(nextEndTime)
@@ -179,7 +179,7 @@ calcAvgAndBestAnswer: (users) ->
     console.log "endCurrRound called"
 
     users = getOnlineUsers()
-    Meteor.call "calcAvgAndBestAnswer", users
+    calcAvgAndBestAnswer(users)
 
     # stop timer first
     if intervalIdFirst isnt undefined
@@ -205,7 +205,7 @@ calcAvgAndBestAnswer: (users) ->
 
 # save chat messages
   sendMsg: (data) ->
-    if (!Meteor.user())
+    if not Meteor.user()
       throw new Meteor.Error(401, "You need to login to chat")
     chatData =
       page      : data.page

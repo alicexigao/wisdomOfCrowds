@@ -51,7 +51,7 @@ Handlebars.registerHelper "showBestAnsLabel", ->
 Template.correctAns.correctAnswer = ->
   questionId = Handlebars._default_helpers.getCurrRoundObj().questionId
   Meteor.subscribe "correctAnswer", questionId
-  return Settings.findOne({_id: questionId}).answer
+  Settings.findOne({_id: questionId}).answer
 
 Template.averageAns.getAverageString = ->
   tre = Handlebars._default_helpers.tre()
@@ -69,7 +69,11 @@ Template.averageAns.getAverage = ->
 
 Handlebars.registerHelper "showAvgAns", ->
   tre = Handlebars._default_helpers.tre()
-  return false unless tre.showAvg
-  return Handlebars._default_helpers.answersFinalized()
+  return tre.showAvg
 
+Template.ansOneStage.username = ->
+  if this.username
+    this.username
+  else
+    this._id
 

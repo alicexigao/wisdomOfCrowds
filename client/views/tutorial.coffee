@@ -1,6 +1,4 @@
 Handlebars.registerHelper "getTemplateAnswers", ->
-  return unless Handlebars._default_helpers.subsReady()
-
   tre = Handlebars._default_helpers.tre()
   return unless tre
 
@@ -15,7 +13,6 @@ Handlebars.registerHelper "getTemplateAnswers", ->
 
 
 Handlebars.registerHelper "getTemplateBreak", ->
-  return unless Handlebars._default_helpers.subsReady()
 
   tre = Handlebars._default_helpers.tre()
   return unless tre
@@ -27,8 +24,6 @@ Handlebars.registerHelper "getTemplateBreak", ->
 
 
 Handlebars.registerHelper "getTemplateRewardRule", ->
-  return unless Handlebars._default_helpers.subsReady()
-
   tre = Handlebars._default_helpers.tre()
   return unless tre
 
