@@ -5,30 +5,32 @@
       "user-status": {
         "path": "../meteor-user-status"
       },
-      "bootboxjs": {
-        "version": "3.2.2"
-      },
       "turkserver": {
         "path": "../turkserver-meteor"
       },
-      "iron-router": {
-        "version": "0.6.1"
+      "bootboxjs": {
+        "version": "3.2.2"
       },
-      "tutorials": {
-        "version": "0.3.1"
-      }
+      "x-editable-bootstrap": {},
+      "iron-router": {},
+      "tutorials": {}
     },
     "packages": {
       "user-status": {
         "path": "../meteor-user-status"
+      },
+      "turkserver": {
+        "path": "../turkserver-meteor"
       },
       "bootboxjs": {
         "git": "https://github.com/TimHeckel/meteor-bootboxjs.git",
         "tag": "v3.2.2",
         "commit": "580adfebfa12b4d2186a80cec1109dab74ad6228"
       },
-      "turkserver": {
-        "path": "../turkserver-meteor"
+      "x-editable-bootstrap": {
+        "git": "https://github.com/nate-strauser/meteor-x-editable-bootstrap.git",
+        "tag": "v1.4.6.2",
+        "commit": "d3fcead1dd2302e30522e8c09d020f9a3d312cd0"
       },
       "iron-router": {
         "git": "https://github.com/EventedMind/iron-router.git",

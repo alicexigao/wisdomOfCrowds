@@ -3,10 +3,10 @@
     "user-status": {
       "path": "../meteor-user-status"
     },
-    "bootboxjs": "3.2.2",
     "turkserver": {
       "path": "../turkserver-meteor"
     },
+    "bootboxjs": "3.2.2",
     "iron-router": {},
     "tutorials": {}
   }

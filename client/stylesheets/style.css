@@ -21,10 +21,10 @@ li.answer {
 }
 
 /* Results table formatting */
+/* ANDREW: please put a CSS class on these <td>s.  */
 td {
     text-align: center;
 }
-
 
 /* Tutorial formatting */
 div#tutorialText {
@@ -49,14 +49,10 @@ input#tutorialInputEstimate {
 }
 
 /* Quiz */
-label {
+label.bigfont {
     vertical-align: middle;
     font-size: 140%;
     padding: 5px;
-}
-
-.bigfont {
-    font-size: 140%;
 }
 
 textarea {
