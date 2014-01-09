@@ -54,14 +54,8 @@ Router.map ->
   @route "exitsurvey"
   @route "admin"
 
-Deps.autorun ->
-  state = Session.get("turkserver.state")
-  return unless state
+# Auto routing for state
+Deps.autorun -> Router.go("/") if TurkServer.inQuiz()
+Deps.autorun -> Router.go("/task") if TurkServer.inExperiment()
 
-  if state is "quiz"
-    Router.go("/")
-  else if state is "lobby" # This route is defined by turkserver
-    Router.go("/lobby")
-  else if state is "experiment"
-    Router.go("/task")
 
