@@ -1,4 +1,6 @@
-Meteor.subscribe "treatment"
+Deps.autorun ->
+  TurkServer.group()
+  Meteor.subscribe "treatment"
 
 Meteor.subscribe "users"
 

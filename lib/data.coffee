@@ -12,3 +12,5 @@
 @ErrorMessages = new Meteor.Collection('errorMessages')
 @Timers = new Meteor.Collection("timeleft")
 
+if Meteor.isServer
+  TurkServer.registerCollection Treatment

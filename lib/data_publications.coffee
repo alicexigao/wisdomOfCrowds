@@ -1,7 +1,7 @@
 if Meteor.isServer
 
   Meteor.publish "treatment", ->
-    Treatment.find({value: "avgPublicChat"})
+    Treatment.find()
 
   Meteor.publish "users", ->
     Meteor.users.find {"status.online": true}

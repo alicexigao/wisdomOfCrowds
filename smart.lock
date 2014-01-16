@@ -11,9 +11,12 @@
       "bootboxjs": {
         "version": "3.2.2"
       },
-      "x-editable-bootstrap": {},
-      "iron-router": {},
-      "tutorials": {}
+      "iron-router": {
+        "version": "0.6.2"
+      },
+      "tutorials": {
+        "version": "0.3.1"
+      }
     },
     "packages": {
       "user-status": {
@@ -27,20 +30,20 @@
         "tag": "v3.2.2",
         "commit": "580adfebfa12b4d2186a80cec1109dab74ad6228"
       },
-      "x-editable-bootstrap": {
-        "git": "https://github.com/nate-strauser/meteor-x-editable-bootstrap.git",
-        "tag": "v1.4.6.2",
-        "commit": "d3fcead1dd2302e30522e8c09d020f9a3d312cd0"
-      },
       "iron-router": {
         "git": "https://github.com/EventedMind/iron-router.git",
-        "tag": "v0.6.1",
-        "commit": "4e1ee0581d68bff422a915dacb0bd30eae10fe08"
+        "tag": "v0.6.2",
+        "commit": "ce56e58b45624dce992490f3a1c10f10d3948bae"
       },
       "tutorials": {
         "git": "https://github.com/mizzao/meteor-tutorials.git",
         "tag": "v0.3.1",
         "commit": "d154f1df80c0fc4ba69c439cb4a6da1294459740"
+      },
+      "x-editable-bootstrap": {
+        "git": "https://github.com/nate-strauser/meteor-x-editable-bootstrap.git",
+        "tag": "v1.4.6.2",
+        "commit": "d3fcead1dd2302e30522e8c09d020f9a3d312cd0"
       },
       "collection-hooks": {
         "path": "../meteor-collection-hooks"

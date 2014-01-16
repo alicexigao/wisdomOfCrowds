@@ -39,63 +39,63 @@ if Meteor.isServer
     value: "Fake Tutorial Question 2"
     answer: 70
 
-  Treatment.remove({})
-  Treatment.insert
-    value: "bestPrivate"
-    rewardRule:    "best"
-    showChatRoom:  false
-    showOtherAns:  false
-    showBestAns:   true
-    showAvg:       false
-  Treatment.insert
-    value: "bestPrivateChat"
-    rewardRule:    "best"
-    showChatRoom:  true
-    showOtherAns:  false
-    showBestAns:   true
-    showAvg:       false
-  Treatment.insert
-    value: "bestPublic"
-    rewardRule:    "best"
-    showChatRoom:  false
-    showOtherAns:  true
-    showBestAns:   true
-    showAvg:       false
-  Treatment.insert
-    value: "bestPublicChat"
-    rewardRule:    "best"
-    showChatRoom:  true
-    showOtherAns:  true
-    showBestAns:   true
-    showAvg:       false
-  Treatment.insert
-    value: "avgPrivate"
-    rewardRule:    "average"
-    showBestAns:   false
-    showAvg:       true
-    showChatRoom:  false
-    showOtherAns:  false
-  Treatment.insert
-    value: "avgPrivateChat"
-    rewardRule:    "average"
-    showChatRoom:  true
-    showOtherAns:  false
-    showBestAns:   false
-    showAvg:       true
-  Treatment.insert
-    value: "avgPublic"
-    rewardRule:    "average"
-    showChatRoom:  false
-    showOtherAns:  true
-    showBestAns:   false
-    showAvg:       true
-  Treatment.insert
-    value: "avgPublicChat"
-    rewardRule:    "average"
-    showChatRoom:  true
-    showOtherAns:  true
-    showAvg:       true
-    showBestAns:   false
+#  Treatment.remove({})
+#  Treatment.insert
+#    value: "bestPrivate"
+#    rewardRule:    "best"
+#    showChatRoom:  false
+#    showOtherAns:  false
+#    showBestAns:   true
+#    showAvg:       false
+#  Treatment.insert
+#    value: "bestPrivateChat"
+#    rewardRule:    "best"
+#    showChatRoom:  true
+#    showOtherAns:  false
+#    showBestAns:   true
+#    showAvg:       false
+#  Treatment.insert
+#    value: "bestPublic"
+#    rewardRule:    "best"
+#    showChatRoom:  false
+#    showOtherAns:  true
+#    showBestAns:   true
+#    showAvg:       false
+#  Treatment.insert
+#    value: "bestPublicChat"
+#    rewardRule:    "best"
+#    showChatRoom:  true
+#    showOtherAns:  true
+#    showBestAns:   true
+#    showAvg:       false
+#  Treatment.insert
+#    value: "avgPrivate"
+#    rewardRule:    "average"
+#    showBestAns:   false
+#    showAvg:       true
+#    showChatRoom:  false
+#    showOtherAns:  false
+#  Treatment.insert
+#    value: "avgPrivateChat"
+#    rewardRule:    "average"
+#    showChatRoom:  true
+#    showOtherAns:  false
+#    showBestAns:   false
+#    showAvg:       true
+#  Treatment.insert
+#    value: "avgPublic"
+#    rewardRule:    "average"
+#    showChatRoom:  false
+#    showOtherAns:  true
+#    showBestAns:   false
+#    showAvg:       true
+#  Treatment.insert
+#    value: "avgPublicChat"
+#    rewardRule:    "average"
+#    showChatRoom:  true
+#    showOtherAns:  true
+#    showAvg:       true
+#    showBestAns:   false
 
 
   # Users
@@ -162,6 +162,73 @@ if Meteor.isServer
   ChatMessages.remove({})
   ErrorMessages.remove({})
   QuizAttempts.remove({})
+
+  TurkServer.initialize ->
+    switch @treatment
+      when "bestPrivate" # the string corresponding to the treatment
+        Treatment.insert
+          value: "bestPrivate"
+          rewardRule:    "best"
+          showChatRoom:  false
+          showOtherAns:  false
+          showBestAns:   true
+          showAvg:       false
+      when "bestPrivateChat"
+        Treatment.insert
+          value: "bestPrivateChat"
+          rewardRule:    "best"
+          showChatRoom:  true
+          showOtherAns:  false
+          showBestAns:   true
+          showAvg:       false
+      when "bestPublic"
+        Treatment.insert
+          value: "bestPublic"
+          rewardRule:    "best"
+          showChatRoom:  false
+          showOtherAns:  true
+          showBestAns:   true
+          showAvg:       false
+      when "bestPublicChat"
+        Treatment.insert
+          value: "bestPublicChat"
+          rewardRule:    "best"
+          showChatRoom:  true
+          showOtherAns:  true
+          showBestAns:   true
+          showAvg:       false
+      when "avgPrivate"
+        Treatment.insert
+          value: "avgPrivate"
+          rewardRule:    "average"
+          showBestAns:   false
+          showAvg:       true
+          showChatRoom:  false
+          showOtherAns:  false
+      when "avgPrivateChat"
+        Treatment.insert
+          value: "avgPrivateChat"
+          rewardRule:    "average"
+          showChatRoom:  true
+          showOtherAns:  false
+          showBestAns:   false
+          showAvg:       true
+      when "avgPublic"
+        Treatment.insert
+          value: "avgPublic"
+          rewardRule:    "average"
+          showChatRoom:  false
+          showOtherAns:  true
+          showBestAns:   false
+          showAvg:       true
+      when "avgPublicChat"
+        Treatment.insert
+          value: "avgPublicChat"
+          rewardRule:    "average"
+          showChatRoom:  true
+          showOtherAns:  true
+          showAvg:       true
+          showBestAns:   false
 
 
 

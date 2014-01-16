@@ -1,11 +1,5 @@
-
-# get treatment
-getTreatment = ->
-  Treatment.findOne()
-
 # get round index
 getRoundIndex = (page) ->
-  # TODO: Is this every used for the tutorial?  Won't work for tutorial for now.
   Rounds.findOne({active: true, page: page}).index
 
 # get online users
@@ -46,11 +40,11 @@ calcAvgAndBestAnswer = (users, page) ->
   if Meteor.isServer
 
     roundIndex = getRoundIndex(page)
-    console.log "current round " + roundIndex
+#    console.log "current round " + roundIndex
     questionId = Rounds.findOne({active: true, page: page}).questionId
     questionObj = Settings.findOne({_id: questionId})
     correct = questionObj.answer
-    console.log "correct answer " + correct
+#    console.log "correct answer " + correct
     numAns = 0
     sumAns = 0
     bestAns = -Infinity
@@ -62,7 +56,7 @@ calcAvgAndBestAnswer = (users, page) ->
       numAns++
       if Math.abs(ans - correct) < Math.abs(bestAns - correct)
         bestAns = ans
-    console.log "best answer " + bestAns
+#    console.log "best answer " + bestAns
 
     bestAnsUserIds = []
     for user in users
@@ -70,10 +64,10 @@ calcAvgAndBestAnswer = (users, page) ->
       ans = ansObj.answer
       if ans is bestAns
         bestAnsUserIds.push user._id
-    console.log "best ans user ids " + bestAnsUserIds
+#    console.log "best ans user ids " + bestAnsUserIds
 
     avg = sumAns / numAns
-    console.log "average " + avg
+#    console.log "average " + avg
 
     Rounds.update
       index: roundIndex
@@ -272,14 +266,14 @@ Meteor.methods
   updateTutorialAnswer: (data) ->
     ansObj = Answers.findOne({userId: data.userId, page: "tutorial"})
     if ansObj
-      console.log "answer exists, update status"
+#      console.log "answer exists, update status"
       Answers.update
         userId: data.userId
         page: "tutorial"
       , $set:
         status: data.status
     else if data.createAnswer is true
-        console.log "answer does not exist"
+#        console.log "answer does not exist"
         Answers.insert
           roundIndex: 0
           userId: data.userId
