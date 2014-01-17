@@ -14,3 +14,4 @@
 
 if Meteor.isServer
   TurkServer.registerCollection Treatment
+  TurkServer.registerCollection ChatMessages

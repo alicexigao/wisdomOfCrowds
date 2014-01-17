@@ -159,7 +159,6 @@ if Meteor.isServer
     secondsLeft: timerNextDur
     start: false
 
-  ChatMessages.remove({})
   ErrorMessages.remove({})
   QuizAttempts.remove({})
 

@@ -1,10 +1,11 @@
 Deps.autorun ->
   TurkServer.group()
   Meteor.subscribe "treatment"
+  Meteor.subscribe "chatMessages"
 
 Meteor.subscribe "users"
 
-Meteor.subscribe "chatMessages"
+
 
 Meteor.subscribe "timers"
 
