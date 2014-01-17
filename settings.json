@@ -1,5 +1,6 @@
 {
     "turkserver": {
-        "adminPassword": "P@$$w0rd"
+        "adminPassword": "P@$$w0rd",
+        "watchRoute": "/task"
     }
 }

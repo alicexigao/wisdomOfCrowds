@@ -9,8 +9,8 @@ tutorialRounds  = null
 tutorialChat    = null
 tutorialAnswers = null
 
+userSub = null
 treatment = null
-users = null
 
 Router.configure({
 #  layoutTemplate: 'layout',
@@ -19,11 +19,12 @@ Router.configure({
 });
 
 Deps.autorun ->
-  TurkServer.group()
+  group = TurkServer.group()
+  # Need to resubscribe to users whenever group changes
+  userSub = Meteor.subscribe "users", group
+
   Meteor.subscribe "chatMessages"
   Meteor.subscribe "timers"
-
-Meteor.subscribe "users"
 
 Meteor.subscribe "errorMessages"
 
@@ -39,11 +40,10 @@ Router.map ->
   @route "tutorial",
     waitOn: ->
       tutorialQuestions = Meteor.subscribe "settingsTutorialQuestions"
-      users = Meteor.subscribe("users")
       tutorialRounds = Meteor.subscribe("rounds", "tutorial")
       tutorialChat = Meteor.subscribe("chatMessages", "tutorial")
       tutorialAnswers = Meteor.subscribe("answers", "tutorial")
-      return [tutorialQuestions, users, treatment, tutorialRounds, tutorialChat, tutorialAnswers]
+      return [tutorialQuestions, treatment, tutorialRounds, tutorialChat, tutorialAnswers]
     unload: ->
       tutorialQuestions.stop()
       tutorialRounds.stop()
@@ -54,11 +54,10 @@ Router.map ->
     waitOn: ->
       TurkServer.group()
       taskQuestions = Meteor.subscribe "settingsTaskQuestions"
-      users = Meteor.subscribe("users")
       taskRounds = Meteor.subscribe("rounds", "task")
       taskChat = Meteor.subscribe("chatMessages", "task")
       taskAnswers = Meteor.subscribe("answers", "task")
-      return [taskQuestions, users, taskRounds, taskChat, taskAnswers]
+      return [taskQuestions, taskRounds, taskChat, taskAnswers]
     before: ->
     after: ->
     unload: ->
@@ -67,7 +66,6 @@ Router.map ->
       taskChat.stop()
       taskAnswers.stop()
   @route "exitsurvey"
-  @route "admin"
 
 # Auto routing for state
 Deps.autorun -> Router.go("/") if TurkServer.inQuiz()
