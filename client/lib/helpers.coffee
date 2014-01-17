@@ -1,3 +1,7 @@
+@Util = @Util || {}
+
+Util.showBestAns = -> Treatment.findOne()?.showBestAns
+Util.showAvg = -> Treatment.findOne()?.showAvg
 
 Handlebars.registerHelper "hasActiveRound", ->
   Rounds.find({active: true}).count() > 0
@@ -6,9 +10,8 @@ Handlebars.registerHelper "hasActiveRound", ->
 Handlebars.registerHelper "tre", ->
   return Treatment.findOne()
 
-Handlebars.registerHelper "showBestAns", ->
-  tre = Handlebars._default_helpers.tre()
-  return tre.showBestAns
+Handlebars.registerHelper "showBestAns", Util.showBestAns
+Handlebars.registerHelper "showAvg", Util.showAvg
 
 # Get rounds collection
 Handlebars.registerHelper "rounds", ->

@@ -37,11 +37,8 @@ Handlebars.registerHelper "getAnsDurRound", (userId) ->
   else
     return ansObj.status
 
-
-
-
 Handlebars.registerHelper "showBestAnsLabel", ->
-  return false unless Handlebars._default_helpers.tre().showBestAns
+  return false unless Util.showBestAns()
   return false unless Handlebars._default_helpers.answersFinalized()
   round = Handlebars._default_helpers.getCurrRoundObj()
   if round.bestAnsUserIds

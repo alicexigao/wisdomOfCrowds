@@ -10,12 +10,28 @@ tutorialChat    = null
 tutorialAnswers = null
 
 treatment = null
+users = null
 
 Router.configure({
 #  layoutTemplate: 'layout',
 #  notFoundTemplate: 'notFound',
   loadingTemplate: 'loading'
 });
+
+Deps.autorun ->
+  TurkServer.group()
+  Meteor.subscribe "chatMessages"
+  Meteor.subscribe "timers"
+
+Meteor.subscribe "users"
+
+Meteor.subscribe "errorMessages"
+
+# Get the data for the current treatment name
+Deps.autorun ->
+  treatment = TurkServer.treatment()
+  return unless treatment
+  Meteor.subscribe("treatment", treatment)
 
 Router.map ->
   @route "homepage",
@@ -24,7 +40,6 @@ Router.map ->
     waitOn: ->
       tutorialQuestions = Meteor.subscribe "settingsTutorialQuestions"
       users = Meteor.subscribe("users")
-      treatment = Meteor.subscribe("treatment")
       tutorialRounds = Meteor.subscribe("rounds", "tutorial")
       tutorialChat = Meteor.subscribe("chatMessages", "tutorial")
       tutorialAnswers = Meteor.subscribe("answers", "tutorial")
@@ -37,9 +52,9 @@ Router.map ->
   @route "quiz"
   @route "task",
     waitOn: ->
+      TurkServer.group()
       taskQuestions = Meteor.subscribe "settingsTaskQuestions"
       users = Meteor.subscribe("users")
-      treatment = Meteor.subscribe("treatment")
       taskRounds = Meteor.subscribe("rounds", "task")
       taskChat = Meteor.subscribe("chatMessages", "task")
       taskAnswers = Meteor.subscribe("answers", "task")

@@ -25,14 +25,6 @@ Template.roundHistory.getMyAnswerString = ->
   return unless ansObj
   return ansObj.answer + "%"
 
-Template.roundHistory.showBestAns = ->
-  tre = Handlebars._default_helpers.tre()
-  tre.showBestAns
-
-Template.roundHistory.showAvg = ->
-  tre = Handlebars._default_helpers.tre()
-  tre.showAvg
-
 Template.roundHistory.getBestAnswerString = ->
   best = parseInt(this.best * 100, 10) / 100
   return best + "%"

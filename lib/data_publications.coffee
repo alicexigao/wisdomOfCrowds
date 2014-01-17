@@ -1,7 +1,7 @@
 if Meteor.isServer
 
-  Meteor.publish "treatment", ->
-    Treatment.find()
+  Meteor.publish "treatment", (name) ->
+    Treatment.find( value: name )
 
   Meteor.publish "users", ->
     Meteor.users.find {"status.online": true}
