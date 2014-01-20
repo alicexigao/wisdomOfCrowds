@@ -88,6 +88,3 @@ Template.tutorial_step_youranswer.events =
 
 Template.tutorial.rendered = ->
   Session.set("page", "tutorial")
-  return unless Timers.findOne({name: "first"})
-  if Timers.findOne({name: "first"}).start is true
-    Meteor.call "stopTimerFirst"

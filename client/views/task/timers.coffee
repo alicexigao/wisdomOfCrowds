@@ -1,7 +1,8 @@
 #    Template.timerFirst.intervalIdMain = Meteor.setInterval Template.timerFirst.countdown, 1000
 
 Template.timerFirst.getTimeLeft = ->
-  left = Timers.findOne({name: "first"}).secondsLeft
+  groupId = TurkServer.group()
+  left = Rounds.findOne({_groupId: groupId, active: true}).secondsLeft
   if left
     seconds = left % 60
     minutes = (left - seconds) / 60
@@ -12,5 +13,9 @@ Template.timerFirst.getTimeLeft = ->
   return "0:00"
 
 Template.timerNext.getTimeLeft = ->
-  return Timers.findOne({name: "next"}).secondsLeft
+  groupId = TurkServer.group()
+  left = Rounds.findOne({_groupId: groupId, active: true}).secondsLeft
+  return "0" unless left
+  return left
+
 

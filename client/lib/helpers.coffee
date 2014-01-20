@@ -26,8 +26,8 @@ Handlebars.registerHelper "getRoundIndex", ->
   if Session.equals("page", "tutorial")
     return Session.get("tutorialRoundIndex")
   else
-    return unless Rounds.findOne({active: true})
-    Rounds.findOne({active: true}).index
+#    return unless Rounds.findOne({active: true})
+    Rounds.findOne({active: true})?.index
 
 # Get current round object
 Handlebars.registerHelper "getCurrRoundObj", ->
@@ -41,10 +41,9 @@ Handlebars.registerHelper "userColl", ->
 
 Handlebars.registerHelper "users", ->
   if Session.equals("page", "tutorial")
-    TutorialUsers.find({}, {sort: {rand: 1}})
+    TutorialUsers.find({}, {sort: {_id: 1}})
   else if Session.equals("page", "task")
-    Meteor.users.find({"status.online": true})
-#    Meteor.users.find({"status.online": true}, {sort: {rand: 1}})
+    Meteor.users.find({"status.online": true}, {sort: {_id: 1}})
 
 Handlebars.registerHelper "currUser", ->
   if Session.equals("page", "task")

@@ -4,9 +4,6 @@ Meteor.publish "treatment", (name) ->
 
 Meteor.publish "users", ->
   Meteor.users.find {"status.online": true}
-#      fields:
-#        username: 1
-#        rand: 1
 
 Meteor.publish "settingsTaskQuestions", ->
   Settings.find {key: "taskQuestion"},
@@ -36,9 +33,6 @@ Meteor.publish "answers", (page) ->
 
 Meteor.publish "chatMessages", (page) ->
   ChatMessages.find {page: page}
-
-Meteor.publish "timers", ->
-  Timers.find()
 
 Meteor.publish 'errorMessages', ->
   ErrorMessages.find()

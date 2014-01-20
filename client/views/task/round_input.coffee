@@ -66,8 +66,8 @@ finalizeAnsOneStage = (ev) ->
     return bootbox.alert err.reason if err
 
   if Handlebars._default_helpers.answersFinalized()
-
-      Meteor.call 'endCurrRound'
+      groupId = TurkServer.group()
+      Meteor.call 'saveEndTime', groupId
 
 Template.oneStage.events =
 

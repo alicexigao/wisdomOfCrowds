@@ -24,7 +24,6 @@ Deps.autorun ->
   userSub = Meteor.subscribe "users", group
 
   Meteor.subscribe "chatMessages"
-  Meteor.subscribe "timers"
 
 Meteor.subscribe "errorMessages"
 
@@ -69,6 +68,11 @@ Router.map ->
 
 # Auto routing for state
 Deps.autorun -> Router.go("/") if TurkServer.inQuiz()
-Deps.autorun -> Router.go("/task") if TurkServer.inExperiment()
+
+Deps.autorun ->
+  if TurkServer.inExperiment()
+    groupId = TurkServer.group()
+    Router.go("/task")
+    Meteor.call "saveStartTime", groupId
 
 
