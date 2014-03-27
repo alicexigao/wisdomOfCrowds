@@ -13,3 +13,5 @@ if Meteor.isServer
   TurkServer.registerCollection ChatMessages
   TurkServer.registerCollection Answers
   TurkServer.registerCollection Rounds
+
+@TestObjects = {}

@@ -10,7 +10,7 @@
             <!--Correct Answer-->
             {{> correctAns}}
             <!--Average Answer-->
-            {{#if showAvgAns}}
+            {{#if showAvg}}
                 {{> averageAns}}
             {{/if}}
         </div>
@@ -19,7 +19,7 @@
 
     <ul class="answerList">
 
-        {{#each users}}
+        {{#each userCursor}}
 
             {{#if isCurrentUser}}
 

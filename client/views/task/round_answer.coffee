@@ -1,34 +1,33 @@
-
 Template.answers.treatmentDisplay = (treatment, context) ->
   switch treatment
     when "bestPrivate", "bestPrivateChat", "bestPublic", "bestPublicChat", "avgPrivate", "avgPrivateChat", "avgPublic", "avgPublicChat"
       return new Handlebars.SafeString Template.ansOneStage(context)
 
-Handlebars.registerHelper "isCurrentUser", ->
-  currUserId = Handlebars._default_helpers.currUserId()
+Template.ansOneStage.isCurrentUser = ->
+  currUserId = Util.getCurrUserId()
   return currUserId is @_id
 
-Handlebars.registerHelper "showAnswer", ->
-  if Handlebars._default_helpers.answersFinalized()
-    return Handlebars._default_helpers.getAnsDurBreak(@_id)
+Template.ansOneStage.showAnswer = ->
+  if Util.answersFinalized()
+    getAnsDurBreak(@_id)
   else
-    return Handlebars._default_helpers.getAnsDurRound(@_id)
+    getAnsDurRound(@_id)
 
-# get answer during the break between rounds
-Handlebars.registerHelper "getAnsDurBreak", (userId) ->
-  ansObj = Handlebars._default_helpers.ansObjForId(userId)
+# Get answer during the break
+getAnsDurBreak = (userId) ->
+  ansObj = Util.ansObjForId(userId)
   if ansObj is undefined
     console.log Meteor.userId()
     console.log userId
   return ansObj.answer + "%"
 
-# get answer during round
-Handlebars.registerHelper "getAnsDurRound", (userId) ->
-  ansObj = Handlebars._default_helpers.ansObjForId(userId)
+# Get answer during round
+getAnsDurRound = (userId) ->
+  ansObj = Util.ansObjForId(userId)
   return "pending" unless ansObj
 
-  tre = Handlebars._default_helpers.tre()
-  currUserId = Handlebars._default_helpers.currUserId()
+  tre = Util.tre()
+  currUserId = Util.getCurrUserId()
   if currUserId is userId
     # always display current user's answer
     return ansObj.answer + "%"
@@ -37,36 +36,32 @@ Handlebars.registerHelper "getAnsDurRound", (userId) ->
   else
     return ansObj.status
 
-Handlebars.registerHelper "showBestAnsLabel", ->
+Template.ansOneStage.showBestAnsLabel = ->
   return false unless Util.showBestAns()
-  return false unless Handlebars._default_helpers.answersFinalized()
-  round = Handlebars._default_helpers.getCurrRoundObj()
+  return false unless Util.answersFinalized()
+  round = Util.getCurrRoundObj()
   if round.bestAnsUserIds
     return @_id in round.bestAnsUserIds
   return false
 
 Template.correctAns.correctAnswer = ->
-  questionId = Handlebars._default_helpers.getCurrRoundObj().questionId
+  questionId = Util.getCurrRoundObj().questionId
   Meteor.subscribe "correctAnswer", questionId
   Settings.findOne({_id: questionId}).answer
 
 Template.averageAns.getAverageString = ->
-  tre = Handlebars._default_helpers.tre()
+  tre = Util.tre()
   switch tre.rewardRule
       when "average"
         return "average"
 
 Template.averageAns.getAverage = ->
-  round = Handlebars._default_helpers.getCurrRoundObj()
-  tre = Handlebars._default_helpers.tre()
+  round = Util.getCurrRoundObj()
+  tre = Util.tre()
   if tre.rewardRule is "average"
     avg = round.average
   avg = parseInt(avg * 100) / 100
   return avg
-
-Handlebars.registerHelper "showAvgAns", ->
-  tre = Handlebars._default_helpers.tre()
-  return tre.showAvg
 
 Template.ansOneStage.username = ->
   if this.username

@@ -7,6 +7,7 @@ preserve-inputs
 bootstrap
 coffeescript
 standard-app-packages
+woc-server
 bootboxjs
 iron-router
 handlebars

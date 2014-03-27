@@ -2,11 +2,11 @@ Template.roundHistory.rounds = ->
   Rounds.find({}, {sort: {index: 1}})
 
 Template.roundHistory.isRoundFinished = (index) ->
-  currRoundIndex = Handlebars._default_helpers.getRoundIndex()
+  currRoundIndex = Util.getRoundIndex()
   if index < currRoundIndex
     return true
   else if index is currRoundIndex
-    if Handlebars._default_helpers.answersFinalized()
+    if Util.answersFinalized()
       return true
   return false
 
@@ -20,8 +20,9 @@ Template.roundHistory.getCorrectAnswer = ->
   return answer + "%"
 
 Template.roundHistory.getMyAnswerString = ->
-  currUserId = Handlebars._default_helpers.currUserId()
-  ansObj = Handlebars._default_helpers.ansObjForIndexId(@index, currUserId)
+  currUserId = Util.getCurrUserId()
+  ansObj =
+    Answers.findOne {roundIndex: @index, userId: currUserId}
   return unless ansObj
   return ansObj.answer + "%"
 
@@ -34,8 +35,8 @@ Template.roundHistory.getAverageString = ->
   return avg + "%"
 
 Template.roundHistory.calcPoints = ->
-  tre = Handlebars._default_helpers.tre()
-  userId = Handlebars._default_helpers.currUserId()
+  tre = Util.tre()
+  userId = Util.getCurrUserId()
 
   if tre.rewardRule is "best"
 

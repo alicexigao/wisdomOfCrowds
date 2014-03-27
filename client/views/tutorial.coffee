@@ -1,5 +1,5 @@
-Handlebars.registerHelper "getTemplateAnswers", ->
-  tre = Handlebars._default_helpers.tre()
+Util.getTemplateAnswers = ->
+  tre = Util.tre()
   return unless tre
 
   if tre.showOtherAns is false and tre.showChatRoom is false
@@ -11,8 +11,8 @@ Handlebars.registerHelper "getTemplateAnswers", ->
   else
     return Template.tutorial_step_answers_publicChat
 
-Handlebars.registerHelper "getTemplateBreak", ->
-  tre = Handlebars._default_helpers.tre()
+Util.getTemplateBreak = ->
+  tre = Util.tre()
   return unless tre
 
   if tre.showBestAns is true
@@ -20,8 +20,8 @@ Handlebars.registerHelper "getTemplateBreak", ->
   else if tre.showAvg is true
     return Template.tutorial_step_break_average
 
-Handlebars.registerHelper "getTemplateRewardRule", ->
-  tre = Handlebars._default_helpers.tre()
+Util.getTemplateRewardRule = ->
+  tre = Util.tre()
   return unless tre
 
   if tre.rewardRule is "best"
@@ -34,8 +34,10 @@ setTutorialAnswer = (username, status, createAnswer) ->
   if username
     userId = TutorialUsers.findOne({username: username})._id
   else
-    userId = Handlebars._default_helpers.currUserId()
+    userId = Util.getCurrUserId()
   Meteor.call "updateTutorialAnswer", {userId: userId, status: status, createAnswer: createAnswer}
+
+
 
 tutorialSteps = [
     template: Template.tutorial_step_intro
@@ -48,7 +50,7 @@ tutorialSteps = [
     template: Template.tutorial_step_youranswer
     spot: ".currPlayerInput, .currPlayerAnswer"
   ,
-    template: Handlebars._default_helpers.getTemplateAnswers()
+    template: Util.getTemplateAnswers()
     spot: ".currPlayerInput, .currPlayerAnswer, .otherPlayerAnswers, .divChatRoom"
   ,
     template: Template.tutorial_step_timelimit
@@ -58,7 +60,7 @@ tutorialSteps = [
       setTutorialAnswer("Bob", "submitted", false)
       setTutorialAnswer("Carol", "finalized", false)
   ,
-    template: Handlebars._default_helpers.getTemplateBreak()
+    template: Util.getTemplateBreak()
     spot: ".timerDuringBreak, .correctAndAverageAns, .currPlayerAnswer, .otherPlayerAnswers, .gameHistory"
     onLoad: ->
       setTutorialAnswer("Bob", "finalized", false)
@@ -66,7 +68,7 @@ tutorialSteps = [
       setTutorialAnswer(null, "finalized", true)
       Meteor.call "calcAvgAndBest", TutorialUsers.find().fetch()
   ,
-    template: Handlebars._default_helpers.getTemplateRewardRule()
+    template: Util.getTemplateRewardRule()
     spot: ".gameHistory"
   ,
     template: Template.tutorial_step_bonusrule

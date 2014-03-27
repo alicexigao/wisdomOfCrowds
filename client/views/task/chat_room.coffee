@@ -1,6 +1,5 @@
 Template.chatRoom.messages = ->
-  chatColl = Handlebars._default_helpers.chat()
-  chatColl.find({}, {sort: {timestamp: 1}})
+  ChatMessages.find({}, {sort: {timestamp: 1}})
 
 Template.chatRoom.events =
   "submit form": (ev) ->

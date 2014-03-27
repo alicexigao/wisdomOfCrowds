@@ -71,8 +71,7 @@ Deps.autorun -> Router.go("/") if TurkServer.inQuiz()
 
 Deps.autorun ->
   if TurkServer.inExperiment()
-    groupId = TurkServer.group()
     Router.go("/task")
-    Meteor.call "saveStartTime", groupId
+
 
 

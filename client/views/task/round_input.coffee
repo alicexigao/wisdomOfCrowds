@@ -1,5 +1,5 @@
 Handlebars.registerHelper "treatment", ->
-  tre =  Handlebars._default_helpers.tre()
+  tre = Util.tre()
   return unless tre
   tre.value
 
@@ -9,7 +9,6 @@ Template.round.treatmentDisplay = (treatment, context) ->
   switch treatment
     when "bestPrivate", "bestPrivateChat", "bestPublic", "bestPublicChat", "avgPrivate", "avgPrivateChat", "avgPublic", "avgPublicChat"
       return new Handlebars.SafeString Template.oneStage(context)
-
 
 answerValid = (ans) ->
   ansFloat = parseFloat(ans, 10)
@@ -27,8 +26,8 @@ updateAnswer = (ev) ->
 
   $("#inputAns").val ""
 
-  currUserId = Handlebars._default_helpers.currUserId()
-  roundIndex = Handlebars._default_helpers.getRoundIndex()
+  currUserId = Util.getCurrUserId()
+  roundIndex = Util.getRoundIndex()
 
   ansData =
     roundIndex: roundIndex
@@ -48,8 +47,8 @@ finalizeAnsOneStage = (ev) ->
   ans = $("#inputAns").val().trim()
   $("#inputAns").val ""
 
-  roundIndex = Handlebars._default_helpers.getRoundIndex()
-  currUserId = Handlebars._default_helpers.currUserId()
+  roundIndex = Util.getRoundIndex()
+  currUserId = Util.getCurrUserId()
 
   ansData =
     roundIndex: roundIndex
@@ -64,10 +63,6 @@ finalizeAnsOneStage = (ev) ->
 
   Meteor.call 'updateAnswer', ansData, (err, res) ->
     return bootbox.alert err.reason if err
-
-  if Handlebars._default_helpers.answersFinalized()
-      groupId = TurkServer.group()
-      Meteor.call 'saveEndTime', groupId
 
 Template.oneStage.events =
 
@@ -87,23 +82,22 @@ Template.oneStage.events =
   "click #goToExitSurvey": (ev) ->
     Router.go('/exitsurvey')
 
-
 Handlebars.registerHelper "currUserHasAns", ->
-  currUserId = Handlebars._default_helpers.currUserId()
-  return Handlebars._default_helpers.ansObjForId(currUserId)
+  currUserId = Util.getCurrUserId()
+  return Util.ansObjForId(currUserId)
 
-Handlebars.registerHelper "currAnsFinalized", ->
-  currUserId = Handlebars._default_helpers.currUserId()
-  ans = Handlebars._default_helpers.ansObjForId(currUserId)
+currAnsFinalized = ->
+  currUserId = Util.getCurrUserId()
+  ans = Util.ansObjForId(currUserId)
   return ans and ans.status is "finalized"
 
 Handlebars.registerHelper "getDisabledStrForAns", ->
-  if Handlebars._default_helpers.currAnsFinalized()
-    return "disabled"
+  if currAnsFinalized()
+    "disabled"
   else
-    return ""
+    ""
 
 Handlebars.registerHelper "taskCompleted", ->
   numQuestions = Rounds.find().count()
-  roundIndex = Handlebars._default_helpers.getRoundIndex()
+  roundIndex = Util.getRoundIndex()
   return numQuestions is (roundIndex + 1)
