@@ -10,8 +10,8 @@
 @ErrorMessages = new Meteor.Collection('errorMessages')
 
 if Meteor.isServer
-  TurkServer.registerCollection ChatMessages
-  TurkServer.registerCollection Answers
-  TurkServer.registerCollection Rounds
+  TurkServer.partitionCollection ChatMessages
+  TurkServer.partitionCollection Answers
+  TurkServer.partitionCollection Rounds
 
 @TestObjects = {}
