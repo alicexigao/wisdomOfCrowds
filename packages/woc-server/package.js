@@ -25,7 +25,7 @@ Package.on_use(function (api) {
         'server/data_publications.coffee'
     ], 'server');
 
-    // api.export(['SomeVariable']);
+    api.export(['Timers']);
 });
 
 Package.on_test(function (api) {

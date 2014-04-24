@@ -1,13 +1,7 @@
 {
   "packages": {
-    "user-status": {
-      "path": "../meteor-user-status"
-    },
     "turkserver": {
       "path": "../turkserver-meteor"
-    },
-    "bootboxjs": "3.2.2",
-    "iron-router": {},
-    "tutorials": {}
+    }
   }
 }

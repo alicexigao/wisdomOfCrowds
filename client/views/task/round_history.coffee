@@ -35,7 +35,8 @@ Template.roundHistory.getAverageString = ->
   return avg + "%"
 
 Template.roundHistory.calcPoints = ->
-  tre = Util.tre()
+  return unless (tre = Util.tre())
+#  tre = Util.tre()
   userId = Util.getCurrUserId()
 
   if tre.rewardRule is "best"

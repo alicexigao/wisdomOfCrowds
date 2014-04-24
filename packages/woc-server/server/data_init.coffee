@@ -1,3 +1,4 @@
+Timers = {}
 
 shuffle = (sourceArray) ->
   n = 0
@@ -97,106 +98,6 @@ Meteor.startup ->
   QuizAttempts.remove({})
   ErrorMessages.remove({})
 
-class RoundTimer
-  constructor: (@gameDur) ->
-
-  tick: =>
-    console.log "round tick called"
-
-    startTimeString = Rounds.findOne({active: true, page: "task"})?.startTime
-    console.log startTimeString
-    return unless startTimeString
-    startTime = new Date(startTimeString)
-
-    endTimeGame = new Date()
-    endTimeGame.setTime(startTime.getTime() + 1000 * @gameDur)
-
-    currTime = new Date()
-
-    endTimeString = Rounds.findOne({active: true, page: "task"})?.endTime
-
-    if !endTimeString and currTime < endTimeGame
-
-      if answersFinalized()
-        console.log "round ends because all answers finalized"
-        @endRound()
-      else
-        console.log "tick for round"
-        @updateRemainingTime endTimeGame.getTime()
-
-    else if !endTimeString and currTime >= endTimeGame
-      console.log "round should have ended but no end time recorded"
-      @endRound()
-
-    else
-      # endTimeString saved in round
-      console.log "at break"
-
-      endTimeBreak = new Date()
-      endTimeBreak.setTime(new Date(endTimeString) + 1000 * @gameDur)
-
-      if currTime < endTimeBreak
-        console.log "tick for break"
-        @updateRemainingTime endTimeBreak.getTime()
-      else
-        console.log "finish break"
-        @finishBreak()
-
-  updateRemainingTime: (timestamp) ->
-    secondsLeft = Math.round( (timestamp - Date.now()) / 1000)
-    console.log secondsLeft
-    Rounds.update
-      page: "task"
-      active: true
-    , $set:
-      secondsLeft: secondsLeft
-
-  finishBreak: ->
-    # finish current round
-    roundIndex = Rounds.findOne({active: true, page: "task"}).index
-    Rounds.update
-      page: "task"
-      index: roundIndex
-    , $set:
-      active: false
-    , (error, result) ->
-      # start next round, with start time
-      startTime = new Date()
-      secondsLeft = 60
-      Rounds.update
-        index: roundIndex + 1
-        page: "task"
-      , $set:
-        active: true
-        startTime:   startTime
-        secondsLeft: secondsLeft
-
-  endRound: ->
-    Rounds.update
-      page: "task"
-      active: true
-    , $set:
-      endTime: Date.now()
-
-    # insert fake answers if necessary
-    fakeAnswers()
-
-    # calculate average and best answers
-    calcAvgAndBestAnswer()
-
-    # if this is the last round, stop ticking
-    roundIndex = Rounds.findOne({active: true, page: "task" }).index
-    numRounds = Rounds.find({page: "task"}).count()
-    if roundIndex is numRounds - 1
-      console.log "last round, stop ticking"
-      Meteor.clearInterval(@intervalTimerId)
-      @intervalTimerId = undefined
-
-  setIntervalId: (id) ->
-    @intervalTimerId = id
-
-TestObjects.RoundTimer = RoundTimer
-
 TurkServer.initialize ->
   groupId = @group
   @treatment
@@ -232,42 +133,35 @@ TurkServer.initialize ->
       page: "tutorial"
     i++
 
-  gameDur = 10
-
-  # set start time of first round
-  startTime = new Date()
-  secondsLeft = gameDur
-  Rounds.update
-    page: "task"
-    active: true
-  , $set:
-    startTime:   startTime
-    secondsLeft: secondsLeft
-
-  timer = new RoundTimer(gameDur)
-  intervalTimerId = Meteor.setInterval(timer.tick, 1000)
-  timer.setIntervalId(intervalTimerId)
+  # start first round
+  startTime = Date.now()
+  endTime = startTime + Timers.roundDur
+  TurkServer.startNewRound(startTime, endTime, Timers.finalizeRound)
 
   return
 
-answersFinalized = ->
-  users = Meteor.users.find({"status.online": true}).fetch()
-  roundIndex = Rounds.findOne({active: true})?.index
-  for user in users
-    ansObj = Answers.findOne({roundIndex: roundIndex, userId: user._id})
-    return false unless ansObj
-    if ansObj.status isnt "finalized"
-      return false
-  # TODO: what to return when no user exists
-  return false
+# Schedule a new round if we're supposed to
+Timers.finalizeRound = ->
+  Timers.fakeAnswers()
+  Timers.calcAvgAndBestAnswer()
 
-fakeAnswers = ->
-  console.log "fake answers called"
+  # return if we don't have any more rounds to go
+  roundIndex = RoundTimers.findOne(active: true).index
+  numQuestions = Rounds.find(page: "task").count()
+  return if roundIndex is numQuestions
 
-  roundIndex = Rounds.findOne({active: true, page: "task"}).index
-  #    console.log roundIndex
-  users = Meteor.users.find({"status.online": true}).fetch()
-  console.log users
+  startTime = Date.now() + Timers.breakDur
+  endTime = startTime + Timers.roundDur
+  TurkServer.startNewRound(startTime, endTime, Timers.finalizeRound)
+
+Timers.roundDur = 20000
+Timers.breakDur = 10000
+
+Timers.fakeAnswers = ->
+#  console.log "fake answers called"
+
+  roundIndex = RoundTimers.findOne(active: true).index - 1
+  users = Meteor.users.find().fetch()
   for user in users
     ans = Answers.findOne({roundIndex: roundIndex, userId: user._id, page: "task"})
     if ans
@@ -286,42 +180,35 @@ fakeAnswers = ->
         status: "finalized"
         page: "task"
 
-calcAvgAndBestAnswer = ->
-  console.log "calculate avg and best answer called"
+Timers.calcAvgAndBestAnswer = ->
+#  console.log "calculate avg and best answer called"
 
   page = "task"
-  roundIndex = Rounds.findOne({active: true, page: page}).index
+  roundIndex = RoundTimers.findOne(active: true).index - 1
   #    console.log "current round " + roundIndex
   questionId = Rounds.findOne({active: true, page: page}).questionId
   questionObj = Settings.findOne({_id: questionId})
   correct = questionObj.answer
   #    console.log "correct answer " + correct
-  numAns = 0
-  sumAns = 0
-  bestAns = -Infinity
 
-  users = Meteor.users.find({"status.online": true}).fetch()
+  users = Meteor.users.find().fetch()
   #    console.log users
-  for user in users
-    ansObj = Answers.findOne({roundIndex: roundIndex, userId: user._id})
-    console.log ansObj
-    ans = ansObj.answer
-    sumAns += ans
-    numAns++
-    if Math.abs(ans - correct) < Math.abs(bestAns - correct)
-      bestAns = ans
-  #    console.log "best answer " + bestAns
+  userIds = _.pluck(users, "_id")
+  answers = Answers.find({roundIndex: roundIndex, userId: $in: userIds}).fetch()
 
-  bestAnsUserIds = []
-  for user in users
-    ansObj = Answers.findOne({roundIndex: roundIndex, userId: user._id})
-    ans = ansObj.answer
-    if ans is bestAns
-      bestAnsUserIds.push user._id
-  #    console.log "best ans user ids " + bestAnsUserIds
+  bestAns = _.reduce answers, (currentBest, ansObj) ->
+    if Math.abs(ansObj.answer - correct) < Math.abs(currentBest - correct) then ansObj.answer else currentBest
+  , -Infinity
+  #  console.log "best answer " + bestAns
 
-  avg = sumAns / numAns
-  #    console.log "average " + avg
+  sumAns = _.reduce answers, (sum, ansObj) ->
+    sum + ansObj.answer
+  , 0
+  avg = sumAns / answers.length
+#  console.log "average " + avg
+
+  bestAnsUserIds = _.pluck Answers.find({roundIndex: roundIndex, answer: bestAns}).fetch(), "userId"
+#  console.log "best ans user ids " + bestAnsUserIds
 
   Rounds.update
     index: roundIndex

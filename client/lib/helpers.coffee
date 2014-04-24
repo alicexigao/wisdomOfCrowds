@@ -14,11 +14,12 @@ Util.getRoundIndex = ->
   if Session.equals("page", "tutorial")
     return Session.get("tutorialRoundIndex")
   else
-    Rounds.findOne({active: true})?.index
+    TurkServer.currentRound()?.index - 1
 
 # Get current round object
 Util.getCurrRoundObj = ->
-  Rounds.findOne({active: true})
+  index = Util.getRoundIndex()
+  Rounds.findOne({index: index})
 
 Util.getUserCursor = ->
   if Session.equals("page", "tutorial")

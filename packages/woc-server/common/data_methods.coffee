@@ -1,19 +1,14 @@
+answersFinalized = ->
+  users = _.pluck Meteor.users.find({"status.online": true}).fetch(), "_id"
+  round = RoundTimers.findOne(active: true)
+  # index for RoundTimers start from 1
+  return _.every Answers.findOne({roundIndex: round.index - 1, userId: $in: users}), (ansObj) ->
+    ansObj?.status is "finalized"
+
 Meteor.methods
 
-  # save chat messages
-  sendMsg: (data) ->
-    if not Meteor.user()
-      throw new Meteor.Error(401, "You need to login to chat")
-    chatData =
-      page      : data.page
-      userId    : Meteor.userId()
-      username  : Meteor.user().username
-      timestamp : data.timestamp
-      content   : data.content
-    ChatMessages.insert chatData
-
-  # update of finalize answer
   updateAnswer: (data) ->
+    # update or finalize answer
     ansExists = Answers.findOne
       roundIndex: data.roundIndex
       userId    : data.userId
@@ -48,6 +43,24 @@ Meteor.methods
         answer    : data.answer
         status    : data.status
         page      : data.page
+
+    if Meteor.isServer and answersFinalized()
+      # all answers are finalized before time limit is reached
+      TurkServer.endCurrentRound()
+      Timers.finalizeRound()
+      return
+
+  sendMsg: (data) ->
+    # save chat messages
+    if not Meteor.user()
+      throw new Meteor.Error(401, "You need to login to chat")
+    chatData =
+      page      : data.page
+      userId    : Meteor.userId()
+      username  : Meteor.user().username
+      timestamp : data.timestamp
+      content   : data.content
+    ChatMessages.insert chatData
 
   ###########################
   # Tutorial methods
