@@ -1,8 +1,9 @@
 answersFinalized = ->
-  users = _.pluck Meteor.users.find({"status.online": true}).fetch(), "_id"
+  users = _.pluck Meteor.users.find().fetch(), "_id"
   round = RoundTimers.findOne(active: true)
   # index for RoundTimers start from 1
-  return _.every Answers.findOne({roundIndex: round.index - 1, userId: $in: users}), (ansObj) ->
+  return _.every Answers.findOne({roundIndex: round.index - 1, userId:
+    $in: users}), (ansObj) ->
     ansObj?.status is "finalized"
 
 Meteor.methods
@@ -11,8 +12,8 @@ Meteor.methods
     # update or finalize answer
     ansExists = Answers.findOne
       roundIndex: data.roundIndex
-      userId    : data.userId
-      page      : data.page
+      userId: data.userId
+      page: data.page
 
     if ansExists
       # already has answer for current user
@@ -23,26 +24,26 @@ Meteor.methods
       if data.answer
         Answers.update
           roundIndex: data.roundIndex
-          userId    : data.userId
+          userId: data.userId
         , $set:
-          answer  : data.answer
+          answer: data.answer
 
       # update status
       Answers.update
         roundIndex: data.roundIndex
-        userId    : data.userId
+        userId: data.userId
       , $set:
-        status  : data.status
-        page    : data.page
+        status: data.status
+        page: data.page
 
     else
       # insert new answer
       Answers.insert
         roundIndex: data.roundIndex
-        userId    : data.userId
-        answer    : data.answer
-        status    : data.status
-        page      : data.page
+        userId: data.userId
+        answer: data.answer
+        status: data.status
+        page: data.page
 
     if Meteor.isServer and answersFinalized()
       # all answers are finalized before time limit is reached
@@ -55,16 +56,16 @@ Meteor.methods
     if not Meteor.user()
       throw new Meteor.Error(401, "You need to login to chat")
     chatData =
-      page      : data.page
-      userId    : Meteor.userId()
-      username  : Meteor.user().username
-      timestamp : data.timestamp
-      content   : data.content
+      page: data.page
+      userId: Meteor.userId()
+      username: Meteor.user().username
+      timestamp: data.timestamp
+      content: data.content
     ChatMessages.insert chatData
 
-  ###########################
-  # Tutorial methods
-  ###########################
+###########################
+# Tutorial methods
+###########################
   updateTutorialStatus: (data) ->
     ansObj = Answers.findOne({userId: data.userId, page: "tutorial"})
     if ansObj
@@ -77,7 +78,7 @@ Meteor.methods
   calcAvgAndBest: (users) ->
     calcAvgAndBestAnswer(users, "tutorial")
 
-  # update tutorial answers
+# update tutorial answers
   updateTutorialAnswer: (data) ->
     ansObj = Answers.findOne({userId: data.userId, page: "tutorial"})
     if ansObj
@@ -89,12 +90,12 @@ Meteor.methods
         status: data.status
     else if data.createAnswer is true
 #        console.log "answer does not exist"
-        Answers.insert
-          roundIndex: 0
-          userId: data.userId
-          answer: Math.floor(Math.random() * 100)
-          status: data.status
-          page: "tutorial"
+      Answers.insert
+        roundIndex: 0
+        userId: data.userId
+        answer: Math.floor(Math.random() * 100)
+        status: data.status
+        page: "tutorial"
 
 #############################
 # Quiz functions

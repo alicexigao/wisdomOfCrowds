@@ -40,60 +40,60 @@ Meteor.startup ->
   Treatment.remove({})
   Treatment.insert
     value: "bestPrivate"
-    rewardRule:    "best"
-    showChatRoom:  false
-    showOtherAns:  false
-    showBestAns:   true
-    showAvg:       false
+    rewardRule: "best"
+    showChatRoom: false
+    showOtherAns: false
+    showBestAns: true
+    showAvg: false
   Treatment.insert
     value: "bestPrivateChat"
-    rewardRule:    "best"
-    showChatRoom:  true
-    showOtherAns:  false
-    showBestAns:   true
-    showAvg:       false
+    rewardRule: "best"
+    showChatRoom: true
+    showOtherAns: false
+    showBestAns: true
+    showAvg: false
   Treatment.insert
     value: "bestPublic"
-    rewardRule:    "best"
-    showChatRoom:  false
-    showOtherAns:  true
-    showBestAns:   true
-    showAvg:       false
+    rewardRule: "best"
+    showChatRoom: false
+    showOtherAns: true
+    showBestAns: true
+    showAvg: false
   Treatment.insert
     value: "bestPublicChat"
-    rewardRule:    "best"
-    showChatRoom:  true
-    showOtherAns:  true
-    showBestAns:   true
-    showAvg:       false
+    rewardRule: "best"
+    showChatRoom: true
+    showOtherAns: true
+    showBestAns: true
+    showAvg: false
   Treatment.insert
     value: "avgPrivate"
-    rewardRule:    "average"
-    showBestAns:   false
-    showAvg:       true
-    showChatRoom:  false
-    showOtherAns:  false
+    rewardRule: "average"
+    showBestAns: false
+    showAvg: true
+    showChatRoom: false
+    showOtherAns: false
   Treatment.insert
     value: "avgPrivateChat"
-    rewardRule:    "average"
-    showChatRoom:  true
-    showOtherAns:  false
-    showBestAns:   false
-    showAvg:       true
+    rewardRule: "average"
+    showChatRoom: true
+    showOtherAns: false
+    showBestAns: false
+    showAvg: true
   Treatment.insert
     value: "avgPublic"
-    rewardRule:    "average"
-    showChatRoom:  false
-    showOtherAns:  true
-    showBestAns:   false
-    showAvg:       true
+    rewardRule: "average"
+    showChatRoom: false
+    showOtherAns: true
+    showBestAns: false
+    showAvg: true
   Treatment.insert
     value: "avgPublicChat"
-    rewardRule:    "average"
-    showChatRoom:  true
-    showOtherAns:  true
-    showAvg:       true
-    showBestAns:   false
+    rewardRule: "average"
+    showChatRoom: true
+    showOtherAns: true
+    showAvg: true
+    showBestAns: false
 
   QuizAttempts.remove({})
   ErrorMessages.remove({})
@@ -159,7 +159,6 @@ Timers.breakDur = 10000
 
 Timers.fakeAnswers = ->
 #  console.log "fake answers called"
-
   roundIndex = RoundTimers.findOne(active: true).index - 1
   users = Meteor.users.find().fetch()
   for user in users
@@ -172,7 +171,7 @@ Timers.fakeAnswers = ->
       ,
         $set: {status: "finalized"}
     else
-      answer = Math.floor(Math.random()*100)
+      answer = Math.floor(Math.random() * 100)
       Answers.insert
         roundIndex: roundIndex
         userId: user._id
@@ -182,7 +181,6 @@ Timers.fakeAnswers = ->
 
 Timers.calcAvgAndBestAnswer = ->
 #  console.log "calculate avg and best answer called"
-
   page = "task"
   roundIndex = RoundTimers.findOne(active: true).index - 1
   #    console.log "current round " + roundIndex
@@ -194,7 +192,8 @@ Timers.calcAvgAndBestAnswer = ->
   users = Meteor.users.find().fetch()
   #    console.log users
   userIds = _.pluck(users, "_id")
-  answers = Answers.find({roundIndex: roundIndex, userId: $in: userIds}).fetch()
+  answers = Answers.find({roundIndex: roundIndex, userId:
+    $in: userIds}).fetch()
 
   bestAns = _.reduce answers, (currentBest, ansObj) ->
     if Math.abs(ansObj.answer - correct) < Math.abs(currentBest - correct) then ansObj.answer else currentBest
@@ -205,10 +204,10 @@ Timers.calcAvgAndBestAnswer = ->
     sum + ansObj.answer
   , 0
   avg = sumAns / answers.length
-#  console.log "average " + avg
+  #  console.log "average " + avg
 
   bestAnsUserIds = _.pluck Answers.find({roundIndex: roundIndex, answer: bestAns}).fetch(), "userId"
-#  console.log "best ans user ids " + bestAnsUserIds
+  #  console.log "best ans user ids " + bestAnsUserIds
 
   Rounds.update
     index: roundIndex

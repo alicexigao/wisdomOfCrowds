@@ -52,8 +52,8 @@ Template.correctAns.correctAnswer = ->
 Template.averageAns.getAverageString = ->
   tre = Util.tre()
   switch tre.rewardRule
-      when "average"
-        return "average"
+    when "average"
+      return "average"
 
 Template.averageAns.getAverage = ->
   round = Util.getCurrRoundObj()

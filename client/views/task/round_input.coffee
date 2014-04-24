@@ -19,7 +19,6 @@ roundToTwoDecimals = (ans) ->
   ansFloat = parseFloat(ans, 10)
   Math.round(ansFloat * 100) / 100
 
-
 updateAnswer = (ev) ->
   ans = $("#inputAns").val().trim()
   return unless ans
@@ -31,9 +30,9 @@ updateAnswer = (ev) ->
 
   ansData =
     roundIndex: roundIndex
-    userId    : currUserId
-    status    : "submitted"
-    page      : Session.get("page")
+    userId: currUserId
+    status: "submitted"
+    page: Session.get("page")
 
   if not answerValid(ans)
     return bootbox.alert "Please enter a number in the range of 0 to 100 inclusive."
@@ -52,9 +51,9 @@ finalizeAnsOneStage = (ev) ->
 
   ansData =
     roundIndex: roundIndex
-    userId    : currUserId
-    status    : "finalized"
-    page      : Session.get("page")
+    userId: currUserId
+    status: "finalized"
+    page: Session.get("page")
 
   if ans and not answerValid(ans)
     return bootbox.alert "Please enter a number in the range of 0 to 100 inclusive."

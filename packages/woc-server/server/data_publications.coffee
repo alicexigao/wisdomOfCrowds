@@ -3,7 +3,7 @@ Meteor.publish "treatment", (name) ->
   Treatment.find( value: name )
 
 Meteor.publish "users", ->
-  Meteor.users.find {"status.online": true}
+  Meteor.users.find()
 
 Meteor.publish "settingsTaskQuestions", ->
   Settings.find {key: "taskQuestion"},

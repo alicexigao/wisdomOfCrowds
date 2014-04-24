@@ -1,13 +1,16 @@
 @Util = @Util || {}
 
-Util.showBestAns = -> Treatment.findOne()?.showBestAns
-Util.showAvg = -> Treatment.findOne()?.showAvg
+Util.showBestAns = ->
+  Treatment.findOne()?.showBestAns
+Util.showAvg = ->
+  Treatment.findOne()?.showAvg
 
 Handlebars.registerHelper "showBestAns", Util.showBestAns
 Handlebars.registerHelper "showAvg", Util.showAvg
 
 # Get treatment
-Util.tre = -> Treatment.findOne()
+Util.tre = ->
+  Treatment.findOne()
 
 # Get current round index
 Util.getRoundIndex = ->
@@ -25,7 +28,7 @@ Util.getUserCursor = ->
   if Session.equals("page", "tutorial")
     TutorialUsers.find({}, {sort: {_id: 1}})
   else if Session.equals("page", "task")
-    Meteor.users.find({"status.online": true}, {sort: {_id: 1}})
+    Meteor.users.find({}, {sort: {_id: 1}})
 
 Handlebars.registerHelper "userCursor", Util.getUserCursor
 
@@ -55,23 +58,4 @@ Util.answersFinalized = ->
   return true
 
 Handlebars.registerHelper "answersFinalized", Util.answersFinalized
-
-
-
-
-Handlebars.registerHelper "clearBestAnsAndAvg", ->
-  tutorialRoundIndex = Session.get("tutorialRoundIndex")
-  TutorialRounds.update
-    index: tutorialRoundIndex
-  , $set:
-      average: undefined
-  TutorialRounds.update
-    index: tutorialRoundIndex
-  , $set:
-      bestAns: undefined
-  TutorialRounds.update
-    index: tutorialRoundIndex
-  ,
-    $set:
-      bestAnsUserIds: undefined
 
