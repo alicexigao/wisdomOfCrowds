@@ -1,9 +1,8 @@
 answersFinalized = ->
+  # TODO: how to check only users in the same group as the current user?
   users = _.pluck Meteor.users.find().fetch(), "_id"
   round = RoundTimers.findOne(active: true)
-  # index for RoundTimers start from 1
-  return _.every Answers.findOne({roundIndex: round.index - 1, userId:
-    $in: users}), (ansObj) ->
+  return _.every Answers.findOne({roundIndex: round.index, userId: $in: users}), (ansObj) ->
     ansObj?.status is "finalized"
 
 Meteor.methods

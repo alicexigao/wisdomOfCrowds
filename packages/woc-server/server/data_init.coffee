@@ -26,15 +26,15 @@ Meteor.startup ->
       value: "What percent of the world's population speaks Spanish as their first language? (Ethnologue: Languages of the World, 4/2007)"
       answer: 4.88
 
-    Settings.insert
-      key: "tutorialQuestion"
-      value: "Fake Tutorial Question 1"
-      answer: 30
-
-    Settings.insert
-      key: "tutorialQuestion"
-      value: "Fake Tutorial Question 2"
-      answer: 70
+#    Settings.insert
+#      key: "tutorialQuestion"
+#      value: "Fake Tutorial Question 1"
+#      answer: 30
+#
+#    Settings.insert
+#      key: "tutorialQuestion"
+#      value: "Fake Tutorial Question 2"
+#      answer: 70
 
   # Static treatment data
   Treatment.remove({})
@@ -106,15 +106,12 @@ TurkServer.initialize ->
   taskQuestions = Settings.find({key: "taskQuestion"}).fetch()
   shuffle(taskQuestions)
 
-  i = 0
+  # Round indices start from 1
+  i = 1
   for question in taskQuestions
-    active = false
-    if i is 0
-      active = true
     Rounds.insert
       index: i
       questionId: question._id
-      active: active
     i++
 
 #  tutorialQuestions = Settings.find({key: "tutorialQuestion"}).fetch()
@@ -152,12 +149,13 @@ Timers.finalizeRound = ->
   endTime = startTime + Timers.roundDur
   TurkServer.startNewRound(startTime, endTime, Timers.finalizeRound)
 
-Timers.roundDur = 20000
+Timers.roundDur = 60000
 Timers.breakDur = 10000
 
 Timers.fakeAnswers = ->
 #  console.log "fake answers called"
-  roundIndex = RoundTimers.findOne(active: true).index - 1
+
+  roundIndex = RoundTimers.findOne(active: true).index
   users = Meteor.users.find().fetch()
   for user in users
     ans = Answers.findOne({roundIndex: roundIndex, userId: user._id})
@@ -177,7 +175,8 @@ Timers.fakeAnswers = ->
 
 Timers.calcAvgAndBestAnswer = ->
 #  console.log "calculate avg and best answer called"
-  roundIndex = RoundTimers.findOne(active: true).index - 1
+
+  roundIndex = RoundTimers.findOne(active: true).index
   #    console.log "current round " + roundIndex
   questionId = Rounds.findOne({active: true}).questionId
   questionObj = Settings.findOne({_id: questionId})
@@ -190,19 +189,23 @@ Timers.calcAvgAndBestAnswer = ->
   answers = Answers.find({roundIndex: roundIndex, userId:
     $in: userIds}).fetch()
 
+  # calculte best answer
   bestAns = _.reduce answers, (currentBest, ansObj) ->
     if Math.abs(ansObj.answer - correct) < Math.abs(currentBest - correct) then ansObj.answer else currentBest
   , -Infinity
   #  console.log "best answer " + bestAns
 
+  # list of user IDs who had the best answer
+  bestAnsUserIds = _.pluck Answers.find({roundIndex: roundIndex, answer: bestAns}).fetch(), "userId"
+  #  console.log "best ans user ids " + bestAnsUserIds
+
+
+  # calculte average answer
   sumAns = _.reduce answers, (sum, ansObj) ->
     sum + ansObj.answer
   , 0
   avg = sumAns / answers.length
   #  console.log "average " + avg
-
-  bestAnsUserIds = _.pluck Answers.find({roundIndex: roundIndex, answer: bestAns}).fetch(), "userId"
-  #  console.log "best ans user ids " + bestAnsUserIds
 
   Rounds.update
     index: roundIndex

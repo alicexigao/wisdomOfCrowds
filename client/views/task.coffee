@@ -1,1 +1,2 @@
-Template.task.showChatRoom = -> Treatment.findOne()?.showChatRoom
+Template.task.showChatRoom = ->
+  Treatment.findOne()?.showChatRoom

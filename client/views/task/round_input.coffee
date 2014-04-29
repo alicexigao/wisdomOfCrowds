@@ -91,4 +91,4 @@ Handlebars.registerHelper "getDisabledStrForAns", ->
 Handlebars.registerHelper "taskCompleted", ->
   numQuestions = Rounds.find().count()
   roundIndex = Util.getRoundIndex()
-  return numQuestions is (roundIndex + 1)
+  return numQuestions is roundIndex

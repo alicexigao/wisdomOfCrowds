@@ -11,7 +11,7 @@ Template.roundHistory.isRoundFinished = (index) ->
   return false
 
 Template.roundHistory.getRoundIndexDisplay = ->
-  return this.index + 1
+  return this.index
 
 Template.roundHistory.getCorrectAnswer = ->
   questionId = this.questionId

@@ -1,5 +1,5 @@
 Template.question.getRoundIndexDisplay = ->
-  Util.getRoundIndex() + 1
+  Util.getRoundIndex()
 
 Template.question.getQuestion = ->
   roundObj = Util.getCurrRoundObj()

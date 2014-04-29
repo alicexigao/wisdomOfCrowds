@@ -14,7 +14,7 @@ Util.tre = ->
 
 # Get current round index
 Util.getRoundIndex = ->
-  TurkServer.currentRound()?.index - 1
+  TurkServer.currentRound()?.index
 
 # Get current round object
 Util.getCurrRoundObj = ->
