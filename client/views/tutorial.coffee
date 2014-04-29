@@ -79,7 +79,7 @@ tutorialSteps = [
 
 
 Deps.autorun ->
-  Template.tutorial.tutorial_steps =
+  Template.tutorial_woc.tutorial_steps =
     steps: tutorialSteps
     onFinish: ->
       Router.go("/quiz")
@@ -88,5 +88,5 @@ Template.tutorial_step_youranswer.events =
   "click .clearAnswer": (ev) ->
     setTutorialAnswer(null, "submitted", false)
 
-Template.tutorial.rendered = ->
+Template.tutorial_woc.rendered = ->
   Session.set("page", "tutorial")

@@ -36,14 +36,15 @@ Deps.autorun ->
 Router.map ->
   @route "homepage",
     path: "/"
-  @route "tutorial",
+  @route "tutorial_woc",
+    path: "/tutorial"
     waitOn: ->
       tutorialQuestions = Meteor.subscribe "settingsTutorialQuestions"
       tutorialRounds = Meteor.subscribe("rounds", "tutorial")
       tutorialChat = Meteor.subscribe("chatMessages", "tutorial")
       tutorialAnswers = Meteor.subscribe("answers", "tutorial")
       return [tutorialQuestions, treatment, tutorialRounds, tutorialChat, tutorialAnswers]
-    unload: ->
+    onStop: ->
       tutorialQuestions.stop()
       tutorialRounds.stop()
       tutorialChat.stop()
@@ -57,9 +58,7 @@ Router.map ->
       taskChat = Meteor.subscribe("chatMessages", "task")
       taskAnswers = Meteor.subscribe("answers", "task")
       return [taskQuestions, taskRounds, taskChat, taskAnswers]
-    before: ->
-    after: ->
-    unload: ->
+    onStop: ->
       taskQuestions.stop()
       taskRounds.stop()
       taskChat.stop()

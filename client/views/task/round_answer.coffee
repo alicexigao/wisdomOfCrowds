@@ -1,7 +1,8 @@
-Template.answers.treatmentDisplay = (treatment, context) ->
-  switch treatment
+Template.answers.treatmentDisplay = ->
+  switch TurkServer.treatment()
     when "bestPrivate", "bestPrivateChat", "bestPublic", "bestPublicChat", "avgPrivate", "avgPrivateChat", "avgPublic", "avgPublicChat"
-      return new Handlebars.SafeString Template.ansOneStage(context)
+      return Template.ansOneStage
+    else return null
 
 Template.ansOneStage.isCurrentUser = ->
   currUserId = Util.getCurrUserId()

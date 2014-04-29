@@ -1,14 +1,8 @@
-Handlebars.registerHelper "treatment", ->
-  tre = Util.tre()
-  return unless tre
-  tre.value
-
-Handlebars.registerHelper "context", ->
-
-Template.round.treatmentDisplay = (treatment, context) ->
-  switch treatment
+Template.round.treatmentDisplay = (treatment) ->
+  switch TurkServer.treatment()
     when "bestPrivate", "bestPrivateChat", "bestPublic", "bestPublicChat", "avgPrivate", "avgPrivateChat", "avgPublic", "avgPublicChat"
-      return new Handlebars.SafeString Template.oneStage(context)
+      return Template.oneStage
+    else return null
 
 answerValid = (ans) ->
   ansFloat = parseFloat(ans, 10)

@@ -4,31 +4,42 @@
     "basePackages": {
       "turkserver": {
         "path": "../turkserver-meteor"
-      }
+      },
+      "tutorials": {}
     },
     "packages": {
       "turkserver": {
         "path": "../turkserver-meteor"
       },
+      "tutorials": {
+        "git": "https://github.com/mizzao/meteor-tutorials.git",
+        "tag": "v0.6.0",
+        "commit": "e63b1f811f087b477a72c33edac9831e6ecafb5c"
+      },
+      "bootstrap-3": {
+        "git": "https://github.com/mangasocial/meteor-bootstrap-3.git",
+        "tag": "v3.1.1-1",
+        "commit": "63dd38968828bb8963636df93e9a1c45e2dfe67e"
+      },
       "bootboxjs": {
         "git": "https://github.com/TimHeckel/meteor-bootboxjs.git",
-        "tag": "v3.2.2",
-        "commit": "580adfebfa12b4d2186a80cec1109dab74ad6228"
+        "tag": "v4.2.0",
+        "commit": "2b7d18ad028d9e7b37238ecf2a8a7970735cebd1"
       },
       "x-editable-bootstrap": {
         "git": "https://github.com/nate-strauser/meteor-x-editable-bootstrap.git",
-        "tag": "v1.4.6.2",
-        "commit": "d3fcead1dd2302e30522e8c09d020f9a3d312cd0"
+        "tag": "v1.5.1",
+        "commit": "ddb9e4523b570f88d96c4fbafa5f6883e544baf8"
       },
       "iron-router": {
         "git": "https://github.com/EventedMind/iron-router.git",
-        "tag": "v0.6.4",
-        "commit": "927bbaed1b87894fb6fb70807f74ff3a5bd89f29"
+        "tag": "v0.7.1",
+        "commit": "d1ffb3f06ea4c112132b030f2eb1a70b81675ecb"
       },
       "moment": {
         "git": "https://github.com/acreeger/meteor-moment.git",
-        "tag": "v2.5.1",
-        "commit": "8c9bc5d3fc96705057737cb9743d555417f6e551"
+        "tag": "v2.6.0",
+        "commit": "26156df681750fd6e6ed77043eef32b6653ebbdf"
       },
       "collection-hooks": {
         "git": "https://github.com/matb33/meteor-collection-hooks.git",
@@ -37,13 +48,18 @@
       },
       "partitioner": {
         "git": "https://github.com/mizzao/meteor-partitioner.git",
-        "tag": "v0.5.0",
-        "commit": "853185ee64cbd15ff5297e79398bd9aaa7239212"
+        "tag": "v0.5.1",
+        "commit": "8aa40b68e1644c23a0bc57117795b20a970a6203"
       },
       "user-status": {
         "git": "https://github.com/mizzao/meteor-user-status.git",
-        "tag": "v0.3.4",
-        "commit": "741df5e3304807ba42fbe0aca5b8251c5683e1f7"
+        "tag": "v0.3.5",
+        "commit": "d325a3ab62742659e195085ead76b1ed736aab35"
+      },
+      "blaze-layout": {
+        "git": "https://github.com/EventedMind/blaze-layout.git",
+        "tag": "v0.2.4",
+        "commit": "b40e9b0612329288d75cf52ad14a7da64bb8618f"
       },
       "timesync": {
         "git": "https://github.com/mizzao/meteor-timesync.git",

@@ -3,15 +3,13 @@
 # 'meteor add' and 'meteor remove' will edit this file for you,
 # but you can also edit it by hand.
 
-bootstrap
 coffeescript
 standard-app-packages
 woc-server
 bootboxjs
 iron-router
-handlebars
 user-status
 stylus
-tutorials
 
 turkserver
+tutorials
