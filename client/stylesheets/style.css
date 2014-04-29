@@ -5,13 +5,8 @@ ul#messageArea {
     list-style: none;
 }
 
-div.answerList {
-    padding-top:10px;
-}
-
-span.answer {
+li.answer {
     font-size:  120%;
-    padding: 10px;
 }
 
 /* Results table formatting */

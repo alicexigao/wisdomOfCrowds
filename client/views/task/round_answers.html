@@ -17,34 +17,34 @@
 
     {{/if}}
 
-    <div class="answerList">
+    <ul class="list-group">
 
         {{#each userCursor}}
             {{#if isCurrentUser}}
 
-                <span class="answer label label-danger currPlayerAnswer">
-                    {{username}} => {{showAnswer}}
+                <li class="list-group-item list-group-item-danger answer currPlayerAnswer">
+                    <span>{{username}}</span>
+                    <strong>{{showAnswer}}</strong>
                     {{#if showBestAnsLabel}}
                         (Best Answer)
                     {{/if}}
-                    <br/>
-                </span>
+                </li>
 
             {{else}}
 
-                <span class="answer label label-warning otherPlayerAnswers">
-                    {{username}} => {{showAnswer}}
+                <li class="list-group-item list-group-item-info answer otherPlayerAnswers">
+                    <span>{{username}}</span>
+                    <strong>{{showAnswer}}</strong>
                     {{#if showBestAnsLabel}}
                         (Best Answer)
                     {{/if}}
-                    <br/>
-                </span>
+                </li>
 
             {{/if}}
 
         {{/each}}
 
-    </div>
+    </ul>
 
 </template>
 
