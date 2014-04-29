@@ -149,7 +149,7 @@ Timers.finalizeRound = ->
   endTime = startTime + Timers.roundDur
   TurkServer.startNewRound(startTime, endTime, Timers.finalizeRound)
 
-Timers.roundDur = 60000
+Timers.roundDur = 10000
 Timers.breakDur = 10000
 
 Timers.fakeAnswers = ->
@@ -176,17 +176,16 @@ Timers.fakeAnswers = ->
 Timers.calcAvgAndBestAnswer = ->
 #  console.log "calculate avg and best answer called"
 
-  roundIndex = RoundTimers.findOne(active: true).index
-  #    console.log "current round " + roundIndex
-  questionId = Rounds.findOne({active: true}).questionId
-  questionObj = Settings.findOne({_id: questionId})
-  correct = questionObj.answer
+  rIndex = RoundTimers.findOne(active: true).index
+  #    console.log "current round " + rIndex
+  questionId = Rounds.findOne(index: rIndex).questionId
+  correct = Settings.findOne({_id: questionId})?.answer
   #    console.log "correct answer " + correct
 
   users = Meteor.users.find().fetch()
   #    console.log users
   userIds = _.pluck(users, "_id")
-  answers = Answers.find({roundIndex: roundIndex, userId:
+  answers = Answers.find({roundIndex: rIndex, userId:
     $in: userIds}).fetch()
 
   # calculte best answer
@@ -196,7 +195,7 @@ Timers.calcAvgAndBestAnswer = ->
   #  console.log "best answer " + bestAns
 
   # list of user IDs who had the best answer
-  bestAnsUserIds = _.pluck Answers.find({roundIndex: roundIndex, answer: bestAns}).fetch(), "userId"
+  bestAnsUserIds = _.pluck Answers.find({roundIndex: rIndex, answer: bestAns}).fetch(), "userId"
   #  console.log "best ans user ids " + bestAnsUserIds
 
 
@@ -208,7 +207,7 @@ Timers.calcAvgAndBestAnswer = ->
   #  console.log "average " + avg
 
   Rounds.update
-    index: roundIndex
+    index: rIndex
   , $set:
     "best": bestAns
     "average": avg

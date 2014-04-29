@@ -17,45 +17,34 @@
 
     {{/if}}
 
-    <ul class="answerList">
+    <div class="answerList">
 
         {{#each userCursor}}
-
             {{#if isCurrentUser}}
 
-                <li class="answer badge badge-important currPlayerAnswer">
-                    <!--Best Answer Label-->
+                <span class="answer label label-danger currPlayerAnswer">
+                    {{username}} => {{showAnswer}}
                     {{#if showBestAnsLabel}}
-                    <p class="badgeRow">Best Answer</p>
+                        (Best Answer)
                     {{/if}}
-
-                    <!--Answer Value or Status-->
-                    <p class="badgeRow">{{showAnswer}}</p>
-
-                    <!--User name-->
-                    <p class="badgeRow">{{username}}</p>
-                </li>
+                    <br/>
+                </span>
 
             {{else}}
 
-                <li class="answer badge badge-warning otherPlayerAnswers">
-                    <!--Best Answer Label-->
+                <span class="answer label label-warning otherPlayerAnswers">
+                    {{username}} => {{showAnswer}}
                     {{#if showBestAnsLabel}}
-                    <p class="badgeRow">Best Answer</p>
+                        (Best Answer)
                     {{/if}}
-
-                    <!--Answer Value or Status-->
-                    <p class="badgeRow">{{showAnswer}}</p>
-
-                    <!--User name-->
-                    <p class="badgeRow">{{username}}</p>
-                </li>
+                    <br/>
+                </span>
 
             {{/if}}
 
         {{/each}}
 
-    </ul>
+    </div>
 
 </template>
 

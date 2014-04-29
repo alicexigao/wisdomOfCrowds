@@ -5,19 +5,13 @@ ul#messageArea {
     list-style: none;
 }
 
-/* Answers formatting */
-ul.answerList {
-    display: inline;
-    list-style-type: none;
+div.answerList {
+    padding-top:10px;
 }
 
-p.badgeRow {
-    text-align: center;
-}
-
-li.answer {
-    padding:    5px;
+span.answer {
     font-size:  120%;
+    padding: 10px;
 }
 
 /* Results table formatting */
