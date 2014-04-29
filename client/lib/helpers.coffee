@@ -1,16 +1,12 @@
 @Util = @Util || {}
 
 Util.showBestAns = ->
-  Treatment.findOne()?.showBestAns
+  TurkServer.treatment()?.showBestAns
 Util.showAvg = ->
-  Treatment.findOne()?.showAvg
+  TurkServer.treatment()?.showAvg
 
 Handlebars.registerHelper "showBestAns", Util.showBestAns
 Handlebars.registerHelper "showAvg", Util.showAvg
-
-# Get treatment
-Util.tre = ->
-  Treatment.findOne()
 
 # Get current round index
 Util.getRoundIndex = ->

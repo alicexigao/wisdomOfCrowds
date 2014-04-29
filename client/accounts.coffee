@@ -5,3 +5,6 @@
 #    return if blurDialog
 #    blurDialog = bootbox.alert "You are not supposed to do that! Please do not look up answers online.",
 #      -> blurDialog = null
+
+Meteor.startup -> TurkServer.ensureUsername()
+

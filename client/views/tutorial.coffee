@@ -1,6 +1,5 @@
 Util.getTemplateAnswers = ->
-  tre = Util.tre()
-  return unless tre
+  return unless (tre = TurkServer.treatment())
 
   if tre.showOtherAns is false and tre.showChatRoom is false
     return Template.tutorial_step_answers_private
@@ -12,8 +11,7 @@ Util.getTemplateAnswers = ->
     return Template.tutorial_step_answers_publicChat
 
 Util.getTemplateBreak = ->
-  tre = Util.tre()
-  return unless tre
+  return unless (tre = TurkServer.treatment())
 
   if tre.showBestAns is true
     return Template.tutorial_step_break_best
@@ -21,8 +19,7 @@ Util.getTemplateBreak = ->
     return Template.tutorial_step_break_average
 
 Util.getTemplateRewardRule = ->
-  tre = Util.tre()
-  return unless tre
+  return unless (tre = TurkServer.treatment())
 
   if tre.rewardRule is "best"
     return Template.tutorial_step_rewardrule_1
@@ -36,8 +33,6 @@ setTutorialAnswer = (username, status, createAnswer) ->
   else
     userId = Util.getCurrUserId()
   Meteor.call "updateTutorialAnswer", {userId: userId, status: status, createAnswer: createAnswer}
-
-
 
 tutorialSteps = [
     template: Template.tutorial_step_intro

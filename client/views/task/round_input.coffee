@@ -1,5 +1,5 @@
 Template.round.treatmentDisplay = (treatment) ->
-  switch TurkServer.treatment()
+  switch TurkServer.treatment()?.name
     when "bestPrivate", "bestPrivateChat", "bestPublic", "bestPublicChat", "avgPrivate", "avgPrivateChat", "avgPublic", "avgPublicChat"
       return Template.oneStage
     else return null

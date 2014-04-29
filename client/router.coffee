@@ -23,15 +23,9 @@ Deps.autorun ->
   # Need to resubscribe to users whenever group changes
   userSub = Meteor.subscribe "users", group
 
-  Meteor.subscribe "chatMessages"
+  Meteor.subscribe "chatMessages", group
 
 Meteor.subscribe "errorMessages"
-
-# Get the data for the current treatment name
-Deps.autorun ->
-  treatment = TurkServer.treatment()
-  return unless treatment
-  Meteor.subscribe("treatment", treatment)
 
 Router.map ->
   @route "homepage",

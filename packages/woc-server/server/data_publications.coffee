@@ -1,7 +1,3 @@
-
-Meteor.publish "treatment", (name) ->
-  Treatment.find( value: name )
-
 Meteor.publish "users", ->
   Meteor.users.find()
 

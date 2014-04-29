@@ -1,5 +1,5 @@
 Template.answers.treatmentDisplay = ->
-  switch TurkServer.treatment()
+  switch TurkServer.treatment()?.name
     when "bestPrivate", "bestPrivateChat", "bestPublic", "bestPublicChat", "avgPrivate", "avgPrivateChat", "avgPublic", "avgPublicChat"
       return Template.ansOneStage
     else return null
@@ -27,7 +27,7 @@ getAnsDurRound = (userId) ->
   ansObj = Util.ansObjForId(userId)
   return "pending" unless ansObj
 
-  tre = Util.tre()
+  tre = TurkServer.treatment()
   currUserId = Util.getCurrUserId()
   if currUserId is userId
     # always display current user's answer
@@ -51,14 +51,14 @@ Template.correctAns.correctAnswer = ->
   Settings.findOne({_id: questionId}).answer
 
 Template.averageAns.getAverageString = ->
-  tre = Util.tre()
+  tre = TurkServer.treatment()
   switch tre.rewardRule
     when "average"
       return "average"
 
 Template.averageAns.getAverage = ->
   round = Util.getCurrRoundObj()
-  tre = Util.tre()
+  tre = TurkServer.treatment()
   if tre.rewardRule is "average"
     avg = round.average
   avg = parseInt(avg * 100) / 100

@@ -9,6 +9,67 @@ shuffle = (sourceArray) ->
     sourceArray[n] = temp
     n++
 
+# Initialize treatments
+Meteor.startup ->
+  return unless Treatments.find().count() is 0
+
+  Treatments.insert
+    name: "bestPrivate"
+    rewardRule: "best"
+    showChatRoom: false
+    showOtherAns: false
+    showBestAns: true
+    showAvg: false
+  Treatments.insert
+    name: "bestPrivateChat"
+    rewardRule: "best"
+    showChatRoom: true
+    showOtherAns: false
+    showBestAns: true
+    showAvg: false
+  Treatments.insert
+    name: "bestPublic"
+    rewardRule: "best"
+    showChatRoom: false
+    showOtherAns: true
+    showBestAns: true
+    showAvg: false
+  Treatments.insert
+    name: "bestPublicChat"
+    rewardRule: "best"
+    showChatRoom: true
+    showOtherAns: true
+    showBestAns: true
+    showAvg: false
+  Treatments.insert
+    name: "avgPrivate"
+    rewardRule: "average"
+    showBestAns: false
+    showAvg: true
+    showChatRoom: false
+    showOtherAns: false
+  Treatments.insert
+    name: "avgPrivateChat"
+    rewardRule: "average"
+    showChatRoom: true
+    showOtherAns: false
+    showBestAns: false
+    showAvg: true
+  Treatments.insert
+    name: "avgPublic"
+    rewardRule: "average"
+    showChatRoom: false
+    showOtherAns: true
+    showBestAns: false
+    showAvg: true
+  Treatments.insert
+    name: "avgPublicChat"
+    rewardRule: "average"
+    showChatRoom: true
+    showOtherAns: true
+    showAvg: true
+    showBestAns: false
+
 Meteor.startup ->
   if Settings.find().count() is 0
     Settings.insert
@@ -35,65 +96,6 @@ Meteor.startup ->
 #      key: "tutorialQuestion"
 #      value: "Fake Tutorial Question 2"
 #      answer: 70
-
-  # Static treatment data
-  Treatment.remove({})
-  Treatment.insert
-    value: "bestPrivate"
-    rewardRule: "best"
-    showChatRoom: false
-    showOtherAns: false
-    showBestAns: true
-    showAvg: false
-  Treatment.insert
-    value: "bestPrivateChat"
-    rewardRule: "best"
-    showChatRoom: true
-    showOtherAns: false
-    showBestAns: true
-    showAvg: false
-  Treatment.insert
-    value: "bestPublic"
-    rewardRule: "best"
-    showChatRoom: false
-    showOtherAns: true
-    showBestAns: true
-    showAvg: false
-  Treatment.insert
-    value: "bestPublicChat"
-    rewardRule: "best"
-    showChatRoom: true
-    showOtherAns: true
-    showBestAns: true
-    showAvg: false
-  Treatment.insert
-    value: "avgPrivate"
-    rewardRule: "average"
-    showBestAns: false
-    showAvg: true
-    showChatRoom: false
-    showOtherAns: false
-  Treatment.insert
-    value: "avgPrivateChat"
-    rewardRule: "average"
-    showChatRoom: true
-    showOtherAns: false
-    showBestAns: false
-    showAvg: true
-  Treatment.insert
-    value: "avgPublic"
-    rewardRule: "average"
-    showChatRoom: false
-    showOtherAns: true
-    showBestAns: false
-    showAvg: true
-  Treatment.insert
-    value: "avgPublicChat"
-    rewardRule: "average"
-    showChatRoom: true
-    showOtherAns: true
-    showAvg: true
-    showBestAns: false
 
   QuizAttempts.remove({})
   ErrorMessages.remove({})

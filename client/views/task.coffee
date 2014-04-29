@@ -1,2 +1,2 @@
 Template.task.showChatRoom = ->
-  Treatment.findOne()?.showChatRoom
+  TurkServer.treatment()?.showChatRoom
