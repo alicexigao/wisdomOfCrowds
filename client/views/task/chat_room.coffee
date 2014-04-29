@@ -9,7 +9,6 @@ Template.chatRoom.events =
 
     if msgContent.val()
       data =
-        page      : Session.get("page")
         timestamp : new Date()
         content   : msgContent.val()
 

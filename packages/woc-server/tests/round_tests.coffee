@@ -27,7 +27,6 @@ Tinytest.addAsync "server - rounds - single tick", withCleanup (test, next) ->
     index: 1
     questionId: "blah"
     active: true
-    page: "task"
     startTime: Date.now()
     secondsLeft: 10
 

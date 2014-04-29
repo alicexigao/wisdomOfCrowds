@@ -87,6 +87,3 @@ Deps.autorun ->
 Template.tutorial_step_youranswer.events =
   "click .clearAnswer": (ev) ->
     setTutorialAnswer(null, "submitted", false)
-
-Template.tutorial_woc.rendered = ->
-  Session.set("page", "tutorial")

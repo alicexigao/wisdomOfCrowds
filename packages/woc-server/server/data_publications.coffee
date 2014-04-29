@@ -22,17 +22,17 @@ Meteor.publish "correctAnswer", (id) ->
     fields:
       answer: 1
 
-Meteor.publish "rounds", (page) ->
-  Rounds.find {page: page},
+Meteor.publish "rounds", ->
+  Rounds.find {},
     sort:
       index: 1
 
 # TODO: do not publish answers if they should not be revealed
-Meteor.publish "answers", (page) ->
-  Answers.find {page: page}
+Meteor.publish "answers", () ->
+  Answers.find {}
 
-Meteor.publish "chatMessages", (page) ->
-  ChatMessages.find {page: page}
+Meteor.publish "chatMessages", () ->
+  ChatMessages.find {}
 
 Meteor.publish 'errorMessages', ->
   ErrorMessages.find()

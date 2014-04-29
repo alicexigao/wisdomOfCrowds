@@ -115,23 +115,21 @@ TurkServer.initialize ->
       index: i
       questionId: question._id
       active: active
-      page: "task"
     i++
 
-  tutorialQuestions = Settings.find({key: "tutorialQuestion"}).fetch()
-  shuffle(tutorialQuestions)
-
-  i = 0
-  for question in tutorialQuestions
-    active = false
-    if i is 0
-      active = true
-    Rounds.insert
-      index: i
-      questionId: question._id
-      active: active
-      page: "tutorial"
-    i++
+#  tutorialQuestions = Settings.find({key: "tutorialQuestion"}).fetch()
+#  shuffle(tutorialQuestions)
+#
+#  i = 0
+#  for question in tutorialQuestions
+#    active = false
+#    if i is 0
+#      active = true
+#    Rounds.insert
+#      index: i
+#      questionId: question._id
+#      active: active
+#    i++
 
   # start first round
   startTime = Date.now()
@@ -147,7 +145,7 @@ Timers.finalizeRound = ->
 
   # return if we don't have any more rounds to go
   roundIndex = RoundTimers.findOne(active: true).index
-  numQuestions = Rounds.find(page: "task").count()
+  numQuestions = Rounds.find().count()
   return if roundIndex is numQuestions
 
   startTime = Date.now() + Timers.breakDur
@@ -162,12 +160,11 @@ Timers.fakeAnswers = ->
   roundIndex = RoundTimers.findOne(active: true).index - 1
   users = Meteor.users.find().fetch()
   for user in users
-    ans = Answers.findOne({roundIndex: roundIndex, userId: user._id, page: "task"})
+    ans = Answers.findOne({roundIndex: roundIndex, userId: user._id})
     if ans
       Answers.update
         roundIndex: roundIndex
         userId: user._id
-        page: "task"
       ,
         $set: {status: "finalized"}
     else
@@ -177,14 +174,12 @@ Timers.fakeAnswers = ->
         userId: user._id
         answer: answer
         status: "finalized"
-        page: "task"
 
 Timers.calcAvgAndBestAnswer = ->
 #  console.log "calculate avg and best answer called"
-  page = "task"
   roundIndex = RoundTimers.findOne(active: true).index - 1
   #    console.log "current round " + roundIndex
-  questionId = Rounds.findOne({active: true, page: page}).questionId
+  questionId = Rounds.findOne({active: true}).questionId
   questionObj = Settings.findOne({_id: questionId})
   correct = questionObj.answer
   #    console.log "correct answer " + correct
@@ -211,7 +206,6 @@ Timers.calcAvgAndBestAnswer = ->
 
   Rounds.update
     index: roundIndex
-    page: "task"
   , $set:
     "best": bestAns
     "average": avg

@@ -26,7 +26,6 @@ updateAnswer = (ev) ->
     roundIndex: roundIndex
     userId: currUserId
     status: "submitted"
-    page: Session.get("page")
 
   if not answerValid(ans)
     return bootbox.alert "Please enter a number in the range of 0 to 100 inclusive."
@@ -47,7 +46,6 @@ finalizeAnsOneStage = (ev) ->
     roundIndex: roundIndex
     userId: currUserId
     status: "finalized"
-    page: Session.get("page")
 
   if ans and not answerValid(ans)
     return bootbox.alert "Please enter a number in the range of 0 to 100 inclusive."

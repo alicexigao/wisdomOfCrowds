@@ -14,10 +14,7 @@ Util.tre = ->
 
 # Get current round index
 Util.getRoundIndex = ->
-  if Session.equals("page", "tutorial")
-    return Session.get("tutorialRoundIndex")
-  else
-    TurkServer.currentRound()?.index - 1
+  TurkServer.currentRound()?.index - 1
 
 # Get current round object
 Util.getCurrRoundObj = ->
@@ -25,23 +22,12 @@ Util.getCurrRoundObj = ->
   Rounds.findOne({index: index})
 
 Util.getUserCursor = ->
-  if Session.equals("page", "tutorial")
-    TutorialUsers.find({}, {sort: {_id: 1}})
-  else if Session.equals("page", "task")
-    Meteor.users.find({}, {sort: {_id: 1}})
+  return Meteor.users.find({}, {sort: {_id: 1}})
 
 Handlebars.registerHelper "userCursor", Util.getUserCursor
 
 Util.getCurrUserId = ->
-  if Session.equals("page", "tutorial")
-    currUser = null
-    if Meteor.user().username
-      currUser = TutorialUsers.findOne({username: Meteor.user().username})
-    else
-      currUser = TutorialUsers.findOne({username: Meteor.userId()})
-    currUser._id
-  else if Session.equals("page", "task")
-    Meteor.userId()
+  return Meteor.userId()
 
 Util.ansObjForId = (id) ->
   index = Util.getRoundIndex()
