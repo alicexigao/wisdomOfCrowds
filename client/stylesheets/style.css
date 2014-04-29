@@ -5,15 +5,20 @@ ul#messageArea {
     list-style: none;
 }
 
+/* Answer list */
 li.answer {
     font-size:  120%;
 }
 
 /* Results table formatting */
-/* ANDREW: please put a CSS class on these <td>s.  */
-td {
+td.roundHistory
+{
     text-align: center;
 }
+th.roundHistory {
+    text-align: center;
+}
+
 
 /* Tutorial formatting */
 div#tutorialText {

@@ -1,45 +1,45 @@
 <template name="roundHistory">
 
-    <table class="table table-striped gameHistory">
+    <table class="table table-bordered gameHistory">
         <caption class="lead">Results</caption>
         <tr>
 
-            <th>#</th>
+            <th class="roundHistory">#</th>
 
-            <th>Your Answer</th>
+            <th class="roundHistory">Your Answer</th>
 
-            <th>Correct Answer</th>
+            <th class="roundHistory">Correct Answer</th>
 
             {{#if showBestAns}}
-                <th>Best Answer</th>
+                <th class="roundHistory">Best Answer</th>
             {{/if}}
 
             {{#if showAvg}}
-                <th>Average</th>
+                <th class="roundHistory">Average</th>
             {{/if}}
 
-            <th>Your Points</th>
+            <th class="roundHistory">Your Points</th>
 
         </tr>
 
         {{#each rounds}}
             {{# if isRoundFinished this.index}}
                 <tr>
-                    <td>{{getRoundIndexDisplay}}</td>
+                    <td class="roundHistory">{{getRoundIndexDisplay}}</td>
 
-                    <td>{{getMyAnswerString}}</td>
+                    <td class="roundHistory">{{getMyAnswerString}}</td>
 
-                    <td>{{getCorrectAnswer}}</td>
+                    <td class="roundHistory">{{getCorrectAnswer}}</td>
 
                     {{#if showBestAns}}
-                        <td>{{getBestAnswerString}}</td>
+                        <td class="roundHistory">{{getBestAnswerString}}</td>
                     {{/if}}
 
                     {{#if showAvg}}
-                        <td>{{getAverageString}}</td>
+                        <td class="roundHistory">{{getAverageString}}</td>
                     {{/if}}
 
-                    <td>{{calcPoints}}</td>
+                    <td class="roundHistory">{{calcPoints}}</td>
                 </tr>
             {{/if}}
         {{/each}}
