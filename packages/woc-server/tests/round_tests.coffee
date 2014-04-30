@@ -3,12 +3,13 @@ groupId = "fakeGroup"
 withCleanup = (func) ->
   return ->
     args = arguments
-    Settings.remove({ _direct: true})
-    Rounds.remove({ _direct: true })
+    Partitioner.bindGroup groupId, ->
+      Settings.remove({})
+      Rounds.remove({})
     Meteor.flush()
 
     try
-      res = TurkServer.bindGroup groupId, ->
+      res = Partitioner.bindGroup groupId, ->
         func.apply(this, args);
     catch error
       throw error

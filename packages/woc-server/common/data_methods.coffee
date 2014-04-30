@@ -43,7 +43,7 @@ Meteor.methods
 
     if Meteor.isServer and answersFinalized()
       # all answers are finalized before time limit is reached
-      TurkServer.endCurrentRound()
+      TurkServer.Timers.endCurrentRound()
       Timers.finalizeRound()
       return
 

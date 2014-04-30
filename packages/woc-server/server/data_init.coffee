@@ -133,7 +133,7 @@ TurkServer.initialize ->
   # start first round
   startTime = Date.now()
   endTime = startTime + Timers.roundDur
-  TurkServer.startNewRound(startTime, endTime, Timers.finalizeRound)
+  TurkServer.Timers.startNewRound(startTime, endTime, Timers.finalizeRound)
 
   return
 
@@ -149,7 +149,7 @@ Timers.finalizeRound = ->
 
   startTime = Date.now() + Timers.breakDur
   endTime = startTime + Timers.roundDur
-  TurkServer.startNewRound(startTime, endTime, Timers.finalizeRound)
+  TurkServer.Timers.startNewRound(startTime, endTime, Timers.finalizeRound)
 
 Timers.roundDur = 10000
 Timers.breakDur = 10000
