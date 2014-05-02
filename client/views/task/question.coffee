@@ -1,14 +1,14 @@
-Template.question.getRoundIndexDisplay = ->
+Template.roundQuestion.getRoundIndexDisplay = ->
   Util.getRoundIndex()
 
-Template.question.getQuestion = ->
+Template.roundQuestion.getQuestion = ->
   roundObj = Util.getCurrRoundObj()
   return unless roundObj
   questionId = roundObj.questionId
   Settings.findOne({_id: questionId}).value
 
-Template.question.numRounds = ->
+Template.roundQuestion.numRounds = ->
   Rounds.find().count()
 
-Template.question.hasActiveRound = ->
+Template.roundQuestion.hasActiveRound = ->
   TurkServer.currentRound()?

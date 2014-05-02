@@ -49,7 +49,7 @@ tutorialSteps = [
     spot: ".currPlayerInput, .currPlayerAnswer, .otherPlayerAnswers, .divChatRoom"
   ,
     template: Template.tutorial_step_timelimit
-    spot: ".roundQuestion, .timerDuringGame"
+    spot: ".divQuestion, .timerDuringGame"
     onLoad: ->
       setTutorialAnswer(null, "submitted", false)
       setTutorialAnswer("Bob", "submitted", false)

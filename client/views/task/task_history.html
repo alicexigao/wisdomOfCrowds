@@ -1,0 +1,48 @@
+<template name="taskHistory">
+
+    <table class="table table-bordered gameHistory">
+        <caption class="lead">Results</caption>
+        <tr>
+
+            <th class="taskHistory">#</th>
+
+            <th class="taskHistory">Your Answer</th>
+
+            <th class="taskHistory">Correct Answer</th>
+
+            {{#if showBestAns}}
+                <th class="taskHistory">Best Answer</th>
+            {{/if}}
+
+            {{#if showAvg}}
+                <th class="taskHistory">Average</th>
+            {{/if}}
+
+            <th class="taskHistory">Your Points</th>
+
+        </tr>
+
+        {{#each rounds}}
+            {{# if isRoundFinished this.index}}
+                <tr>
+                    <td class="taskHistory">{{getRoundIndexDisplay}}</td>
+
+                    <td class="taskHistory">{{getMyAnswerString}}</td>
+
+                    <td class="taskHistory">{{getCorrectAnswer}}</td>
+
+                    {{#if showBestAns}}
+                        <td class="taskHistory">{{getBestAnswerString}}</td>
+                    {{/if}}
+
+                    {{#if showAvg}}
+                        <td class="taskHistory">{{getAverageString}}</td>
+                    {{/if}}
+
+                    <td class="taskHistory">{{calcPoints}}</td>
+                </tr>
+            {{/if}}
+        {{/each}}
+    </table>
+
+</template>

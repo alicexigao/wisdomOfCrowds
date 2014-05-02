@@ -1,7 +1,7 @@
-Template.round.treatmentDisplay = (treatment) ->
+Template.roundInput.treatmentDisplay = (treatment) ->
   switch TurkServer.treatment()?.name
     when "bestPrivate", "bestPrivateChat", "bestPublic", "bestPublicChat", "avgPrivate", "avgPrivateChat", "avgPublic", "avgPublicChat"
-      return Template.oneStage
+      return Template.roundInputTreatment
     else return null
 
 answerValid = (ans) ->
@@ -55,7 +55,7 @@ finalizeAnsOneStage = (ev) ->
   Meteor.call 'updateAnswer', ansData, (err, res) ->
     return bootbox.alert err.reason if err
 
-Template.oneStage.events =
+Template.roundInputTreatment.events =
 
   "keydown #inputAns": (ev) ->
     return unless ev.keyCode is 13

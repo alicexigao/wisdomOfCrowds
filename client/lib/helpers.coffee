@@ -4,9 +4,12 @@ Util.showBestAns = ->
   TurkServer.treatment()?.showBestAns
 Util.showAvg = ->
   TurkServer.treatment()?.showAvg
+Util.showChatRoom = ->
+  TurkServer.treatment()?.showChatRoom
 
 Handlebars.registerHelper "showBestAns", Util.showBestAns
 Handlebars.registerHelper "showAvg", Util.showAvg
+Handlebars.registerHelper "showChatRoom", Util.showChatRoom
 
 # Get current round index
 Util.getRoundIndex = ->

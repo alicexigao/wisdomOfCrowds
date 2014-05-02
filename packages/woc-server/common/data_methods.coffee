@@ -1,10 +1,3 @@
-answersFinalized = ->
-  # TODO: how to check only users in the same group as the current user?
-  users = _.pluck Meteor.users.find().fetch(), "_id"
-  round = RoundTimers.findOne(active: true)
-  return _.every Answers.findOne({roundIndex: round.index, userId: $in: users}), (ansObj) ->
-    ansObj?.status is "finalized"
-
 Meteor.methods
 
   updateAnswer: (data) ->
@@ -41,7 +34,7 @@ Meteor.methods
         answer: data.answer
         status: data.status
 
-    if Meteor.isServer and answersFinalized()
+    if Meteor.isServer and Timers.answersFinalized()
       # all answers are finalized before time limit is reached
       TurkServer.endCurrentRound()
       Timers.finalizeRound()

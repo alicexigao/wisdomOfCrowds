@@ -1,14 +1,17 @@
-Template.answers.treatmentDisplay = ->
+Template.roundAnswers.treatmentDisplay = ->
   switch TurkServer.treatment()?.name
     when "bestPrivate", "bestPrivateChat", "bestPublic", "bestPublicChat", "avgPrivate", "avgPrivateChat", "avgPublic", "avgPublicChat"
-      return Template.ansOneStage
+      return Template.roundAnswersTreatment
     else return null
 
-Template.ansOneStage.isCurrentUser = ->
+
+
+
+Template.roundAnswersTreatment.isCurrentUser = ->
   currUserId = Util.getCurrUserId()
   return currUserId is @_id
 
-Template.ansOneStage.showAnswer = ->
+Template.roundAnswersTreatment.showAnswer = ->
   if Util.answersFinalized()
     getAnsDurBreak(@_id)
   else
@@ -37,7 +40,7 @@ getAnsDurRound = (userId) ->
   else
     return ansObj.status
 
-Template.ansOneStage.showBestAnsLabel = ->
+Template.roundAnswersTreatment.showBestAnsLabel = ->
   return false unless Util.showBestAns()
   return false unless Util.answersFinalized()
   round = Util.getCurrRoundObj()
@@ -64,7 +67,7 @@ Template.averageAns.getAverage = ->
   avg = parseInt(avg * 100) / 100
   return avg
 
-Template.ansOneStage.username = ->
+Template.roundAnswersTreatment.username = ->
   if this.username
     this.username
   else

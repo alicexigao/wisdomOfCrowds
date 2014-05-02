@@ -11,11 +11,11 @@ li.answer {
 }
 
 /* Results table formatting */
-td.roundHistory
+td.taskHistory
 {
     text-align: center;
 }
-th.roundHistory {
+th.taskHistory {
     text-align: center;
 }
 

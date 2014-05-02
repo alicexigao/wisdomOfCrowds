@@ -1,0 +1,20 @@
+<template name="round">
+    <div>
+        {{> roundQuestion}}
+    </div>
+
+    <div>
+        {{> roundInput}}
+    </div>
+
+    <div>
+        {{> roundAnswers}}
+    </div>
+
+    {{#if showChatRoom}}
+        <div>
+            {{> chatRoom}}
+        </div>
+    {{/if}}
+
+</template>

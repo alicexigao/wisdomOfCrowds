@@ -151,27 +151,38 @@ Timers.finalizeRound = ->
   endTime = startTime + Timers.roundDur
   TurkServer.startNewRound(startTime, endTime, Timers.finalizeRound)
 
-Timers.roundDur = 10000
+Timers.roundDur = 20000
 Timers.breakDur = 10000
+
+Timers.answersFinalized = ->
+  userIds = _.pluck Meteor.users.find().fetch(), "_id"
+  round = RoundTimers.findOne(active: true)
+  val = _.every Answers.find({roundIndex: round.index, userId: $in: userIds}).fetch(), (ansObj) ->
+    ansObj?.status is "finalized"
+  return val
 
 Timers.fakeAnswers = ->
 #  console.log "fake answers called"
 
   roundIndex = RoundTimers.findOne(active: true).index
-  users = Meteor.users.find().fetch()
-  for user in users
-    ans = Answers.findOne({roundIndex: roundIndex, userId: user._id})
-    if ans
+  userIds = _.pluck Meteor.users.find().fetch(), "_id"
+#  console.log userIds
+
+  for userId in userIds
+    ans = Answers.findOne({roundIndex: roundIndex, userId: userId})
+    if ans and ans.status is "finalized"
+      return
+    else if ans
       Answers.update
         roundIndex: roundIndex
-        userId: user._id
-      ,
-        $set: {status: "finalized"}
+        userId: userId
+      , $set:
+        status: "finalized"
     else
       answer = Math.floor(Math.random() * 100)
       Answers.insert
         roundIndex: roundIndex
-        userId: user._id
+        userId: userId
         answer: answer
         status: "finalized"
 
