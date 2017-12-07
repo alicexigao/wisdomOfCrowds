@@ -43,8 +43,8 @@
       },
       "collection-hooks": {
         "git": "https://github.com/matb33/meteor-collection-hooks.git",
-        "tag": "v0.6.3",
-        "commit": "70f2598bf991cb36effd72aea2555cba96f88355"
+        "tag": "v0.6.7",
+        "commit": "f1d2ac629864edda09df6c955fa5ff3df26f739c"
       },
       "partitioner": {
         "git": "https://github.com/mizzao/meteor-partitioner.git",
@@ -53,8 +53,8 @@
       },
       "user-status": {
         "git": "https://github.com/mizzao/meteor-user-status.git",
-        "tag": "v0.3.5",
-        "commit": "d325a3ab62742659e195085ead76b1ed736aab35"
+        "tag": "v0.4.0",
+        "commit": "e2a1c7a4075f28b87b361387688e083a4b047a08"
       },
       "blaze-layout": {
         "git": "https://github.com/EventedMind/blaze-layout.git",
@@ -63,8 +63,8 @@
       },
       "timesync": {
         "git": "https://github.com/mizzao/meteor-timesync.git",
-        "tag": "v0.1.5",
-        "commit": "3ee7eb21f60650de2ca32661b7c964e464e578e3"
+        "tag": "v0.1.6",
+        "commit": "83067433f511bc13a11ae8c87e9a4d331256915e"
       }
     }
   }

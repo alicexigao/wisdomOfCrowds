@@ -9,60 +9,94 @@ shuffle = (sourceArray) ->
     sourceArray[n] = temp
     n++
 
+class TutorialGroupAssigner extends TurkServer.Assigner
+  constructor: (@groupSize) ->
+
+  @initialize: ->
+    super()
+    @setBatchData("groupSize", @groupSize)
+
+  userJoined: (asst) ->
+    # if user hasn't taken tutorial, create an instance with the tutorial treatment
+    # and add user to the instance
+    unless asst.getData("tutorialCompleted")
+      @assignToNewInstance([asst.userId], [ "bestPrivate", "tutorial" ])
+
+    # otherwise do nothing - users wait for others to join
+
+  userStatusChanged: (asst) ->
+    readyUsers = @lobby.getUsers({status: true})
+    return if readyUsers.length < @groupSize
+
+    userIds = _.pluck(readyUsers, "_id")
+    @assignToNewInstance(userIds, [ "bestPrivate" ])
+
+  userLeft: (asst) ->
+
+# Add assigner to the batch
+Meteor.startup ->
+  batchId = Batches.findOne()._id
+  batch = TurkServer.Batch.getBatch(batchId)
+  batch.setAssigner(new TutorialGroupAssigner(3) )
+
 # Initialize treatments
 Meteor.startup ->
-  return unless Treatments.find().count() is 0
 
-  Treatments.insert
+  # create the treatment if it doesn't exist already
+  TurkServer.ensureTreatmentExists
+    name: "tutorial"
+    tutorial: true
+
+  TurkServer.ensureTreatmentExists
     name: "bestPrivate"
     rewardRule: "best"
     showChatRoom: false
     showOtherAns: false
     showBestAns: true
     showAvg: false
-  Treatments.insert
+  TurkServer.ensureTreatmentExists
     name: "bestPrivateChat"
     rewardRule: "best"
     showChatRoom: true
     showOtherAns: false
     showBestAns: true
     showAvg: false
-  Treatments.insert
+  TurkServer.ensureTreatmentExists
     name: "bestPublic"
     rewardRule: "best"
     showChatRoom: false
     showOtherAns: true
     showBestAns: true
     showAvg: false
-  Treatments.insert
+  TurkServer.ensureTreatmentExists
     name: "bestPublicChat"
     rewardRule: "best"
     showChatRoom: true
     showOtherAns: true
     showBestAns: true
     showAvg: false
-  Treatments.insert
+  TurkServer.ensureTreatmentExists
     name: "avgPrivate"
     rewardRule: "average"
     showBestAns: false
     showAvg: true
     showChatRoom: false
     showOtherAns: false
-  Treatments.insert
+  TurkServer.ensureTreatmentExists
     name: "avgPrivateChat"
     rewardRule: "average"
     showChatRoom: true
     showOtherAns: false
     showBestAns: false
     showAvg: true
-  Treatments.insert
+  TurkServer.ensureTreatmentExists
     name: "avgPublic"
     rewardRule: "average"
     showChatRoom: false
     showOtherAns: true
     showBestAns: false
     showAvg: true
-  Treatments.insert
+  TurkServer.ensureTreatmentExists
     name: "avgPublicChat"
     rewardRule: "average"
     showChatRoom: true
